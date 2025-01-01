@@ -1,8 +1,7 @@
 import Foundation
 
-func timeAgoText(from date: Date) -> String {
+func timeAgoText(from date: Date, relativeTo now: Date = Date()) -> String {
     let calendar = Calendar.current
-    let now = Date()
     let components = calendar.dateComponents([.minute, .hour, .day], from: date, to: now)
     
     if let minutes = components.minute {

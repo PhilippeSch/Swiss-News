@@ -11,6 +11,11 @@ import AuthenticationServices
 
 struct ContentView: View {
     @StateObject private var rssParser = RSSFeedParser()
+    @State private var currentTime = Date()
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var isRefreshing = false
+    
+    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     var body: some View {
         NavigationView {
@@ -24,7 +29,7 @@ struct ContentView: View {
                                 .font(.title3)
                                 .fontWeight(.bold)
                             if let lastUpdate = rssParser.lastUpdate {
-                                Text("Updated: \(timeAgoText(from: lastUpdate))")
+                                Text("Updated: \(timeAgoText(from: lastUpdate, relativeTo: currentTime))")
                                     .font(.caption2)
                                     .foregroundColor(.gray)
                             }
@@ -85,12 +90,28 @@ struct ContentView: View {
             }
             .navigationBarHidden(true)
             .refreshable {
-                try? await Task.sleep(nanoseconds: 500_000_000)
+                isRefreshing = true
                 await rssParser.fetchAllFeeds()
+                isRefreshing = false
+            }
+            .overlay {
+                if isRefreshing {
+                    ProgressView()
+                }
+            }
+            .onReceive(timer) { _ in
+                currentTime = Date()
             }
         }
         .task {
             await rssParser.fetchAllFeeds()
+        }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            if newPhase == .active {
+                Task {
+                    await rssParser.fetchAllFeeds()
+                }
+            }
         }
     }
 }

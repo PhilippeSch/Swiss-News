@@ -42,6 +42,8 @@ class RSSFeedParser: ObservableObject {
     }
     
     func fetchAllFeeds() async {
+        print("Starting fetch...")
+        
         // Try loading from cache first
         if let cached = loadFromCache(for: "generalNews") {
             self.generalNews = cached
@@ -51,6 +53,7 @@ class RSSFeedParser: ObservableObject {
         self.error = nil
         
         do {
+            print("Fetching feeds...")
             async let general = fetchNews(from: generalFeedURL)
             async let international = fetchNews(from: internationalFeedURL)
             async let economy = fetchNews(from: economyFeedURL)
@@ -60,9 +63,11 @@ class RSSFeedParser: ObservableObject {
             
             let (generalItems, internationalItems, economyItems, 
                  scienceItems, sportItems, cultureItems) = await (
-                general, international, economy, 
-                science, sport, culture
+                try general, try international, try economy, 
+                try science, try sport, try culture
             )
+            
+            print("Feeds fetched, updating UI...")
             
             // Sort items by date
             self.generalNews = generalItems.sorted { $0.pubDate > $1.pubDate }
@@ -71,22 +76,23 @@ class RSSFeedParser: ObservableObject {
             self.scienceNews = scienceItems.sorted { $0.pubDate > $1.pubDate }
             self.sportNews = sportItems.sorted { $0.pubDate > $1.pubDate }
             self.cultureNews = cultureItems.sorted { $0.pubDate > $1.pubDate }
-            self.isLoading = false
             
             self.lastUpdate = Date()
             
             // Save to cached
             saveToCache(self.generalNews, for: "generalNews")
+            print("Fetch completed successfully")
         } catch {
+            print("Fetch error: \(error.localizedDescription)")
             self.error = error
-            self.isLoading = false
         }
+        
+        self.isLoading = false
     }
     
-    private func fetchNews(from urlString: String) async -> [NewsItem] {
+    private func fetchNews(from urlString: String) async throws -> [NewsItem] {
         guard let url = URL(string: urlString) else {
-            print("Invalid URL: \(urlString)")
-            return []
+            throw FeedError.fetchError("Invalid URL: \(urlString)")
         }
         
         do {
@@ -98,12 +104,12 @@ class RSSFeedParser: ObservableObject {
             if parser.parse() {
                 return delegate.newsItems
             } else if let error = parser.parserError {
-                print("Parser error: \(error.localizedDescription)")
+                throw FeedError.parseError(error.localizedDescription)
             }
+            throw FeedError.parseError("Unknown parsing error")
         } catch {
-            print("Network error: \(error.localizedDescription)")
+            throw FeedError.fetchError(error.localizedDescription)
         }
-        return []
     }
 }
 
