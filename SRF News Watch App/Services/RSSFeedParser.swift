@@ -22,6 +22,7 @@ class RSSFeedParser: ObservableObject {
     @Published var cultureNews: [NewsItem] = []
     @Published var isLoading = false
     @Published var error: Error?
+    @Published var lastUpdate: Date?
     
     private let generalFeedURL = "https://www.srf.ch/news/bnf/rss/19032223"
     private let internationalFeedURL = "https://www.srf.ch/news/bnf/rss/1922"
@@ -72,7 +73,9 @@ class RSSFeedParser: ObservableObject {
             self.cultureNews = cultureItems.sorted { $0.pubDate > $1.pubDate }
             self.isLoading = false
             
-            // Save to cache
+            self.lastUpdate = Date()
+            
+            // Save to cached
             saveToCache(self.generalNews, for: "generalNews")
         } catch {
             self.error = error
@@ -140,7 +143,9 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "item" {
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+            dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
+            
             let pubDate = dateFormatter.date(from: currentPubDate.trimmingCharacters(in: .whitespacesAndNewlines)) ?? Date()
             
             let newsItem = NewsItem(
