@@ -19,6 +19,20 @@ struct ContentView: View {
                     if rssParser.isLoading && rssParser.generalNews.isEmpty {
                         ProgressView("Laden...")
                     } else {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("SRF News")
+                                .font(.title3)
+                                .fontWeight(.bold)
+                            if let lastUpdate = rssParser.lastUpdate {
+                                Text("Updated: \(timeAgoText(from: lastUpdate))")
+                                    .font(.caption2)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: -25, leading: 15, bottom: -8, trailing: 15))
+                        
                         if !rssParser.generalNews.isEmpty {
                             NavigationLink {
                                 NewsCategoryView(title: "Allgemein", newsItems: rssParser.generalNews)
@@ -69,7 +83,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("SRF News")
+            .navigationBarHidden(true)
             .refreshable {
                 try? await Task.sleep(nanoseconds: 500_000_000)
                 await rssParser.fetchAllFeeds()
