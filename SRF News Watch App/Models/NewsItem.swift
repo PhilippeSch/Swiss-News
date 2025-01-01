@@ -1,0 +1,30 @@
+import Foundation
+
+struct NewsItem: Identifiable, Sendable {
+    let id = UUID()
+    let title: String
+    let description: String
+    let pubDate: Date
+    let link: String
+    
+    // Convert string URL to URL type for better handling
+    var imageUrl: URL? {
+        // Extract image URL from description if it exists
+        if let range = description.range(of: "src=\"(.*?)\"", options: .regularExpression) {
+            let urlString = String(description[range]).replacingOccurrences(of: "src=\"", with: "").dropLast()
+            return URL(string: String(urlString))
+        }
+        return nil
+    }
+    
+    // Clean description by removing HTML tags
+    var cleanDescription: String {
+        description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil)
+    }
+    
+    var dayGroup: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yy"
+        return formatter.string(from: pubDate)
+    }
+} 
