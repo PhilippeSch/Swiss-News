@@ -1,6 +1,5 @@
 import SwiftUI
 import WatchKit
-import AuthenticationServices
 
 struct NewsCategoryView: View {
     let title: String
@@ -47,18 +46,16 @@ struct NewsCategoryView: View {
                         
                         Spacer()
                         
-                        NavigationLink {
-                            ArticleView(title: item.title, url: item.link, guid: item.guid)
-                        } label: {
-                            Text("Lesen")
-                                .font(.system(size: 14))
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 8)
-                                .background(Color.accentColor)
-                                .foregroundColor(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        Button("Lesen") {
+                            // Button is inactive for now
                         }
-                        .buttonStyle(.plain)
+                        .font(.system(size: 14))
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 8)
+                        .background(Color.accentColor)
+                        .foregroundColor(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .disabled(true)  // Disable the button
                     }
                 }
                 .padding(.vertical, 8)

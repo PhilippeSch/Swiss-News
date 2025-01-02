@@ -4,9 +4,7 @@ struct ArticleView: View {
     let title: String
     let url: String
     let guid: String
-    @StateObject private var articleService = ArticleService()
-    @State private var articleContent: String = ""
-    @State private var isLoading = true
+    @State private var isLoading = false
     @State private var error: Error?
     
     var body: some View {
@@ -29,21 +27,12 @@ struct ArticleView: View {
                             .foregroundColor(.red)
                     }
                 } else {
-                    Text(articleContent)
+                    Text("Full article content will be available here.")
                         .font(.body)
                 }
             }
             .padding()
         }
         .navigationTitle("Artikel")
-        .task {
-            do {
-                articleContent = try await articleService.fetchArticleContent(from: url, guid: guid)
-                error = nil
-            } catch {
-                self.error = error
-            }
-            isLoading = false
-        }
     }
 } 
