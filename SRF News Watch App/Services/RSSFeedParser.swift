@@ -23,6 +23,7 @@ class RSSFeedParser: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
     @Published var lastUpdate: Date?
+    @Published var settings: Settings
     
     private let generalFeedURL = "https://www.srf.ch/news/bnf/rss/19032223"
     private let internationalFeedURL = "https://www.srf.ch/news/bnf/rss/1922"
@@ -32,6 +33,10 @@ class RSSFeedParser: ObservableObject {
     private let cultureFeedURL = "https://www.srf.ch/kultur/bnf/rss/454"
     
     private let cache = NSCache<NSString, NSArray>()
+    
+    init(settings: Settings) {
+        self.settings = settings
+    }
     
     private func saveToCache(_ items: [NewsItem], for key: String) {
         cache.setObject(items as NSArray, forKey: key as NSString)
@@ -102,7 +107,12 @@ class RSSFeedParser: ObservableObject {
             parser.delegate = delegate
             
             if parser.parse() {
-                return delegate.newsItems
+                // If cutoffHours is 0, return all articles
+                if settings.cutoffHours == 0 {
+                    return delegate.newsItems
+                }
+                let cutoffDate = Calendar.current.date(byAdding: .hour, value: Int(-settings.cutoffHours), to: Date()) ?? Date()
+                return delegate.newsItems.filter { $0.pubDate > cutoffDate }
             } else if let error = parser.parserError {
                 throw FeedError.parseError(error.localizedDescription)
             }

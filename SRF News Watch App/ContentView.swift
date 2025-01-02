@@ -10,12 +10,19 @@ import WatchKit
 import AuthenticationServices
 
 struct ContentView: View {
-    @StateObject private var rssParser = RSSFeedParser()
+    @StateObject private var settings = Settings()
+    @StateObject private var rssParser: RSSFeedParser
     @State private var currentTime = Date()
     @Environment(\.scenePhase) private var scenePhase
     @State private var isRefreshing = false
     
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    
+    init() {
+        let settings = Settings()
+        _settings = StateObject(wrappedValue: settings)
+        _rssParser = StateObject(wrappedValue: RSSFeedParser(settings: settings))
+    }
     
     var body: some View {
         NavigationView {
@@ -94,6 +101,20 @@ struct ContentView: View {
                         }
                     }
                 }
+                
+                NavigationLink {
+                    SettingsView(settings: settings)
+                } label: {
+                    HStack {
+                        Spacer()
+                        Image(systemName: "gear")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        Spacer()
+                    }
+                }
+                .buttonStyle(.plain)
+                .listRowBackground(Color.clear)
             }
             .navigationBarHidden(true)
             .refreshable {
@@ -112,6 +133,11 @@ struct ContentView: View {
         }
         .task {
             await rssParser.fetchAllFeeds()
+        }
+        .onChange(of: settings.cutoffHours) { _, _ in
+            Task {
+                await rssParser.fetchAllFeeds()
+            }
         }
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if newPhase == .active {
