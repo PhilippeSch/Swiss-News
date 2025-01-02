@@ -25,9 +25,16 @@ struct ContentView: View {
                         ProgressView("Laden...")
                     } else {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("SRF News")
-                                .font(.title3)
-                                .fontWeight(.bold)
+                            HStack(alignment: .center, spacing: 4) {
+                                Image("srf_logo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 16)
+                                    .padding(.top, 2)
+                                Text("News")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                            }
                             if let lastUpdate = rssParser.lastUpdate {
                                 Text("Updated: \(timeAgoText(from: lastUpdate, relativeTo: currentTime))")
                                     .font(.caption2)
