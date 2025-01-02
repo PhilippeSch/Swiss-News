@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3745C8842D24009100194BDA /* SRF News Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3745C8832D24009100194BDA /* SRF News Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		37CBC8902D2694BB0018FE72 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 37CBC88F2D2694BB0018FE72 /* SwiftSoup */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37CBC8902D2694BB0018FE72 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +160,7 @@
 			);
 			name = "SRF News Watch App";
 			packageProductDependencies = (
+				37CBC88F2D2694BB0018FE72 /* SwiftSoup */,
 			);
 			productName = "SRF News Watch App";
 			productReference = 3745C8832D24009100194BDA /* SRF News Watch App.app */;
@@ -244,6 +247,9 @@
 			);
 			mainGroup = 3745C8762D24009100194BDA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				37CBC88E2D2694BB0018FE72 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3745C87E2D24009100194BDA /* Products */;
 			projectDirPath = "";
@@ -673,6 +679,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		37CBC88E2D2694BB0018FE72 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		37CBC88F2D2694BB0018FE72 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 37CBC88E2D2694BB0018FE72 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3745C8772D24009100194BDA /* Project object */;
 }

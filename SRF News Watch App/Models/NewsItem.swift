@@ -1,12 +1,21 @@
 import Foundation
 
 struct NewsItem: Identifiable, Hashable, Codable, Sendable {
-    let id = UUID()
+    let id: UUID
     let title: String
     let description: String
     let pubDate: Date
     let link: String
     let guid: String
+    
+    init(title: String, description: String, pubDate: Date, link: String, guid: String) {
+        self.id = UUID()
+        self.title = title
+        self.description = description
+        self.pubDate = pubDate
+        self.link = link
+        self.guid = guid
+    }
     
     // Convert string URL to URL type for better handling
     var imageUrl: URL? {

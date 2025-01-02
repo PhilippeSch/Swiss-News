@@ -46,16 +46,18 @@ struct NewsCategoryView: View {
                         
                         Spacer()
                         
-                        Button("Lesen") {
-                            // Button is inactive for now
+                        NavigationLink {
+                            ArticleView(title: item.title, url: item.link)
+                        } label: {
+                            Text("Lesen")
+                                .font(.system(size: 14))
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 8)
+                                .background(Color.accentColor)
+                                .foregroundColor(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
-                        .font(.system(size: 14))
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 8)
-                        .background(Color.accentColor)
-                        .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .disabled(true)  // Disable the button
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.vertical, 8)
