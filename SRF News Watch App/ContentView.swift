@@ -43,7 +43,7 @@ struct ContentView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: -25, leading: 15, bottom: -8, trailing: 15))
+                        .listRowInsets(EdgeInsets(top: -20, leading: 15, bottom: -8, trailing: 15))
                         
                         if !rssParser.generalNews.isEmpty {
                             NavigationLink {
