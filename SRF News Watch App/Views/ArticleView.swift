@@ -28,8 +28,8 @@ struct ArticleView: View {
                             .foregroundColor(.red)
                     }
                 } else {
-                    Text(articleContent)
-                        .font(.footnote)
+                    HyphenatedTextView(text: articleContent)
+                        .padding(.horizontal, 4)
                 }
             }
             .padding()
