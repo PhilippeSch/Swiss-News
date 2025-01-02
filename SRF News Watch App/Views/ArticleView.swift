@@ -81,7 +81,7 @@ struct ArticleView: View {
                 let cleanedContent = content.replacingOccurrences(of: "\n{3,}", with: "\n\n", options: .regularExpression)
                 articleContent = cleanedContent.trimmingCharacters(in: .whitespacesAndNewlines)
             } else {
-                articleContent = "No content found."
+                articleContent = "No content was found."
             }
             
             isLoading = false
