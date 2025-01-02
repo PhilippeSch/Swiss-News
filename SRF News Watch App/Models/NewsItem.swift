@@ -1,11 +1,12 @@
 import Foundation
 
-struct NewsItem: Identifiable, Sendable {
+struct NewsItem: Identifiable, Hashable, Codable, Sendable {
     let id = UUID()
     let title: String
     let description: String
     let pubDate: Date
     let link: String
+    let guid: String
     
     // Convert string URL to URL type for better handling
     var imageUrl: URL? {
@@ -26,5 +27,14 @@ struct NewsItem: Identifiable, Sendable {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yy"
         return formatter.string(from: pubDate)
+    }
+    
+    // Implement Hashable
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: NewsItem, rhs: NewsItem) -> Bool {
+        lhs.id == rhs.id
     }
 } 

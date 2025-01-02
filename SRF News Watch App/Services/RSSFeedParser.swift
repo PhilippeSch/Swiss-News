@@ -119,6 +119,7 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
     private var currentDescription = ""
     private var currentPubDate = ""
     private var currentLink = ""
+    private var currentGuid = ""
     private var parsingItem = false
     
     var newsItems: [NewsItem] = []
@@ -131,6 +132,7 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
             currentDescription = ""
             currentPubDate = ""
             currentLink = ""
+            currentGuid = ""
         }
     }
     
@@ -141,6 +143,7 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
             case "description": currentDescription += string
             case "pubDate": currentPubDate += string
             case "link": currentLink += string
+            case "guid": currentGuid += string
             default: break
             }
         }
@@ -158,7 +161,8 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
                 title: currentTitle.trimmingCharacters(in: .whitespacesAndNewlines),
                 description: currentDescription.trimmingCharacters(in: .whitespacesAndNewlines),
                 pubDate: pubDate,
-                link: currentLink.trimmingCharacters(in: .whitespacesAndNewlines)
+                link: currentLink.trimmingCharacters(in: .whitespacesAndNewlines),
+                guid: currentGuid.trimmingCharacters(in: .whitespacesAndNewlines)
             )
             newsItems.append(newsItem)
             parsingItem = false

@@ -47,12 +47,18 @@ struct NewsCategoryView: View {
                         
                         Spacer()
                         
-                        Button("Lesen") {
-                            // To be implemented later
+                        NavigationLink {
+                            ArticleView(title: item.title, url: item.link, guid: item.guid)
+                        } label: {
+                            Text("Lesen")
+                                .font(.system(size: 14))
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 8)
+                                .background(Color.accentColor)
+                                .foregroundColor(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
-                        .buttonStyle(.bordered)
-                        .disabled(true)
-                        .frame(width: 90)
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.vertical, 8)
