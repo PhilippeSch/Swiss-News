@@ -3,21 +3,9 @@ import Combine
 
 @MainActor
 class RSSFeedParser: ObservableObject {
-    enum FeedError: LocalizedError, Sendable {
-        case fetchError(String)
-        case parseError(String)
-        
-        var errorDescription: String? {
-            switch self {
-            case .fetchError(let message): return "Fehler beim Laden: \(message)"
-            case .parseError(let message): return "Fehler beim Verarbeiten: \(message)"
-            }
-        }
-    }
-    
     @Published var newsItems: [String: [NewsItem]] = [:]
     @Published var isLoading = false
-    @Published var error: Error?
+    @Published var error: AppError?
     @Published var lastUpdate: Date?
     @Published var settings: Settings
     
@@ -40,17 +28,26 @@ class RSSFeedParser: ObservableObject {
         do {
             var feeds: [String: [NewsItem]] = [:]
             
-            // Only fetch selected categories
             for category in NewsCategory.available where settings.selectedCategories.contains(category.id) {
-                feeds[category.id] = try await fetchNews(from: category.feedURL)
+                do {
+                    feeds[category.id] = try await fetchNews(from: category.feedURL)
+                } catch {
+                    print("Error fetching \(category.title): \(error.localizedDescription)")
+                    // Continue with other feeds even if one fails
+                }
+            }
+            
+            if feeds.isEmpty {
+                throw AppError.noData
             }
             
             self.newsItems = feeds
             self.lastUpdate = Date()
             
-        } catch {
-            print("Fetch error: \(error.localizedDescription)")
+        } catch let error as AppError {
             self.error = error
+        } catch {
+            self.error = AppError.networkError(error.localizedDescription)
         }
         
         self.isLoading = false
@@ -58,28 +55,55 @@ class RSSFeedParser: ObservableObject {
     
     private func fetchNews(from urlString: String) async throws -> [NewsItem] {
         guard let url = URL(string: urlString) else {
-            throw FeedError.fetchError("Invalid URL: \(urlString)")
+            throw AppError.invalidURL(urlString)
         }
         
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await URLSession.shared.data(from: url)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AppError.networkError("Invalid response")
+            }
+            
+            guard httpResponse.statusCode == 200 else {
+                throw AppError.networkError("Server returned \(httpResponse.statusCode)")
+            }
+            
             let parser = XMLParser(data: data)
             let delegate = RSSParserDelegate()
             parser.delegate = delegate
             
-            if parser.parse() {
-                // If cutoffHours is 0, return all articles
-                if settings.cutoffHours == 0 {
-                    return delegate.newsItems
+            guard parser.parse() else {
+                if let error = parser.parserError {
+                    throw AppError.parsingError(error.localizedDescription)
                 }
-                let cutoffDate = Calendar.current.date(byAdding: .hour, value: Int(-settings.cutoffHours), to: Date()) ?? Date()
-                return delegate.newsItems.filter { $0.pubDate > cutoffDate }
-            } else if let error = parser.parserError {
-                throw FeedError.parseError(error.localizedDescription)
+                throw AppError.parsingError("Unknown parsing error")
             }
-            throw FeedError.parseError("Unknown parsing error")
+            
+            let items = delegate.newsItems
+            
+            if items.isEmpty {
+                throw AppError.noData
+            }
+            
+            // If cutoffHours is 0, return all articles
+            if settings.cutoffHours == 0 {
+                return items
+            }
+            
+            let cutoffDate = Calendar.current.date(byAdding: .hour, value: Int(-settings.cutoffHours), to: Date()) ?? Date()
+            let filteredItems = items.filter { $0.pubDate > cutoffDate }
+            
+            if filteredItems.isEmpty {
+                throw AppError.noData
+            }
+            
+            return filteredItems
+            
+        } catch let error as AppError {
+            throw error
         } catch {
-            throw FeedError.fetchError(error.localizedDescription)
+            throw AppError.networkError(error.localizedDescription)
         }
     }
 }

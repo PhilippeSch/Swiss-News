@@ -16,6 +16,7 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isRefreshing = false
     @State private var showWelcome = false
+    @State private var showError = false
     private let groupedCategories = NewsCategory.categoriesByGroup()
     
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
@@ -143,6 +144,26 @@ struct ContentView: View {
             if newPhase == .active {
                 Task {
                     await rssParser.fetchAllFeeds()
+                }
+            }
+        }
+        .alert("Fehler", isPresented: Binding(
+            get: { rssParser.error != nil },
+            set: { if !$0 { rssParser.error = nil } }
+        )) {
+            Button("OK", role: .cancel) {
+                rssParser.error = nil
+            }
+            Button("Erneut versuchen") {
+                Task {
+                    await rssParser.fetchAllFeeds()
+                }
+            }
+        } message: {
+            if let error = rssParser.error {
+                Text(error.localizedDescription)
+                if let recovery = error.recoverySuggestion {
+                    Text(recovery)
                 }
             }
         }
