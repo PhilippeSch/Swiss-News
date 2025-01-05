@@ -21,6 +21,8 @@ struct ContentView: View {
     
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
+    @StateObject private var readArticlesManager = ReadArticlesManager()
+    
     init() {
         print("ContentView init")
         let settings = Settings()
@@ -62,10 +64,18 @@ struct ContentView: View {
                             if let categories = groupedCategories[group] {
                                 ForEach(categories.filter { settings.selectedCategories.contains($0.id) }) { category in
                                     if let items = rssParser.newsItems[category.id], !items.isEmpty {
+                                        let unreadCount = items.filter { !readArticlesManager.isRead($0.link) }.count
                                         NavigationLink {
-                                            NewsCategoryView(title: category.title, newsItems: items)
+                                            NewsCategoryView(
+                                                title: category.title,
+                                                newsItems: items,
+                                                readArticlesManager: readArticlesManager
+                                            )
                                         } label: {
-                                            SectionHeaderView(title: category.title, count: items.count)
+                                            SectionHeaderView(
+                                                title: category.title,
+                                                count: unreadCount
+                                            )
                                         }
                                     }
                                 }

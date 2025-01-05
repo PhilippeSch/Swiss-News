@@ -5,6 +5,7 @@ enum Constants {
         static let cornerRadius: CGFloat = 8
         static let defaultPadding: CGFloat = 16
         static let minimumScale: CGFloat = 0.8
+        static let readArticleOpacity: CGFloat = 0.6
     }
     
     enum Network {
@@ -17,5 +18,6 @@ enum Constants {
         static let selectedCategoriesKey = "selectedCategories"
         static let categoryOrderKey = "categoryOrder"
         static let cutoffHoursKey = "cutoffHours"
+        static let readArticlesKey = "com.scheuber.srfnews.readArticles"
     }
 } 

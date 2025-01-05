@@ -8,6 +8,8 @@ struct NewsItem: Identifiable, Hashable, Codable, Sendable {
     let link: String
     let guid: String
     
+    var isRead: Bool = false
+    
     init(title: String, description: String, pubDate: Date, link: String, guid: String) {
         self.id = UUID()
         self.title = title

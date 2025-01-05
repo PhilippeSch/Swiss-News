@@ -4,6 +4,8 @@ import WatchKit
 struct NewsCategoryView: View {
     let title: String
     let newsItems: [NewsItem]
+    @ObservedObject var readArticlesManager: ReadArticlesManager
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         List {
@@ -12,6 +14,7 @@ struct NewsCategoryView: View {
                     Text(item.title)
                         .font(.headline)
                         .fixedSize(horizontal: false, vertical: true)
+                        .opacity(readArticlesManager.isRead(item.link) ? Constants.UI.readArticleOpacity : 1)
                     
                     if let imageUrl = item.imageUrl {
                         AsyncImage(url: imageUrl) { phase in
@@ -38,6 +41,7 @@ struct NewsCategoryView: View {
                         .font(.body)
                         .fixedSize(horizontal: false, vertical: true)
                         .lineLimit(nil)
+                        .opacity(readArticlesManager.isRead(item.link) ? Constants.UI.readArticleOpacity : 1)
                     
                     HStack {
                         Text(dateFormatter.string(from: item.pubDate))
@@ -48,6 +52,9 @@ struct NewsCategoryView: View {
                         
                         NavigationLink {
                             ArticleView(title: item.title, url: item.link)
+                                .onAppear {
+                                    readArticlesManager.markAsViewed(item.link)
+                                }
                         } label: {
                             Text("Lesen")
                                 .font(.system(size: 14))
@@ -63,9 +70,15 @@ struct NewsCategoryView: View {
                 .padding(.vertical, 8)
                 .background(Color(.clear))
                 .cornerRadius(12)
+                .onAppear {
+                    readArticlesManager.markAsViewed(item.link)
+                }
             }
         }
         .navigationTitle(title)
+        .onDisappear {
+            readArticlesManager.markAllViewedAsRead()
+        }
     }
     
     private let dateFormatter: DateFormatter = {
