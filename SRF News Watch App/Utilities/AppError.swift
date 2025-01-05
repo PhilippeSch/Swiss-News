@@ -1,6 +1,6 @@
 import Foundation
 
-enum AppError: LocalizedError {
+enum AppError: LocalizedError, Equatable {
     case networkError(String)
     case parsingError(String)
     case noData
@@ -27,6 +27,16 @@ enum AppError: LocalizedError {
             return "Bitte versuche es später erneut."
         case .noData:
             return "Versuche die Filtereinstellungen anzupassen."
+        }
+    }
+    
+    static func == (lhs: AppError, rhs: AppError) -> Bool {
+        switch (lhs, rhs) {
+        case (.networkError(let l), .networkError(let r)): return l == r
+        case (.parsingError(let l), .parsingError(let r)): return l == r
+        case (.noData, .noData): return true
+        case (.invalidURL(let l), .invalidURL(let r)): return l == r
+        default: return false
         }
     }
 } 

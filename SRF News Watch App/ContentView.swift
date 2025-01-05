@@ -34,7 +34,7 @@ struct ContentView: View {
         NavigationView {
             List {
                 Group {
-                    if rssParser.isLoading && rssParser.newsItems.isEmpty {
+                    if rssParser.state.isLoading && rssParser.newsItems.isEmpty {
                         ProgressView("Laden...")
                     } else {
                         VStack(alignment: .leading, spacing: 2) {
@@ -48,7 +48,7 @@ struct ContentView: View {
                                     .font(.title3)
                                     .fontWeight(.bold)
                             }
-                            if let lastUpdate = rssParser.lastUpdate {
+                            if let lastUpdate = rssParser.state.lastUpdate {
                                 Text("Updated: \(timeAgoText(from: lastUpdate, relativeTo: currentTime))")
                                     .font(.caption2)
                                     .foregroundColor(.gray)
@@ -148,11 +148,11 @@ struct ContentView: View {
             }
         }
         .alert("Fehler", isPresented: Binding(
-            get: { rssParser.error != nil },
-            set: { if !$0 { rssParser.error = nil } }
+            get: { rssParser.state.error != nil },
+            set: { if !$0 { rssParser.resetState() } }
         )) {
             Button("OK", role: .cancel) {
-                rssParser.error = nil
+                rssParser.resetState()
             }
             Button("Erneut versuchen") {
                 Task {
@@ -160,7 +160,7 @@ struct ContentView: View {
                 }
             }
         } message: {
-            if let error = rssParser.error {
+            if let error = rssParser.state.error {
                 Text(error.localizedDescription)
                 if let recovery = error.recoverySuggestion {
                     Text(recovery)

@@ -4,9 +4,7 @@ import Combine
 @MainActor
 class RSSFeedParser: ObservableObject {
     @Published var newsItems: [String: [NewsItem]] = [:]
-    @Published var isLoading = false
-    @Published var error: AppError?
-    @Published var lastUpdate: Date?
+    @Published private(set) var state: LoadingState = .idle
     @Published var settings: Settings
     
     private var settingsObserver: AnyCancellable?
@@ -22,8 +20,7 @@ class RSSFeedParser: ObservableObject {
     
     func fetchAllFeeds() async {
         print("Starting fetch...")
-        self.isLoading = true
-        self.error = nil
+        state = .loading
         
         do {
             var feeds: [String: [NewsItem]] = [:]
@@ -33,7 +30,6 @@ class RSSFeedParser: ObservableObject {
                     feeds[category.id] = try await fetchNews(from: category.feedURL)
                 } catch {
                     print("Error fetching \(category.title): \(error.localizedDescription)")
-                    // Continue with other feeds even if one fails
                 }
             }
             
@@ -42,15 +38,13 @@ class RSSFeedParser: ObservableObject {
             }
             
             self.newsItems = feeds
-            self.lastUpdate = Date()
+            state = .loaded(Date())
             
         } catch let error as AppError {
-            self.error = error
+            state = .error(error)
         } catch {
-            self.error = AppError.networkError(error.localizedDescription)
+            state = .error(AppError.networkError(error.localizedDescription))
         }
-        
-        self.isLoading = false
     }
     
     private func fetchNews(from urlString: String) async throws -> [NewsItem] {
@@ -105,6 +99,10 @@ class RSSFeedParser: ObservableObject {
         } catch {
             throw AppError.networkError(error.localizedDescription)
         }
+    }
+    
+    func resetState() {
+        state = .idle
     }
 }
 
