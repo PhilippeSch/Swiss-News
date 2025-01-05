@@ -21,11 +21,21 @@ struct NewsItem: Identifiable, Hashable, Codable, Sendable {
     
     // Convert string URL to URL type for better handling
     var imageUrl: URL? {
-        // Extract image URL from description if it exists
-        if let range = description.range(of: "src=\"(.*?)\"", options: .regularExpression) {
-            let urlString = String(description[range]).replacingOccurrences(of: "src=\"", with: "").dropLast()
-            return URL(string: String(urlString))
+        // First try to extract image URL from enclosure tag
+        if let enclosureStart = description.range(of: "<enclosure"),
+           let urlStart = description[enclosureStart.upperBound...].range(of: "url=\""),
+           let urlEnd = description[urlStart.upperBound...].range(of: "\"") {
+            let urlString = String(description[urlStart.upperBound..<urlEnd.lowerBound])
+            return URL(string: urlString)
         }
+        
+        // If no enclosure, try the SRF style with src attribute
+        if let srcStart = description.range(of: "src=\""),
+           let srcEnd = description[srcStart.upperBound...].range(of: "\"") {
+            let urlString = String(description[srcStart.upperBound..<srcEnd.lowerBound])
+            return URL(string: urlString)
+        }
+        
         return nil
     }
     

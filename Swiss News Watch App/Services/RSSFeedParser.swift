@@ -20,23 +20,34 @@ class RSSFeedParser: ObservableObject {
     
     func fetchAllFeeds() async {
         print("Starting fetch...")
+        print("Selected sources: \(settings.selectedSources)")
+        print("Selected categories: \(settings.selectedCategories)")
         state = .loading
         
         do {
             var feeds: [String: [NewsItem]] = [:]
             
-            for category in NewsCategory.available where settings.selectedCategories.contains(category.id) {
-                do {
-                    feeds[category.id] = try await fetchNews(from: category.feedURL)
-                } catch {
-                    print("Error fetching \(category.title): \(error.localizedDescription)")
+            for category in NewsCategory.available {
+                let shouldFetch = settings.selectedSources.contains(category.sourceId) && 
+                                settings.selectedCategories.contains(category.id)
+                print("Category \(category.id): shouldFetch=\(shouldFetch), source=\(category.sourceId), selected=\(category.id)")
+                
+                if shouldFetch {
+                    print("Fetching category: \(category.id)")
+                    do {
+                        let items = try await fetchNews(from: category.feedURL)
+                        print("Fetched \(items.count) items for \(category.id)")
+                        if items.isEmpty {
+                            print("No items found for \(category.id)")
+                        }
+                        feeds[category.id] = items
+                    } catch {
+                        print("Error fetching \(category.title): \(error.localizedDescription)")
+                    }
                 }
             }
             
-            if feeds.isEmpty {
-                throw AppError.noData
-            }
-            
+            print("Final feeds: \(feeds.keys.sorted())")
             self.newsItems = feeds
             state = .loaded(Date())
             
@@ -80,17 +91,12 @@ class RSSFeedParser: ObservableObject {
                 throw AppError.noData
             }
             
-            // If cutoffHours is 0, return all articles
             if settings.cutoffHours == 0 {
                 return items
             }
             
             let cutoffDate = Calendar.current.date(byAdding: .hour, value: Int(-settings.cutoffHours), to: Date()) ?? Date()
             let filteredItems = items.filter { $0.pubDate > cutoffDate }
-            
-            if filteredItems.isEmpty {
-                throw AppError.noData
-            }
             
             return filteredItems
             
@@ -113,6 +119,7 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
     private var currentPubDate = ""
     private var currentLink = ""
     private var currentGuid = ""
+    private var currentEnclosureUrl = ""
     private var parsingItem = false
     
     var newsItems: [NewsItem] = []
@@ -126,6 +133,11 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
             currentPubDate = ""
             currentLink = ""
             currentGuid = ""
+            currentEnclosureUrl = ""
+        } else if elementName == "enclosure" {
+            if let url = attributeDict["url"] {
+                currentEnclosureUrl = url
+            }
         }
     }
     
@@ -150,9 +162,14 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
             
             let pubDate = dateFormatter.date(from: currentPubDate.trimmingCharacters(in: .whitespacesAndNewlines)) ?? Date()
             
+            var finalDescription = currentDescription
+            if !currentEnclosureUrl.isEmpty {
+                finalDescription += "<enclosure url=\"\(currentEnclosureUrl)\" type=\"image/jpeg\"/>"
+            }
+            
             let newsItem = NewsItem(
                 title: currentTitle.trimmingCharacters(in: .whitespacesAndNewlines),
-                description: currentDescription.trimmingCharacters(in: .whitespacesAndNewlines),
+                description: finalDescription.trimmingCharacters(in: .whitespacesAndNewlines),
                 pubDate: pubDate,
                 link: currentLink.trimmingCharacters(in: .whitespacesAndNewlines),
                 guid: currentGuid.trimmingCharacters(in: .whitespacesAndNewlines)

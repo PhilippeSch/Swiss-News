@@ -5,6 +5,7 @@ struct NewsCategory: Identifiable, Codable, Hashable {
     let title: String
     let feedURL: String
     let group: CategoryGroup
+    let sourceId: String
     
     enum CategoryGroup: String, Codable, Identifiable, CaseIterable {
         case news
@@ -22,54 +23,85 @@ struct NewsCategory: Identifiable, Codable, Hashable {
             case .culture: return 3
             }
         }
+        
+        var title: String {
+            switch self {
+            case .news: return "News"
+            case .sport: return "Sport"
+            case .culture: return "Kultur"
+            case .knowledge: return "Wissen"
+            }
+        }
     }
-    
-    //20min
-    //https://partner-feeds.beta.20min.ch/rss/20minuten/front
-    //https://partner-feeds.beta.20min.ch/rss/20minuten/schweiz
-    //https://partner-feeds.beta.20min.ch/rss/20minuten/digital
+
     
     static let available: [NewsCategory] = [
-        // News Group
-        NewsCategory(id: "news_all", title: "News", feedURL: "https://www.srf.ch/news/bnf/rss/1646", group: .news),
-        NewsCategory(id: "news_latest", title: "Das Neueste", feedURL: "https://www.srf.ch/news/bnf/rss/19032223", group: .news),
-        NewsCategory(id: "news_swiss", title: "Schweiz", feedURL: "https://www.srf.ch/news/bnf/rss/1890", group: .news),
-        NewsCategory(id: "news_international", title: "International", feedURL: "https://www.srf.ch/news/bnf/rss/1922", group: .news),
-        NewsCategory(id: "news_economy", title: "Wirtschaft", feedURL: "https://www.srf.ch/news/bnf/rss/1926", group: .news),
+        // SRF News Group
+        NewsCategory(id: "srf_news_all", title: "News", feedURL: "https://www.srf.ch/news/bnf/rss/1646", group: .news, sourceId: "srf"),
+        NewsCategory(id: "srf_news_latest", title: "Das Neueste", feedURL: "https://www.srf.ch/news/bnf/rss/19032223", group: .news, sourceId: "srf"),
+        NewsCategory(id: "srf_news_swiss", title: "Schweiz", feedURL: "https://www.srf.ch/news/bnf/rss/1890", group: .news, sourceId: "srf"),
+        NewsCategory(id: "srf_news_international", title: "International", feedURL: "https://www.srf.ch/news/bnf/rss/1922", group: .news, sourceId: "srf"),
+        NewsCategory(id: "srf_news_economy", title: "Wirtschaft", feedURL: "https://www.srf.ch/news/bnf/rss/1926", group: .news, sourceId: "srf"),
         
-        // Sport Group
-        NewsCategory(id: "sport_all", title: "Sport", feedURL: "https://www.srf.ch/sport/bnf/rss/718", group: .sport),
-        NewsCategory(id: "sport_football", title: "Fussball", feedURL: "https://www.srf.ch//sport/bnf/rss/2562", group: .sport),
-        NewsCategory(id: "sport_hockey", title: "Eishockey", feedURL: "https://www.srf.ch/sport/bnf/rss/3418", group: .sport),
-        NewsCategory(id: "sport_tennis", title: "Tennis", feedURL: "https://www.srf.ch/sport/bnf/rss/2814", group: .sport),
-        NewsCategory(id: "sport_ski", title: "Ski Alpin", feedURL: "https://www.srf.ch/sport/bnf/rss/787950", group: .sport),
-        NewsCategory(id: "sport_athletics", title: "Leichtathletik", feedURL: "https://www.srf.ch/sport/bnf/rss/3042", group: .sport),
-        NewsCategory(id: "sport_motorsport", title: "Motorsport", feedURL: "https://www.srf.ch/sport/bnf/rss/2958", group: .sport),
-        NewsCategory(id: "sport_more", title: "Mehr Sport", feedURL: "https://www.srf.ch/sport/bnf/rss/3010", group: .sport),
+        // SRF Sport Group
+        NewsCategory(id: "srf_sport_all", title: "Sport", feedURL: "https://www.srf.ch/sport/bnf/rss/718", group: .sport, sourceId: "srf"),
+        NewsCategory(id: "srf_sport_football", title: "Fussball", feedURL: "https://www.srf.ch//sport/bnf/rss/2562", group: .sport, sourceId: "srf"),
+        NewsCategory(id: "srf_sport_hockey", title: "Eishockey", feedURL: "https://www.srf.ch/sport/bnf/rss/3418", group: .sport, sourceId: "srf"),
+        NewsCategory(id: "srf_sport_tennis", title: "Tennis", feedURL: "https://www.srf.ch/sport/bnf/rss/2814", group: .sport, sourceId: "srf"),
+        NewsCategory(id: "srf_sport_ski", title: "Ski Alpin", feedURL: "https://www.srf.ch/sport/bnf/rss/787950", group: .sport, sourceId: "srf"),
+        NewsCategory(id: "srf_sport_athletics", title: "Leichtathletik", feedURL: "https://www.srf.ch/sport/bnf/rss/3042", group: .sport, sourceId: "srf"),
+        NewsCategory(id: "srf_sport_motorsport", title: "Motorsport", feedURL: "https://www.srf.ch/sport/bnf/rss/2958", group: .sport, sourceId: "srf"),
+        NewsCategory(id: "srf_sport_more", title: "Mehr Sport", feedURL: "https://www.srf.ch/sport/bnf/rss/3010", group: .sport, sourceId: "srf"),
         
-        // Culture Group
-        NewsCategory(id: "culture_all", title: "Kultur", feedURL: "https://www.srf.ch/kultur/bnf/rss/454", group: .culture),
-        NewsCategory(id: "culture_film", title: "Film & Serien", feedURL: "https://www.srf.ch/kultur/bnf/rss/8726", group: .culture),
-        NewsCategory(id: "culture_society", title: "Gesellschaft & Religion", feedURL: "https://www.srf.ch/kultur/bnf/rss/8798", group: .culture),
-        NewsCategory(id: "culture_literature", title: "Literatur", feedURL: "https://www.srf.ch/kultur/bnf/rss/8762", group: .culture),
-        NewsCategory(id: "culture_music", title: "Musik", feedURL: "https://www.srf.ch/kultur/bnf/rss/8738", group: .culture),
-        NewsCategory(id: "culture_art", title: "Kunst", feedURL: "https://www.srf.ch/kultur/bnf/rss/8774", group: .culture),
-        NewsCategory(id: "culture_stage", title: "Bühne", feedURL: "https://www.srf.ch/kultur/bnf/rss/8786", group: .culture),
+        // SRF Culture Group
+        NewsCategory(id: "srf_culture_all", title: "Kultur", feedURL: "https://www.srf.ch/kultur/bnf/rss/454", group: .culture, sourceId: "srf"),
+        NewsCategory(id: "srf_culture_film", title: "Film & Serien", feedURL: "https://www.srf.ch/kultur/bnf/rss/8726", group: .culture, sourceId: "srf"),
+        NewsCategory(id: "srf_culture_society", title: "Gesellschaft & Religion", feedURL: "https://www.srf.ch/kultur/bnf/rss/8798", group: .culture, sourceId: "srf"),
+        NewsCategory(id: "srf_culture_literature", title: "Literatur", feedURL: "https://www.srf.ch/kultur/bnf/rss/8762", group: .culture, sourceId: "srf"),
+        NewsCategory(id: "srf_culture_music", title: "Musik", feedURL: "https://www.srf.ch/kultur/bnf/rss/8738", group: .culture, sourceId: "srf"),
+        NewsCategory(id: "srf_culture_art", title: "Kunst", feedURL: "https://www.srf.ch/kultur/bnf/rss/8774", group: .culture, sourceId: "srf"),
+        NewsCategory(id: "srf_culture_stage", title: "Bühne", feedURL: "https://www.srf.ch/kultur/bnf/rss/8786", group: .culture, sourceId: "srf"),
         
-        // Knowledge Group
-        NewsCategory(id: "knowledge_all", title: "Wissen", feedURL: "https://www.srf.ch/bnf/rss/630", group: .knowledge),
-        NewsCategory(id: "knowledge_health", title: "Gesundheit", feedURL: "https://www.srf.ch/bnf/rss/19919909", group: .knowledge),
-        NewsCategory(id: "knowledge_sustainability", title: "Nachhaltigkeit", feedURL: "https://www.srf.ch/bnf/rss/19920002", group: .knowledge),
-        NewsCategory(id: "knowledge_human", title: "Mensch", feedURL: "https://www.srf.ch/bnf/rss/19920107", group: .knowledge),
-        NewsCategory(id: "knowledge_nature", title: "Natur & Tiere", feedURL: "https://www.srf.ch/bnf/rss/19920818", group: .knowledge),
-        NewsCategory(id: "knowledge_tech", title: "Technik", feedURL: "https://www.srf.ch/bnf/rss/19920122", group: .knowledge)
+        // SRF Knowledge Group
+        NewsCategory(id: "srf_knowledge_all", title: "Wissen", feedURL: "https://www.srf.ch/bnf/rss/630", group: .knowledge, sourceId: "srf"),
+        NewsCategory(id: "srf_knowledge_health", title: "Gesundheit", feedURL: "https://www.srf.ch/bnf/rss/19919909", group: .knowledge, sourceId: "srf"),
+        NewsCategory(id: "srf_knowledge_sustainability", title: "Nachhaltigkeit", feedURL: "https://www.srf.ch/bnf/rss/19920002", group: .knowledge, sourceId: "srf"),
+        NewsCategory(id: "srf_knowledge_human", title: "Mensch", feedURL: "https://www.srf.ch/bnf/rss/19920107", group: .knowledge, sourceId: "srf"),
+        NewsCategory(id: "srf_knowledge_nature", title: "Natur & Tiere", feedURL: "https://www.srf.ch/bnf/rss/19920818", group: .knowledge, sourceId: "srf"),
+        NewsCategory(id: "srf_knowledge_tech", title: "Technik", feedURL: "https://www.srf.ch/bnf/rss/19920122", group: .knowledge, sourceId: "srf"),
+        
+        // 20 Minuten News Group
+        NewsCategory(id: "20min_news_all", title: "News", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/front", group: .news, sourceId: "20min"),
+        NewsCategory(id: "20min_news_swiss", title: "Schweiz", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/schweiz", group: .news, sourceId: "20min"),
+        NewsCategory(id: "20min_news_international", title: "International", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/ausland", group: .news, sourceId: "20min"),
+        NewsCategory(id: "20min_news_economy", title: "Wirtschaft", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/wirtschaft", group: .news, sourceId: "20min"),
+        NewsCategory(id: "20min_news_digital", title: "Digital", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/digital", group: .news, sourceId: "20min"),
+        
+        // 20 Minuten Sport Group
+        NewsCategory(id: "20min_sport_all", title: "Sport", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/sport", group: .sport, sourceId: "20min"),
+        NewsCategory(id: "20min_sport_football", title: "Fussball", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/sport/fussball", group: .sport, sourceId: "20min"),
+        NewsCategory(id: "20min_sport_hockey", title: "Eishockey", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/sport/eishockey", group: .sport, sourceId: "20min"),
+        NewsCategory(id: "20min_sport_winter", title: "Wintersport", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/sport/wintersport", group: .sport, sourceId: "20min"),
+        NewsCategory(id: "20min_sport_tennis", title: "Tennis", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/sport/tennis", group: .sport, sourceId: "20min"),
+        NewsCategory(id: "20min_sport_motorsport", title: "Motorsport", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/sport/motorsport", group: .sport, sourceId: "20min"),
+        NewsCategory(id: "20min_sport_more", title: "Weitere Sportarten", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/sport/weitere-sportarten", group: .sport, sourceId: "20min"),
+        
+        // 20 Minuten Knowledge Group
+        NewsCategory(id: "20min_knowledge_all", title: "Wissen", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/wissen", group: .knowledge, sourceId: "20min"),
+        NewsCategory(id: "20min_knowledge_health", title: "Gesundheit", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/gesundheit", group: .knowledge, sourceId: "20min"),
+        
+        // 20 Minuten Culture Group
+        NewsCategory(id: "20min_culture_people", title: "People", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/people", group: .culture, sourceId: "20min")
     ]
     
     static let defaultCategories: Set<String> = Set([
-        "news_all",        // News
-        "sport_all",       // Sport
-        "culture_all",     // Kultur
-        "knowledge_all"    // Wissen
+        "srf_news_all",
+        "srf_sport_all",
+        "srf_culture_all",
+        "srf_knowledge_all",
+        "20min_news_all",
+        "20min_sport_all",
+        "20min_knowledge_all"
     ])
     
     static func categoriesByGroup() -> [CategoryGroup: [NewsCategory]] {

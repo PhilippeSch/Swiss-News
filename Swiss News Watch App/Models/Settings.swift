@@ -4,6 +4,7 @@ class Settings: ObservableObject {
     @Published var cutoffHours: Double
     @Published var selectedCategories: Set<String>
     @Published var categoryOrder: [NewsCategory.CategoryGroup]
+    @Published var selectedSources: Set<String>
     
     private let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
     private let lastLaunchedVersion = UserDefaults.standard.string(forKey: "lastLaunchedVersion")
@@ -44,6 +45,14 @@ class Settings: ObservableObject {
             self.categoryOrder = decoded
         } else {
             self.categoryOrder = NewsCategory.CategoryGroup.allCases.sorted(by: { $0.sortOrder < $1.sortOrder })
+        }
+        
+        // Initialize selected sources
+        if let data = UserDefaults.standard.data(forKey: "selectedSources"),
+           let decoded = try? JSONDecoder().decode(Set<String>.self, from: data) {
+            self.selectedSources = decoded
+        } else {
+            self.selectedSources = NewsSource.defaultSources
         }
         
         // Setup observers after initialization
@@ -89,6 +98,13 @@ extension Settings {
     func resetFirstLaunch() {
         print("Resetting first launch state")
         UserDefaults.standard.removeObject(forKey: Settings.firstLaunchKey)
+    }
+    
+    func saveSelectedSources() {
+        if let encoded = try? JSONEncoder().encode(selectedSources) {
+            UserDefaults.standard.set(encoded, forKey: "selectedSources")
+            NotificationCenter.default.post(name: .settingsChanged, object: nil)
+        }
     }
 }
 
