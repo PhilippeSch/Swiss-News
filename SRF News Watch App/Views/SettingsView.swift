@@ -4,9 +4,8 @@ struct SettingsView: View {
     @ObservedObject var settings: Settings
     
     private var versionInfo: String {
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown"
-        return "Version \(version) (Build \(build))"
+        return "Build \(build)"
     }
     
     var body: some View {

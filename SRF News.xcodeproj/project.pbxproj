@@ -149,6 +149,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3745C8A92D24009200194BDA /* Build configuration list for PBXNativeTarget "SRF News Watch App" */;
 			buildPhases = (
+				3749E3E42D2AD79E005B62F7 /* Set Build Number */,
 				3745C87F2D24009100194BDA /* Sources */,
 				3745C8802D24009100194BDA /* Frameworks */,
 				3745C8812D24009100194BDA /* Resources */,
@@ -295,6 +296,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3749E3E42D2AD79E005B62F7 /* Set Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Set Build Number";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\n\n# Get the marketing version\nVERSION=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\n\n# Generate timestamp in format YYYYMMDDHHMMSS\nbuildNumber=$(date +%Y%m%d%H%M)\n\n# Combine version and timestamp\nFULL_VERSION=\"${VERSION}.${buildNumber}\"\n\n# Update Info.plist\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $FULL_VERSION\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n\n# Print for debugging\necho \"Set build number to: $FULL_VERSION\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3745C87F2D24009100194BDA /* Sources */ = {
@@ -464,6 +486,7 @@
 				DEVELOPMENT_LANGUAGE = de;
 				DEVELOPMENT_TEAM = PZ2HQ4532Q;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "SRF-News-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "SRF News";
@@ -497,6 +520,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"SRF News Watch App/Preview Content\"";
 				DEVELOPMENT_TEAM = PZ2HQ4532Q;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "SRF-News-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "SRF News";
