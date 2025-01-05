@@ -24,6 +24,11 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         }
     }
     
+    //20min
+    //https://partner-feeds.beta.20min.ch/rss/20minuten/front
+    //https://partner-feeds.beta.20min.ch/rss/20minuten/schweiz
+    //https://partner-feeds.beta.20min.ch/rss/20minuten/digital
+    
     static let available: [NewsCategory] = [
         // News Group
         NewsCategory(id: "news_all", title: "News", feedURL: "https://www.srf.ch/news/bnf/rss/1646", group: .news),
