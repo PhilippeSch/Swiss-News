@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 @MainActor
 class RSSFeedParser: ObservableObject {
@@ -14,79 +15,39 @@ class RSSFeedParser: ObservableObject {
         }
     }
     
-    @Published var generalNews: [NewsItem] = []
-    @Published var internationalNews: [NewsItem] = []
-    @Published var economyNews: [NewsItem] = []
-    @Published var scienceNews: [NewsItem] = []
-    @Published var sportNews: [NewsItem] = []
-    @Published var cultureNews: [NewsItem] = []
+    @Published var newsItems: [String: [NewsItem]] = [:]
     @Published var isLoading = false
     @Published var error: Error?
     @Published var lastUpdate: Date?
     @Published var settings: Settings
     
-    private let generalFeedURL = "https://www.srf.ch/news/bnf/rss/19032223"
-    private let internationalFeedURL = "https://www.srf.ch/news/bnf/rss/1922"
-    private let economyFeedURL = "https://www.srf.ch/news/bnf/rss/1926"
-    private let scienceFeedURL = "https://www.srf.ch/bnf/rss/630"
-    private let sportFeedURL = "https://www.srf.ch/sport/bnf/rss/718"
-    private let cultureFeedURL = "https://www.srf.ch/kultur/bnf/rss/454"
-    
-    private let cache = NSCache<NSString, NSArray>()
+    private var settingsObserver: AnyCancellable?
     
     init(settings: Settings) {
         self.settings = settings
-    }
-    
-    private func saveToCache(_ items: [NewsItem], for key: String) {
-        cache.setObject(items as NSArray, forKey: key as NSString)
-    }
-    
-    private func loadFromCache(for key: String) -> [NewsItem]? {
-        return cache.object(forKey: key as NSString) as? [NewsItem]
+        settingsObserver = settings.$selectedCategories.sink { [weak self] _ in
+            Task {
+                await self?.fetchAllFeeds()
+            }
+        }
     }
     
     func fetchAllFeeds() async {
         print("Starting fetch...")
-        
-        // Try loading from cache first
-        if let cached = loadFromCache(for: "generalNews") {
-            self.generalNews = cached
-        }
-        
         self.isLoading = true
         self.error = nil
         
         do {
-            print("Fetching feeds...")
-            async let general = fetchNews(from: generalFeedURL)
-            async let international = fetchNews(from: internationalFeedURL)
-            async let economy = fetchNews(from: economyFeedURL)
-            async let science = fetchNews(from: scienceFeedURL)
-            async let sport = fetchNews(from: sportFeedURL)
-            async let culture = fetchNews(from: cultureFeedURL)
+            var feeds: [String: [NewsItem]] = [:]
             
-            let (generalItems, internationalItems, economyItems, 
-                 scienceItems, sportItems, cultureItems) = await (
-                try general, try international, try economy, 
-                try science, try sport, try culture
-            )
+            // Only fetch selected categories
+            for category in NewsCategory.available where settings.selectedCategories.contains(category.id) {
+                feeds[category.id] = try await fetchNews(from: category.feedURL)
+            }
             
-            print("Feeds fetched, updating UI...")
-            
-            // Sort items by date
-            self.generalNews = generalItems.sorted { $0.pubDate > $1.pubDate }
-            self.internationalNews = internationalItems.sorted { $0.pubDate > $1.pubDate }
-            self.economyNews = economyItems.sorted { $0.pubDate > $1.pubDate }
-            self.scienceNews = scienceItems.sorted { $0.pubDate > $1.pubDate }
-            self.sportNews = sportItems.sorted { $0.pubDate > $1.pubDate }
-            self.cultureNews = cultureItems.sorted { $0.pubDate > $1.pubDate }
-            
+            self.newsItems = feeds
             self.lastUpdate = Date()
             
-            // Save to cached
-            saveToCache(self.generalNews, for: "generalNews")
-            print("Fetch completed successfully")
         } catch {
             print("Fetch error: \(error.localizedDescription)")
             self.error = error

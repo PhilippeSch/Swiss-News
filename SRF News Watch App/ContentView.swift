@@ -15,6 +15,8 @@ struct ContentView: View {
     @State private var currentTime = Date()
     @Environment(\.scenePhase) private var scenePhase
     @State private var isRefreshing = false
+    @State private var showWelcome = false
+    private let groupedCategories = NewsCategory.categoriesByGroup()
     
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
@@ -28,7 +30,7 @@ struct ContentView: View {
         NavigationView {
             List {
                 Group {
-                    if rssParser.isLoading && rssParser.generalNews.isEmpty {
+                    if rssParser.isLoading && rssParser.newsItems.isEmpty {
                         ProgressView("Laden...")
                     } else {
                         VStack(alignment: .leading, spacing: 2) {
@@ -52,52 +54,24 @@ struct ContentView: View {
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets(top: -20, leading: 15, bottom: -8, trailing: 15))
                         
-                        if !rssParser.generalNews.isEmpty {
-                            NavigationLink {
-                                NewsCategoryView(title: "Allgemein", newsItems: rssParser.generalNews)
-                            } label: {
-                                SectionHeaderView(title: "Allgemein", count: rssParser.generalNews.count)
+                        ForEach(settings.categoryOrder) { group in
+                            if let categories = groupedCategories[group] {
+                                ForEach(categories.filter { settings.selectedCategories.contains($0.id) }) { category in
+                                    if let items = rssParser.newsItems[category.id], !items.isEmpty {
+                                        NavigationLink {
+                                            NewsCategoryView(title: category.title, newsItems: items)
+                                        } label: {
+                                            SectionHeaderView(title: category.title, count: items.count)
+                                        }
+                                    }
+                                }
                             }
                         }
-                        
-                        if !rssParser.internationalNews.isEmpty {
-                            NavigationLink {
-                                NewsCategoryView(title: "International", newsItems: rssParser.internationalNews)
-                            } label: {
-                                SectionHeaderView(title: "International", count: rssParser.internationalNews.count)
-                            }
+                        .onChange(of: settings.selectedCategories) { _, newValue in
+                            print("Selected categories: \(newValue)")
                         }
-                        
-                        if !rssParser.economyNews.isEmpty {
-                            NavigationLink {
-                                NewsCategoryView(title: "Wirtschaft", newsItems: rssParser.economyNews)
-                            } label: {
-                                SectionHeaderView(title: "Wirtschaft", count: rssParser.economyNews.count)
-                            }
-                        }
-                        
-                        if !rssParser.scienceNews.isEmpty {
-                            NavigationLink {
-                                NewsCategoryView(title: "Wissen", newsItems: rssParser.scienceNews)
-                            } label: {
-                                SectionHeaderView(title: "Wissen", count: rssParser.scienceNews.count)
-                            }
-                        }
-                        
-                        if !rssParser.sportNews.isEmpty {
-                            NavigationLink {
-                                NewsCategoryView(title: "Sport", newsItems: rssParser.sportNews)
-                            } label: {
-                                SectionHeaderView(title: "Sport", count: rssParser.sportNews.count)
-                            }
-                        }
-                        
-                        if !rssParser.cultureNews.isEmpty {
-                            NavigationLink {
-                                NewsCategoryView(title: "Kultur", newsItems: rssParser.cultureNews)
-                            } label: {
-                                SectionHeaderView(title: "Kultur", count: rssParser.cultureNews.count)
-                            }
+                        .onChange(of: rssParser.newsItems) { _, newValue in
+                            print("News items: \(newValue.keys)")
                         }
                     }
                 }
@@ -115,6 +89,13 @@ struct ContentView: View {
                 }
                 .buttonStyle(.plain)
                 .listRowBackground(Color.clear)
+                
+                #if DEBUG
+                Button("Show Welcome") {
+                    settings.resetFirstLaunch()
+                    showWelcome = true
+                }
+                #endif
             }
             .navigationBarHidden(true)
             .refreshable {
@@ -131,7 +112,15 @@ struct ContentView: View {
                 currentTime = Date()
             }
         }
+        .sheet(isPresented: $showWelcome) {
+            WelcomeView(settings: settings, showWelcome: $showWelcome)
+        }
         .task {
+            print("Checking first launch state: \(settings.isFirstLaunch)")
+            if settings.isFirstLaunch {
+                print("Should show welcome screen")
+                showWelcome = true
+            }
             await rssParser.fetchAllFeeds()
         }
         .onChange(of: settings.cutoffHours) { _, _ in
