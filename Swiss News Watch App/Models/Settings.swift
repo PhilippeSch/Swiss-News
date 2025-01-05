@@ -8,7 +8,7 @@ class Settings: ObservableObject {
     private let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
     private let lastLaunchedVersion = UserDefaults.standard.string(forKey: "lastLaunchedVersion")
     
-    private static let firstLaunchKey = "com.scheuber.srfnews.firstLaunch"
+    private static let firstLaunchKey = "com.scheuber.swissnews.firstLaunch"
     
     var isFirstLaunch: Bool {
         get {

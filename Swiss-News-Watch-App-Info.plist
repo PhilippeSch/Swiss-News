@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>SRF News</string>
+	<string>Swiss News</string>
 	<key>CFBundleDisplayName</key>
-	<string>SRF News</string>
+	<string>Swiss News</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

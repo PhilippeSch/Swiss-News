@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  SRF News Watch App
+//  Swiss News Watch App
 //
 //  Created by Philippe Scheuber on 31.12.2024.
 //

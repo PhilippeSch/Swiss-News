@@ -1,13 +1,13 @@
 //
-//  SRF_News_Watch_AppUITests.swift
-//  SRF News Watch AppUITests
+//  Swiss_News_Watch_AppUITests.swift
+//  Swiss News Watch AppUITests
 //
 //  Created by Philippe Scheuber on 31.12.2024.
 //
 
 import XCTest
 
-final class SRF_News_Watch_AppUITests: XCTestCase {
+final class Swiss_News_Watch_AppUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

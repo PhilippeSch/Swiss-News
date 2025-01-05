@@ -1,13 +1,13 @@
 //
-//  SRF_News_Watch_AppUITestsLaunchTests.swift
-//  SRF News Watch AppUITests
+//  Swiss_News_Watch_AppUITestsLaunchTests.swift
+//  Swiss News Watch AppUITests
 //
 //  Created by Philippe Scheuber on 31.12.2024.
 //
 
 import XCTest
 
-final class SRF_News_Watch_AppUITestsLaunchTests: XCTestCase {
+final class Swiss_News_Watch_AppUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

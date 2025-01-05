@@ -14,10 +14,10 @@ enum Constants {
     }
     
     enum UserDefaults {
-        static let firstLaunchKey = "com.scheuber.srfnews.firstLaunch"
+        static let firstLaunchKey = "com.scheuber.swissnews.firstLaunch"
         static let selectedCategoriesKey = "selectedCategories"
         static let categoryOrderKey = "categoryOrder"
         static let cutoffHoursKey = "cutoffHours"
-        static let readArticlesKey = "com.scheuber.srfnews.readArticles"
+        static let readArticlesKey = "com.scheuber.swissnews.readArticles"
     }
 } 
