@@ -10,7 +10,7 @@ import WatchKit
 import AuthenticationServices
 
 struct ContentView: View {
-    @StateObject private var settings = Settings()
+    @StateObject private var settings: Settings
     @StateObject private var rssParser: RSSFeedParser
     @State private var currentTime = Date()
     @Environment(\.scenePhase) private var scenePhase
@@ -21,9 +21,12 @@ struct ContentView: View {
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     init() {
+        print("ContentView init")
         let settings = Settings()
+        print("Initial isFirstLaunch value: \(settings.isFirstLaunch)")
         _settings = StateObject(wrappedValue: settings)
         _rssParser = StateObject(wrappedValue: RSSFeedParser(settings: settings))
+        _showWelcome = State(initialValue: settings.isFirstLaunch)
     }
     
     var body: some View {
@@ -95,6 +98,11 @@ struct ContentView: View {
                     settings.resetFirstLaunch()
                     showWelcome = true
                 }
+                Button("Reset App State") {
+                    Settings.resetAllSettings()
+                    settings.resetFirstLaunch()
+                    showWelcome = true
+                }
                 #endif
             }
             .navigationBarHidden(true)
@@ -115,12 +123,15 @@ struct ContentView: View {
         .sheet(isPresented: $showWelcome) {
             WelcomeView(settings: settings, showWelcome: $showWelcome)
         }
-        .task {
-            print("Checking first launch state: \(settings.isFirstLaunch)")
+        .onAppear {
+            print("ContentView appeared")
+            print("isFirstLaunch: \(settings.isFirstLaunch)")
             if settings.isFirstLaunch {
-                print("Should show welcome screen")
+                print("Showing welcome screen")
                 showWelcome = true
             }
+        }
+        .task {
             await rssParser.fetchAllFeeds()
         }
         .onChange(of: settings.cutoffHours) { _, _ in

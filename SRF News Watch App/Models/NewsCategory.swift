@@ -60,6 +60,13 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         NewsCategory(id: "knowledge_tech", title: "Technik", feedURL: "https://www.srf.ch/bnf/rss/19920122", group: .knowledge)
     ]
     
+    static let defaultCategories: Set<String> = Set([
+        "news_all",        // News
+        "sport_all",       // Sport
+        "culture_all",     // Kultur
+        "knowledge_all"    // Wissen
+    ])
+    
     static func categoriesByGroup() -> [CategoryGroup: [NewsCategory]] {
         Dictionary(grouping: available, by: { $0.group })
     }

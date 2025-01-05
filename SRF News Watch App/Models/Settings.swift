@@ -5,9 +5,24 @@ class Settings: ObservableObject {
     @Published var selectedCategories: Set<String>
     @Published var categoryOrder: [NewsCategory.CategoryGroup]
     
+    private let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+    private let lastLaunchedVersion = UserDefaults.standard.string(forKey: "lastLaunchedVersion")
+    
+    private static let firstLaunchKey = "com.scheuber.srfnews.firstLaunch"
+    
     var isFirstLaunch: Bool {
-        get { UserDefaults.standard.bool(forKey: "hasLaunched") == false }
-        set { UserDefaults.standard.set(!newValue, forKey: "hasLaunched") }
+        get {
+            // Check if we've stored the first launch key
+            let hasKey = UserDefaults.standard.object(forKey: Settings.firstLaunchKey) != nil
+            print("Has first launch key: \(hasKey)")
+            return !hasKey
+        }
+        set {
+            if !newValue {
+                print("Setting first launch completed")
+                UserDefaults.standard.set(true, forKey: Settings.firstLaunchKey)
+            }
+        }
     }
     
     init() {
@@ -20,12 +35,7 @@ class Settings: ObservableObject {
            let decoded = try? JSONDecoder().decode([String].self, from: data) {
             self.selectedCategories = Set(decoded)
         } else {
-            self.selectedCategories = Set([
-                "news_all",        // News
-                "sport_all",       // Sport
-                "culture_all",     // Kultur
-                "knowledge_all"    // Wissen
-            ])
+            self.selectedCategories = NewsCategory.defaultCategories
         }
         
         // Initialize category order
@@ -55,6 +65,7 @@ class Settings: ObservableObject {
     
     #if DEBUG
     static func resetAllSettings() {
+        print("Resetting all settings")
         if let bundleID = Bundle.main.bundleIdentifier {
             UserDefaults.standard.removePersistentDomain(forName: bundleID)
         }
@@ -76,8 +87,8 @@ extension Settings {
     }
     
     func resetFirstLaunch() {
-        UserDefaults.standard.removeObject(forKey: "hasLaunched")
-        UserDefaults.standard.removeObject(forKey: "selectedCategoriesInitialized")
+        print("Resetting first launch state")
+        UserDefaults.standard.removeObject(forKey: Settings.firstLaunchKey)
     }
 }
 
