@@ -3,6 +3,12 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var settings: Settings
     
+    private var versionInfo: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown"
+        return "Version \(version) (Build \(build))"
+    }
+    
     var body: some View {
         Form {
             Section(header: Text("Artikel Filter")) {
@@ -12,6 +18,13 @@ struct SettingsView: View {
                     Text("48 Stunden").tag(48.0)
                     Text("72 Stunden").tag(72.0)
                 }
+            }
+            
+            Section {
+                Text(versionInfo)
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                    .frame(maxWidth: .infinity, alignment: .center)
             }
         }
         .navigationTitle("Einstellungen")
