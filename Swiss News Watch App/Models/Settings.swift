@@ -15,12 +15,10 @@ class Settings: ObservableObject {
         get {
             // Check if we've stored the first launch key
             let hasKey = UserDefaults.standard.object(forKey: Settings.firstLaunchKey) != nil
-            print("Has first launch key: \(hasKey)")
             return !hasKey
         }
         set {
             if !newValue {
-                print("Setting first launch completed")
                 UserDefaults.standard.set(true, forKey: Settings.firstLaunchKey)
             }
         }

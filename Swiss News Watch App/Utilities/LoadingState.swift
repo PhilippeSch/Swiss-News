@@ -2,7 +2,7 @@ import Foundation
 
 enum LoadingState: Equatable {
     case idle
-    case loading
+    case loading(lastUpdate: Date?)
     case loaded(Date)
     case error(AppError)
     
@@ -21,9 +21,15 @@ enum LoadingState: Equatable {
     }
     
     var lastUpdate: Date? {
-        if case .loaded(let date) = self {
+        switch self {
+        case .idle:
+            return nil
+        case .loading(let date):
             return date
+        case .loaded(let date):
+            return date
+        case .error:
+            return nil
         }
-        return nil
     }
 } 

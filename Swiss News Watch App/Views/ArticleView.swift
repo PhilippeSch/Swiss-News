@@ -16,8 +16,12 @@ struct ArticleView: View {
                     .padding(.bottom, 4)
                 
                 if isLoading {
-                    ProgressView("Laden...")
-                        .frame(maxWidth: .infinity, alignment: .center)
+                    VStack {
+                        ProgressView("Wird aktualisiert...")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        Text(articleContent)
+                            .opacity(0.5)
+                    }
                 } else if let error = error {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Error:")

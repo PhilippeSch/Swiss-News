@@ -5,6 +5,7 @@ import Combine
 class RSSFeedParser: ObservableObject {
     @Published var newsItems: [String: [NewsItem]] = [:]
     @Published private(set) var state: LoadingState = .idle
+    @Published var loadingCategories: Set<String> = []
     @Published var settings: Settings
     
     private var settingsObserver: AnyCancellable?
@@ -20,42 +21,38 @@ class RSSFeedParser: ObservableObject {
     
     func fetchAllFeeds() async {
         print("Starting fetch...")
-        print("Selected sources: \(settings.selectedSources)")
-        print("Selected categories: \(settings.selectedCategories)")
-        state = .loading
-        
-        do {
-            var feeds: [String: [NewsItem]] = [:]
-            
-            for category in NewsCategory.available {
-                let shouldFetch = settings.selectedSources.contains(category.sourceId) && 
-                                settings.selectedCategories.contains(category.id)
-                print("Category \(category.id): shouldFetch=\(shouldFetch), source=\(category.sourceId), selected=\(category.id)")
-                
-                if shouldFetch {
-                    print("Fetching category: \(category.id)")
-                    do {
-                        let items = try await fetchNews(from: category.feedURL)
-                        print("Fetched \(items.count) items for \(category.id)")
-                        if items.isEmpty {
-                            print("No items found for \(category.id)")
-                        }
-                        feeds[category.id] = items
-                    } catch {
-                        print("Error fetching \(category.title): \(error.localizedDescription)")
-                    }
-                }
-            }
-            
-            print("Final feeds: \(feeds.keys.sorted())")
-            self.newsItems = feeds
-            state = .loaded(Date())
-            
-        } catch let error as AppError {
-            state = .error(error)
-        } catch {
-            state = .error(AppError.networkError(error.localizedDescription))
+        if case .loaded(let date) = state {
+            state = .loading(lastUpdate: date)
+        } else {
+            state = .loading(lastUpdate: nil)
         }
+        
+        // Zuerst alle zu ladenden Kategorien markieren
+        for category in NewsCategory.available {
+            let shouldFetch = settings.selectedSources.contains(category.sourceId) && 
+                            settings.selectedCategories.contains(category.id)
+            if shouldFetch {
+                loadingCategories.insert(category.id)
+            }
+        }
+        
+        // Dann sequentiell laden
+        for category in NewsCategory.available {
+            let shouldFetch = settings.selectedSources.contains(category.sourceId) && 
+                            settings.selectedCategories.contains(category.id)
+            
+            if shouldFetch {
+                do {
+                    let items = try await fetchNews(from: category.feedURL)
+                    newsItems[category.id] = items
+                } catch {
+                    print("Error fetching \(category.title): \(error.localizedDescription)")
+                }
+                loadingCategories.remove(category.id)
+            }
+        }
+        
+        state = .loaded(Date())
     }
     
     private func fetchNews(from urlString: String) async throws -> [NewsItem] {

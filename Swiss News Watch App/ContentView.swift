@@ -60,10 +60,11 @@ struct ContentView: View {
     
     private var mainContent: some View {
         Group {
+            HeaderView(lastUpdate: rssParser.state.lastUpdate, currentTime: currentTime)
+            
             if rssParser.state.isLoading && rssParser.newsItems.isEmpty {
                 ProgressView("Laden...")
             } else {
-                HeaderView(lastUpdate: rssParser.state.lastUpdate, currentTime: currentTime)
                 NewsFeedView(
                     settings: settings,
                     rssParser: rssParser,
@@ -118,10 +119,17 @@ private struct HeaderView: View {
             Text("Swiss News")
                 .font(.title3)
                 .fontWeight(.bold)
-            if let lastUpdate = lastUpdate {
-                Text("Updated: \(timeAgoText(from: lastUpdate, relativeTo: currentTime))")
-                    .font(.caption2)
-                    .foregroundColor(.gray)
+            
+            HStack(spacing: 4) {
+                if let lastUpdate = lastUpdate {
+                    Text("Updated: \(timeAgoText(from: lastUpdate, relativeTo: currentTime))")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                } else {
+                    Text("News Feed Update...")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -139,23 +147,16 @@ private struct NewsFeedView: View {
         var filtered: [NewsCategory.CategoryGroup: [NewsCategory]] = [:]
         let allCategories = NewsCategory.categoriesByGroup()
         
-        print("\n--- Debug relevantCategories ---")
-        print("Selected sources: \(settings.selectedSources)")
-        print("Selected categories: \(settings.selectedCategories)")
-        
         for (group, categories) in allCategories {
             let relevantCats = categories.filter { category in
                 let isRelevant = settings.selectedSources.contains(category.sourceId) && 
                                 settings.selectedCategories.contains(category.id)
-                print("Category \(category.id): isRelevant=\(isRelevant)")
                 return isRelevant
             }
             if !relevantCats.isEmpty {
                 filtered[group] = relevantCats
-                print("Group \(group): \(relevantCats.map { $0.id })")
             }
         }
-        print("-------------------------\n")
         return filtered
     }
     
@@ -166,7 +167,8 @@ private struct NewsFeedView: View {
                     CategoryRowView(
                         category: category,
                         newsItems: rssParser.newsItems[category.id] ?? [],
-                        readArticlesManager: readArticlesManager
+                        readArticlesManager: readArticlesManager,
+                        rssParser: rssParser
                     )
                 }
             }
@@ -178,6 +180,7 @@ private struct CategoryRowView: View {
     let category: NewsCategory
     let newsItems: [NewsItem]
     @ObservedObject var readArticlesManager: ReadArticlesManager
+    @ObservedObject var rssParser: RSSFeedParser
     
     var body: some View {
         NavigationLink {
@@ -190,11 +193,12 @@ private struct CategoryRowView: View {
             SectionHeaderView(
                 title: category.title,
                 count: newsItems.filter { !readArticlesManager.isRead($0.link) }.count,
-                sourceId: category.sourceId
+                sourceId: category.sourceId,
+                rssParser: rssParser,
+                categoryId: category.id
             )
         }
         .onAppear {
-            print("Showing category: \(category.id) with \(newsItems.count) items")
         }
     }
 }
@@ -203,6 +207,8 @@ struct SectionHeaderView: View {
     let title: String
     let count: Int
     let sourceId: String
+    @ObservedObject var rssParser: RSSFeedParser
+    let categoryId: String
     
     var body: some View {
         HStack {
@@ -216,9 +222,17 @@ struct SectionHeaderView: View {
             
             Spacer()
             
-            Text("\(count)")
-                .font(.caption2)
-                .foregroundColor(.gray)
+            ZStack(alignment: .trailing) {
+                Text("\(count)")
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                    .opacity(rssParser.loadingCategories.contains(categoryId) ? 0 : 1)
+                
+                ProgressView()
+                    .scaleEffect(0.7)
+                    .opacity(rssParser.loadingCategories.contains(categoryId) ? 1 : 0)
+            }
+            .frame(width: 30, alignment: .trailing)
         }
     }
 }
@@ -236,10 +250,7 @@ private extension View {
                 SourceSelectionView(settings: settings, showWelcome: showWelcome)
             }
             .onAppear {
-                print("ContentView appeared")
-                print("isFirstLaunch: \(settings.isFirstLaunch)")
                 if settings.isFirstLaunch {
-                    print("Showing welcome screen")
                     showWelcome.wrappedValue = true
                 }
             }
