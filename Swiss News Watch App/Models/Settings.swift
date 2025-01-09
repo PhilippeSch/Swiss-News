@@ -73,11 +73,40 @@ class Settings: ObservableObject {
     #if DEBUG
     static func resetAllSettings() {
         print("Resetting all settings")
+        // Löscht alle UserDefaults
         if let bundleID = Bundle.main.bundleIdentifier {
             UserDefaults.standard.removePersistentDomain(forName: bundleID)
         }
+        
+        // Löscht den App Container
+        if let appDomain = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: appDomain)
+        }
+        
+        // Setzt Default-Werte zurück
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: "selectedCategories")
+        defaults.removeObject(forKey: "selectedSources")
+        defaults.removeObject(forKey: "categoryOrder")
+        defaults.removeObject(forKey: "cutoffHours")
+        defaults.removeObject(forKey: "selectedCategoriesInitialized")
+        defaults.removeObject(forKey: Settings.firstLaunchKey)
+        
+        // Synchronisiert UserDefaults
+        defaults.synchronize()
     }
     #endif
+    
+    func resetToDefaults() {
+        selectedCategories = NewsCategory.defaultCategories
+        selectedSources = NewsSource.defaultSources
+        categoryOrder = NewsCategory.CategoryGroup.allCases.sorted(by: { $0.sortOrder < $1.sortOrder })
+        cutoffHours = 48.0
+        
+        // Speichert die Standardwerte
+        saveSelectedCategories()
+        saveSelectedSources()
+    }
 }
 
 extension Settings {

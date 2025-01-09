@@ -2,15 +2,19 @@ import SwiftUI
 
 struct SourceSelectionView: View {
     @ObservedObject var settings: Settings
+    @ObservedObject var rssParser: RSSFeedParser
     @Binding var showWelcome: Bool
     @State private var selectedSources: Set<String>
     @State private var showCategorySelection = false
     @State private var currentSourceIndex = 0
+    @State private var showAlert = false
     
-    init(settings: Settings, showWelcome: Binding<Bool>) {
+    init(settings: Settings, rssParser: RSSFeedParser, showWelcome: Binding<Bool>) {
         self._settings = ObservedObject(wrappedValue: settings)
+        self._rssParser = ObservedObject(wrappedValue: rssParser)
         self._showWelcome = showWelcome
         self._selectedSources = State(initialValue: Set<String>())
+        self._currentSourceIndex = State(initialValue: 0)
     }
     
     var body: some View {
@@ -25,7 +29,7 @@ struct SourceSelectionView: View {
                         .font(.caption)
                         .multilineTextAlignment(.center)
                     
-                    ForEach(NewsSource.available) { source in
+                    ForEach(NewsSource.available.sorted(by: { $0.order < $1.order })) { source in
                         HStack {
                             Image(source.logoName)
                                 .resizable()
@@ -51,10 +55,7 @@ struct SourceSelectionView: View {
                     }
                     
                     Button("Weiter") {
-                        settings.selectedSources = selectedSources
-                        settings.selectedCategories.removeAll()
-                        currentSourceIndex = 0
-                        showCategorySelection = true
+                        handleSourceSelection()
                     }
                     .buttonStyle(.bordered)
                     .disabled(selectedSources.isEmpty)
@@ -64,6 +65,11 @@ struct SourceSelectionView: View {
             }
             .navigationTitle("Quellen")
             .navigationBarTitleDisplayMode(.inline)
+            .alert("Keine Quelle ausgewählt", isPresented: $showAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Bitte wähle mindestens eine Nachrichtenquelle aus.")
+            }
         }
         .sheet(isPresented: $showCategorySelection) {
             if let sourceId = Array(selectedSources)[safe: currentSourceIndex] {
@@ -71,13 +77,13 @@ struct SourceSelectionView: View {
                 NavigationView {
                     WelcomeView(
                         settings: settings,
+                        rssParser: rssParser,
                         showWelcome: $showWelcome,
                         sourceId: sourceId,
                         onCompletion: {
                             currentSourceIndex += 1
                             if currentSourceIndex >= selectedSources.count {
-                                settings.isFirstLaunch = false
-                                showWelcome = false
+                                handleCompletion()
                             }
                         }
                     )
@@ -85,6 +91,29 @@ struct SourceSelectionView: View {
                     .navigationBarTitleDisplayMode(.inline)
                 }
             }
+        }
+    }
+    
+    private func moveToNextSource() {
+        settings.selectedSources = selectedSources
+        settings.selectedCategories.removeAll()
+        currentSourceIndex = 0
+        showCategorySelection = true
+    }
+    
+    private func handleSourceSelection() {
+        if selectedSources.isEmpty {
+            showAlert = true
+        } else {
+            moveToNextSource()
+        }
+    }
+    
+    private func handleCompletion() {
+        settings.isFirstLaunch = false
+        showWelcome = false
+        Task {
+            await rssParser.fetchAllFeeds()
         }
     }
 }

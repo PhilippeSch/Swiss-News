@@ -2,11 +2,20 @@ import SwiftUI
 
 struct WelcomeView: View {
     @ObservedObject var settings: Settings
+    @ObservedObject var rssParser: RSSFeedParser
     @Binding var showWelcome: Bool
-    var sourceId: String? = nil
-    var onCompletion: (() -> Void)? = nil
+    var sourceId: String?
+    var onCompletion: (() -> Void)?
     
-    private let groupedCategories = NewsCategory.categoriesByGroup()
+    @Namespace private var scrollSpace
+    
+    init(settings: Settings, rssParser: RSSFeedParser, showWelcome: Binding<Bool>, sourceId: String? = nil, onCompletion: (() -> Void)? = nil) {
+        self._settings = ObservedObject(wrappedValue: settings)
+        self._rssParser = ObservedObject(wrappedValue: rssParser)
+        self._showWelcome = showWelcome
+        self.sourceId = sourceId
+        self.onCompletion = onCompletion
+    }
     
     private var relevantCategories: [NewsCategory.CategoryGroup: [NewsCategory]] {
         var filtered: [NewsCategory.CategoryGroup: [NewsCategory]] = [:]
@@ -22,49 +31,76 @@ struct WelcomeView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                Text("Wähle deine bevorzugten Kategorien:")
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-                
-                ForEach(settings.categoryOrder) { group in
-                    if let categories = relevantCategories[group] {
-                        VStack(alignment: .leading) {
-                            Text(group.title)
-                                .font(.headline)
-                            
-                            ForEach(categories) { category in
-                                Toggle(category.title, isOn: Binding(
-                                    get: { settings.selectedCategories.contains(category.id) },
-                                    set: { isSelected in
-                                        if isSelected {
-                                            settings.selectedCategories.insert(category.id)
-                                        } else {
-                                            settings.selectedCategories.remove(category.id)
-                                        }
-                                        settings.saveSelectedCategories()
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 20) {
+                    Color.clear
+                        .frame(height: 0)
+                        .id(scrollSpace)
+                    
+                    Text("Wähle deine bevorzugten Kategorien:")
+                        .font(.caption)
+                        .multilineTextAlignment(.center)
+                    
+                    ForEach(settings.categoryOrder) { group in
+                        if let categories = relevantCategories[group] {
+                            VStack(alignment: .leading) {
+                                Text(group.title)
+                                    .font(.headline)
+                                
+                                ForEach(categories) { category in
+                                    if sourceId == nil || category.sourceId == sourceId {
+                                        Toggle(category.title, isOn: Binding(
+                                            get: { settings.selectedCategories.contains(category.id) },
+                                            set: { isSelected in
+                                                if isSelected {
+                                                    settings.selectedCategories.insert(category.id)
+                                                } else {
+                                                    settings.selectedCategories.remove(category.id)
+                                                }
+                                                settings.saveSelectedCategories()
+                                            }
+                                        ))
                                     }
-                                ))
+                                }
                             }
+                            .padding(.vertical, 5)
                         }
-                        .padding(.vertical, 5)
                     }
-                }
-                
-                Button("Fertig") {
-                    if let completion = onCompletion {
-                        completion()
-                    } else {
-                        settings.isFirstLaunch = false
-                        showWelcome = false
+                    
+                    Button("Fertig") {
+                        handleCompletion()
                     }
+                    .buttonStyle(.bordered)
+                    .disabled(settings.selectedCategories.isEmpty)
+                    .padding(.top)
                 }
-                .buttonStyle(.bordered)
-                .disabled(settings.selectedCategories.isEmpty)
-                .padding(.top)
+                .padding()
             }
-            .padding()
+            .onAppear {
+                // Sofort zum Anfang scrollen
+                proxy.scrollTo(scrollSpace, anchor: .top)
+            }
+            .onChange(of: sourceId) { _, _ in
+                // Bei Änderung der Quelle zum Anfang scrollen
+                withAnimation {
+                    proxy.scrollTo(scrollSpace, anchor: .top)
+                }
+            }
+        }
+    }
+    
+    private func handleCompletion() {
+        if let completion = onCompletion {
+            completion()
+        } else {
+            settings.isFirstLaunch = false
+            showWelcome = false
+            
+            // Feeds initial laden
+            Task {
+                await rssParser.fetchAllFeeds()
+            }
         }
     }
 } 

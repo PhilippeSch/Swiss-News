@@ -107,6 +107,12 @@ class RSSFeedParser: ObservableObject {
     func resetState() {
         state = .idle
     }
+    
+    func reset() {
+        newsItems.removeAll()
+        loadingCategories.removeAll()
+        state = .idle
+    }
 }
 
 final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable {

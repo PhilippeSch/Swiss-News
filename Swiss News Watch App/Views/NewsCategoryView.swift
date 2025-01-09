@@ -1,5 +1,4 @@
 import SwiftUI
-import WatchKit
 
 struct NewsCategoryView: View {
     let title: String
@@ -154,43 +153,5 @@ private struct ReadButton: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
-    }
-}
-
-private struct CategoryRowView: View {
-    let category: NewsCategory
-    let newsItems: [NewsItem]
-    @ObservedObject var readArticlesManager: ReadArticlesManager
-    @ObservedObject var rssParser: RSSFeedParser
-    
-    var body: some View {
-        NavigationLink {
-            NewsCategoryView(
-                title: category.title,
-                newsItems: newsItems,
-                readArticlesManager: readArticlesManager
-            )
-        } label: {
-            HStack {
-                Image(NewsSource.available.first { $0.id == category.sourceId }?.logoName ?? "")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 16)
-                    .padding(.trailing, 4)
-                
-                Text(category.title)
-                
-                Spacer()
-                
-                if rssParser.loadingCategories.contains(category.id) {
-                    ProgressView()
-                        .scaleEffect(0.7)
-                } else {
-                    Text("\(newsItems.filter { !readArticlesManager.isRead($0.link) }.count)")
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                }
-            }
-        }
     }
 } 
