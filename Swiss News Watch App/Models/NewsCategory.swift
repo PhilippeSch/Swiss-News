@@ -70,6 +70,27 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         NewsCategory(id: "srf_knowledge_nature", title: "Natur & Tiere", feedURL: "https://www.srf.ch/bnf/rss/19920818", group: .knowledge, sourceId: "srf"),
         NewsCategory(id: "srf_knowledge_tech", title: "Technik", feedURL: "https://www.srf.ch/bnf/rss/19920122", group: .knowledge, sourceId: "srf"),
         
+        // NZZ News Group
+        NewsCategory(id: "nzz_news_recent", title: "Das Neueste", feedURL: "https://www.nzz.ch/recent.rss", group: .news, sourceId: "nzz"),
+        NewsCategory(id: "nzz_news_top", title: "Topthemen", feedURL: "https://www.nzz.ch/startseite.rss", group: .news, sourceId: "nzz"),
+        NewsCategory(id: "nzz_news_international", title: "International", feedURL: "https://www.nzz.ch/international.rss", group: .news, sourceId: "nzz"),
+        NewsCategory(id: "nzz_news_swiss", title: "Schweiz", feedURL: "https://www.nzz.ch/schweiz.rss", group: .news, sourceId: "nzz"),
+        NewsCategory(id: "nzz_news_economy", title: "Wirtschaft", feedURL: "https://www.nzz.ch/wirtschaft.rss", group: .news, sourceId: "nzz"),
+        NewsCategory(id: "nzz_news_finance", title: "Finanzen", feedURL: "https://www.nzz.ch/finanzen.rss", group: .news, sourceId: "nzz"),
+        NewsCategory(id: "nzz_news_zurich", title: "Zürich", feedURL: "https://www.nzz.ch/zuerich.rss", group: .news, sourceId: "nzz"),
+        NewsCategory(id: "nzz_news_panorama", title: "Panorama", feedURL: "https://www.nzz.ch/panorama.rss", group: .news, sourceId: "nzz"),
+        
+        // NZZ Sport Group
+        NewsCategory(id: "nzz_sport_all", title: "Sport", feedURL: "https://www.nzz.ch/sport.rss", group: .sport, sourceId: "nzz"),
+        
+        // NZZ Knowledge Group
+        NewsCategory(id: "nzz_knowledge_science", title: "Wissenschaft", feedURL: "https://www.nzz.ch/wissenschaft.rss", group: .knowledge, sourceId: "nzz"),
+        NewsCategory(id: "nzz_knowledge_tech", title: "Technologie", feedURL: "https://www.nzz.ch/technologie.rss", group: .knowledge, sourceId: "nzz"),
+        NewsCategory(id: "nzz_knowledge_auto", title: "Auto", feedURL: "https://www.nzz.ch/mobilitaet/auto-mobil.rss", group: .knowledge, sourceId: "nzz"),
+        
+        // NZZ Culture Group
+        NewsCategory(id: "nzz_culture_all", title: "Feuilleton", feedURL: "https://www.nzz.ch/feuilleton.rss", group: .culture, sourceId: "nzz"),
+        
         // 20 Minuten News Group
         NewsCategory(id: "20min_news_all", title: "News", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/front", group: .news, sourceId: "20min"),
         NewsCategory(id: "20min_news_swiss", title: "Schweiz", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/schweiz", group: .news, sourceId: "20min"),
@@ -99,6 +120,9 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         "srf_sport_all",
         "srf_culture_all",
         "srf_knowledge_all",
+        "nzz_news_all",
+        "nzz_sport_all",
+        "nzz_culture_all",
         "20min_news_all",
         "20min_sport_all",
         "20min_knowledge_all"

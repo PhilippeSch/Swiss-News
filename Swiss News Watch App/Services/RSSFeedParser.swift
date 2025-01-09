@@ -123,25 +123,27 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
     private var currentLink = ""
     private var currentGuid = ""
     private var currentEnclosureUrl = ""
+    private var currentMediaThumbnail = ""
     private var parsingItem = false
     
     var newsItems: [NewsItem] = []
     
-    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
-        currentElement = elementName
+    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String: String] = [:]) {
         if elementName == "item" {
-            parsingItem = true
             currentTitle = ""
             currentDescription = ""
-            currentPubDate = ""
             currentLink = ""
+            currentPubDate = ""
             currentGuid = ""
             currentEnclosureUrl = ""
+            currentMediaThumbnail = ""
+            parsingItem = true
         } else if elementName == "enclosure" {
-            if let url = attributeDict["url"] {
-                currentEnclosureUrl = url
-            }
+            currentEnclosureUrl = attributeDict["url"] ?? ""
+        } else if elementName == "media:thumbnail" {
+            currentMediaThumbnail = attributeDict["url"] ?? ""
         }
+        currentElement = elementName
     }
     
     func parser(_ parser: XMLParser, foundCharacters string: String) {
@@ -166,7 +168,10 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
             let pubDate = dateFormatter.date(from: currentPubDate.trimmingCharacters(in: .whitespacesAndNewlines)) ?? Date()
             
             var finalDescription = currentDescription
-            if !currentEnclosureUrl.isEmpty {
+            
+            if !currentMediaThumbnail.isEmpty {
+                finalDescription += "<enclosure url=\"\(currentMediaThumbnail)\" type=\"image/jpeg\"/>"
+            } else if !currentEnclosureUrl.isEmpty {
                 finalDescription += "<enclosure url=\"\(currentEnclosureUrl)\" type=\"image/jpeg\"/>"
             }
             
