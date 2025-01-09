@@ -64,10 +64,15 @@ struct ContentView: View {
                                 showWelcome = true
                             })
                         ], id: \.0) { title, action in
-                            Button(title, action: action)
+                            Button(action: action) {
+                                Text(title)
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                            }
+                            .buttonStyle(.bordered)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 15, bottom: 4, trailing: 15))
                         }
                     }
-                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
                     #endif
                 }
                 .listStyle(.plain)
