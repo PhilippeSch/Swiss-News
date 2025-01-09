@@ -71,7 +71,7 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         NewsCategory(id: "srf_knowledge_tech", title: "Technik", feedURL: "https://www.srf.ch/bnf/rss/19920122", group: .knowledge, sourceId: "srf"),
         
         // NZZ News Group
-        NewsCategory(id: "nzz_news_recent", title: "Das Neueste", feedURL: "https://www.nzz.ch/recent.rss", group: .news, sourceId: "nzz"),
+        NewsCategory(id: "nzz_news_recent", title: "Neuestes", feedURL: "https://www.nzz.ch/recent.rss", group: .news, sourceId: "nzz"),
         NewsCategory(id: "nzz_news_top", title: "Topthemen", feedURL: "https://www.nzz.ch/startseite.rss", group: .news, sourceId: "nzz"),
         NewsCategory(id: "nzz_news_international", title: "International", feedURL: "https://www.nzz.ch/international.rss", group: .news, sourceId: "nzz"),
         NewsCategory(id: "nzz_news_swiss", title: "Schweiz", feedURL: "https://www.nzz.ch/schweiz.rss", group: .news, sourceId: "nzz"),

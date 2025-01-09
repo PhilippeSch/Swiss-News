@@ -141,7 +141,11 @@ private struct ReadButton: View {
         NavigationLink {
             ArticleView(title: title, url: url)
                 .onAppear {
+                    print("📖 Article View appeared")
                     readArticlesManager.markAsViewed(url)
+                }
+                .onDisappear {
+                    print("📕 Article View disappeared")
                 }
         } label: {
             Text("Lesen")
@@ -153,5 +157,11 @@ private struct ReadButton: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
+        .onAppear {
+            print("🔵 ReadButton appeared")
+        }
+        .onDisappear {
+            print("🔴 ReadButton disappeared")
+        }
     }
 } 
