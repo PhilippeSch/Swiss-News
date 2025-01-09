@@ -4,7 +4,7 @@ import SwiftSoup
 struct ArticleView: View {
     let title: String
     let url: String
-    @State private var articleContent: String = "Loading..."
+    @State private var articleContent: String = ""
     @State private var isLoading = true
     @State private var error: Error?
     @Environment(\.dismiss) private var dismiss
@@ -20,8 +20,6 @@ struct ArticleView: View {
                     VStack {
                         ProgressView("Wird aktualisiert...")
                             .frame(maxWidth: .infinity, alignment: .center)
-                        Text(articleContent)
-                            .opacity(0.5)
                     }
                 } else if let error = error {
                     VStack(alignment: .leading, spacing: 8) {
