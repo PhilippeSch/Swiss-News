@@ -46,6 +46,7 @@ struct ArticleView: View {
     
     private func fetchArticleContent() async {
         do {
+            print("📱 Loading article from: \(url)")
             guard let url = URL(string: url) else {
                 throw URLError(.badURL)
             }
@@ -56,35 +57,49 @@ struct ArticleView: View {
             }
             
             let document = try SwiftSoup.parse(html)
+            
+            // Versuche verschiedene Selektoren für 20min und SRF
+            let possibleSelectors = [
+                "section.articlepage__article-content",  // SRF Selector
+                "div.article-content",                   // Möglicher 20min Selector
+                "article",                               // Generischer Artikel Selector
+                ".article__body"                         // Alternativer 20min Selector
+            ]
+            
             var content = ""
             
-            if let articleSection = try document.select("section.articlepage__article-content").first() {
-                // Handle bullet point lists
-                let lists = try articleSection.select("ul.article-list")
-                for list in lists {
-                    let items = try list.select("li")
-                    for item in items {
-                        let itemText = try item.text()
-                        content += "• \(itemText)\n"
+            for selector in possibleSelectors {
+                if let articleSection = try document.select(selector).first() {
+                    
+                    // Handle bullet point lists
+                    let lists = try articleSection.select("ul")
+                    for list in lists {
+                        let items = try list.select("li")
+                        for item in items {
+                            let itemText = try item.text()
+                            content += "• \(itemText)\n"
+                        }
+                        content += "\n"
                     }
-                    content += "\n"
-                }
-                
-                // Handle paragraphs, excluding those directly inside expandable boxes
-                let paragraphs = try articleSection.select("p.article-paragraph")
-                for paragraph in paragraphs {
-                    // Check if the paragraph's parent is an expandable box
-                    let parent = paragraph.parent()
-                    if parent?.hasClass("expandable-box") != true {
+                    
+                    // Handle paragraphs
+                    let paragraphs = try articleSection.select("p")
+                    for paragraph in paragraphs {
                         let paragraphText = try paragraph.text()
-                        content += "\(paragraphText)\n\n"
+                        if !paragraphText.isEmpty {
+                            content += "\(paragraphText)\n\n"
+                        }
                     }
+                    
+                    break // Beende die Suche, wenn Content gefunden wurde
                 }
-                
-                // Clean up multiple line breaks
-                let cleanedContent = content.replacingOccurrences(of: "\n{3,}", with: "\n\n", options: .regularExpression)
-                articleContent = cleanedContent.trimmingCharacters(in: .whitespacesAndNewlines)
-            } else {
+            }
+            
+            // Clean up multiple line breaks
+            let cleanedContent = content.replacingOccurrences(of: "\n{3,}", with: "\n\n", options: .regularExpression)
+            articleContent = cleanedContent.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            if articleContent.isEmpty {
                 articleContent = "No content was found."
             }
             
