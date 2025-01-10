@@ -11,6 +11,9 @@ class Settings: ObservableObject {
     
     private static let firstLaunchKey = "com.scheuber.swissnews.firstLaunch"
     
+    private var isBatchUpdating = false
+    private var hasChanges = false
+    
     var isFirstLaunch: Bool {
         get {
             // Check if we've stored the first launch key
@@ -107,31 +110,47 @@ class Settings: ObservableObject {
         saveSelectedCategories()
         saveSelectedSources()
     }
-}
-
-extension Settings {
-    func saveCutoffHours() {
-        UserDefaults.standard.set(cutoffHours, forKey: "cutoffHours")
-        NotificationCenter.default.post(name: .settingsChanged, object: nil)
+    
+    func beginBatchUpdate() {
+        isBatchUpdating = true
+    }
+    
+    func endBatchUpdate() {
+        isBatchUpdating = false
+        if hasChanges {
+            // Trigger a single update after all changes are complete
+            objectWillChange.send()
+            hasChanges = false
+        }
     }
     
     func saveSelectedCategories() {
-        if let encoded = try? JSONEncoder().encode(Array(selectedCategories)) {
-            UserDefaults.standard.set(encoded, forKey: "selectedCategories")
-            NotificationCenter.default.post(name: .settingsChanged, object: nil)
+        if isBatchUpdating {
+            hasChanges = true
+            UserDefaults.standard.set(Array(selectedCategories), forKey: Constants.UserDefaults.selectedCategoriesKey)
+        } else {
+            objectWillChange.send()
+            UserDefaults.standard.set(Array(selectedCategories), forKey: Constants.UserDefaults.selectedCategoriesKey)
         }
+    }
+    
+    func saveSelectedSources() {
+        if isBatchUpdating {
+            hasChanges = true
+            UserDefaults.standard.set(Array(selectedSources), forKey: "selectedSources")
+        } else {
+            objectWillChange.send()
+            UserDefaults.standard.set(Array(selectedSources), forKey: "selectedSources")
+        }
+    }
+    
+    func saveCutoffHours() {
+        UserDefaults.standard.set(cutoffHours, forKey: "cutoffHours")
     }
     
     func resetFirstLaunch() {
         print("Resetting first launch state")
         UserDefaults.standard.removeObject(forKey: Settings.firstLaunchKey)
-    }
-    
-    func saveSelectedSources() {
-        if let encoded = try? JSONEncoder().encode(selectedSources) {
-            UserDefaults.standard.set(encoded, forKey: "selectedSources")
-            NotificationCenter.default.post(name: .settingsChanged, object: nil)
-        }
     }
 }
 

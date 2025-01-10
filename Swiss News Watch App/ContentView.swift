@@ -41,38 +41,14 @@ struct ContentView: View {
                         readArticlesManager: readArticlesManager
                     )
                     
-                    NavigationLink(destination: SettingsView(settings: settings)) {
-                        Image(systemName: "gear")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    }
-                    .buttonStyle(.plain)
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
+                    SettingsButton(settings: settings, rssParser: rssParser)
                     
                     #if DEBUG
-                    Section {
-                        ForEach([
-                            ("Reset App State", {
-                                Settings.resetAllSettings()
-                                settings.resetToDefaults()
-                                settings.resetFirstLaunch()
-                                rssParser.reset()
-                                showWelcome = true
-                            }),
-                            ("Show Welcome", {
-                                settings.resetFirstLaunch()
-                                showWelcome = true
-                            })
-                        ], id: \.0) { title, action in
-                            Button(action: action) {
-                                Text(title)
-                                    .frame(maxWidth: .infinity, alignment: .center)
-                            }
-                            .buttonStyle(.bordered)
-                            .listRowInsets(EdgeInsets(top: 4, leading: 15, bottom: 4, trailing: 15))
-                        }
-                    }
-                    .listRowBackground(Color.clear)
+                    DebugSection(
+                        settings: settings,
+                        rssParser: rssParser,
+                        showWelcome: $showWelcome
+                    )
                     #endif
                 }
                 .listStyle(.plain)
@@ -80,15 +56,13 @@ struct ContentView: View {
                     await rssParser.fetchAllFeeds()
                 }
                 .task {
-                    // Initial scroll to top
                     await MainActor.run {
                         withAnimation {
                             proxy.scrollTo("top", anchor: .top)
                         }
                     }
                 }
-                .onChange(of: rssParser.state.lastUpdate) { oldValue, newValue in
-                    // Scroll to top after feeds are loaded
+                .onChange(of: rssParser.state.lastUpdate) { _, _ in
                     withAnimation {
                         proxy.scrollTo("top", anchor: .top)
                     }
@@ -133,6 +107,57 @@ struct ContentView: View {
         }
     }
 }
+
+private struct SettingsButton: View {
+    let settings: Settings
+    let rssParser: RSSFeedParser
+    
+    var body: some View {
+        NavigationLink {
+            SettingsView(settings: settings, rssParser: rssParser)
+        } label: {
+            Image(systemName: "gear")
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+        .buttonStyle(.plain)
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+    }
+}
+
+#if DEBUG
+private struct DebugSection: View {
+    let settings: Settings
+    let rssParser: RSSFeedParser
+    @Binding var showWelcome: Bool
+    
+    var body: some View {
+        Section {
+            ForEach([
+                ("Reset App State", {
+                    Settings.resetAllSettings()
+                    settings.resetToDefaults()
+                    settings.resetFirstLaunch()
+                    rssParser.reset()
+                    showWelcome = true
+                }),
+                ("Show Welcome", {
+                    settings.resetFirstLaunch()
+                    showWelcome = true
+                })
+            ], id: \.0) { title, action in
+                Button(action: action) {
+                    Text(title)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
+                .buttonStyle(.bordered)
+                .listRowInsets(EdgeInsets(top: 4, leading: 15, bottom: 4, trailing: 15))
+            }
+        }
+        .listRowBackground(Color.clear)
+    }
+}
+#endif
 
 private struct HeaderView: View {
     let lastUpdate: Date?

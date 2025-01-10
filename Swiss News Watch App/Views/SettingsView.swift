@@ -2,7 +2,9 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var settings: Settings
+    @ObservedObject var rssParser: RSSFeedParser
     @State private var expandedSource: String?
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         Form {
@@ -11,6 +13,24 @@ struct SettingsView: View {
             versionSection
         }
         .navigationTitle("Einstellungen")
+        .onAppear {
+            print("📱 SettingsView Body appeared")
+            rssParser.setSettingsViewActive(true)
+        }
+        .onDisappear {
+            print("📱 SettingsView Body disappeared")
+            rssParser.setSettingsViewActive(false)
+        }
+        .onChange(of: settings.selectedCategories) { oldValue, newValue in
+            print("🔄 Selected categories changed in SettingsView")
+            print("Old value: \(oldValue)")
+            print("New value: \(newValue)")
+        }
+        .onChange(of: settings.selectedSources) { oldValue, newValue in
+            print("🔄 Selected sources changed in SettingsView")
+            print("Old value: \(oldValue)")
+            print("New value: \(newValue)")
+        }
     }
     
     private var timeFilterSection: some View {
@@ -152,16 +172,35 @@ private struct CategoryToggle: View {
         Toggle(category.title, isOn: Binding(
             get: { settings.selectedCategories.contains(category.id) },
             set: { isSelected in
-                if isSelected {
-                    settings.selectedCategories.insert(category.id)
-                    settings.selectedSources.insert(sourceId)
-                } else {
-                    settings.selectedCategories.remove(category.id)
-                }
+                settings.beginBatchUpdate()
+                updateSettings(isSelected)
                 settings.saveSelectedCategories()
                 settings.saveSelectedSources()
+                settings.endBatchUpdate()
             }
         ))
         .disabled(!settings.selectedSources.contains(sourceId))
+    }
+    
+    private func checkOtherCategories() -> Bool {
+        let sameSourceCategories = NewsCategory.available.filter { 
+            $0.sourceId == sourceId && $0.id != category.id 
+        }
+        
+        return sameSourceCategories.contains { category in
+            settings.selectedCategories.contains(category.id)
+        }
+    }
+    
+    private func updateSettings(_ isSelected: Bool) {
+        if isSelected {
+            settings.selectedCategories.insert(category.id)
+            settings.selectedSources.insert(sourceId)
+        } else {
+            settings.selectedCategories.remove(category.id)
+            if !checkOtherCategories() {
+                settings.selectedSources.remove(sourceId)
+            }
+        }
     }
 } 

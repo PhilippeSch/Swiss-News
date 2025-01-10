@@ -9,12 +9,82 @@ class RSSFeedParser: ObservableObject {
     @Published var settings: Settings
     
     private var settingsObserver: AnyCancellable?
+    private var refreshTask: Task<Void, Never>?
+    private var isSettingsViewActive = false
+    
+    // Neuer State Manager
+    private enum RefreshState {
+        case idle
+        case refreshing
+        case pendingRefresh
+    }
+    private var currentState: RefreshState = .idle
     
     init(settings: Settings) {
         self.settings = settings
-        settingsObserver = settings.$selectedCategories.sink { [weak self] _ in
+        setupSettingsObserver()
+    }
+    
+    private func setupSettingsObserver() {
+        settingsObserver = settings.$selectedCategories
+            .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
+            .sink { [weak self] categories in
+                guard let self = self else { return }
+                print("🔄 Categories changed in RSSFeedParser")
+                print("Current categories: \(categories)")
+                
+                if self.isSettingsViewActive {
+                    print("⏳ Settings view active, will refresh after closing")
+                    self.currentState = .pendingRefresh
+                    return
+                }
+                
+                Task {
+                    await self.tryRefresh()
+                }
+            }
+    }
+    
+    private func tryRefresh() async {
+        switch currentState {
+        case .idle:
+            await startRefresh()
+        case .refreshing:
+            print("⏳ Refresh already in progress, marking as pending")
+            currentState = .pendingRefresh
+        case .pendingRefresh:
+            print("⏳ Refresh already pending")
+        }
+    }
+    
+    private func startRefresh() async {
+        print("🔄 Starting refresh")
+        currentState = .refreshing
+        refreshTask?.cancel()
+        
+        refreshTask = Task {
+            print("📡 Fetching feeds...")
+            await fetchAllFeeds()
+            
+            if currentState == .pendingRefresh {
+                print("🔄 Executing pending refresh")
+                currentState = .idle
+                await tryRefresh()
+            } else {
+                currentState = .idle
+            }
+        }
+    }
+    
+    func setSettingsViewActive(_ active: Bool) {
+        print("🔧 Settings view active state changed to: \(active)")
+        isSettingsViewActive = active
+        
+        if !active && currentState == .pendingRefresh {
             Task {
-                await self?.fetchAllFeeds()
+                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
+                print("🔄 Settings view closed, executing pending refresh")
+                await tryRefresh()
             }
         }
     }
