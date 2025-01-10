@@ -8,6 +8,8 @@ struct ArticleView: View {
     @State private var isLoading = true
     @State private var error: Error?
     @Environment(\.dismiss) private var dismiss
+    @State private var hasSubtitle = false
+    @State private var subtitles: Set<String> = []
     
     var body: some View {
         ScrollView {
@@ -31,7 +33,7 @@ struct ArticleView: View {
                             .foregroundColor(.red)
                     }
                 } else {
-                    HyphenatedTextView(text: articleContent)
+                    HyphenatedTextView(text: articleContent, subtitles: subtitles)
                         .padding(.horizontal, 4)
                 }
             }
@@ -59,6 +61,8 @@ struct ArticleView: View {
             var content = ""
             
             if url.absoluteString.contains("nzz.ch") {
+                subtitles.removeAll()
+                
                 let articleElements = try document.select("[pagetype='Article']")
                 for element in articleElements {
                     let componentType = try element.attr("componenttype")
@@ -68,6 +72,7 @@ struct ArticleView: View {
                         switch componentType {
                         case "subtitle":
                             content += "\(elementText)\n\n"
+                            subtitles.insert(elementText)
                         case "p":
                             content += "\(elementText)\n\n"
                         default:
@@ -75,9 +80,8 @@ struct ArticleView: View {
                         }
                     }
                 }
-            }
-            
-            if content.isEmpty {
+            } else {
+                subtitles.removeAll()
                 let possibleSelectors = [
                     "section.articlepage__article-content",
                     "div.article-content",

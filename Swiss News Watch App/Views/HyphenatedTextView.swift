@@ -2,13 +2,15 @@ import SwiftUI
 
 struct HyphenatedTextView: View {
     let text: String
+    let subtitles: Set<String>
     
     var body: some View {
         Text(attributedString)
-            .font(.footnote)
             .lineSpacing(2)
             .multilineTextAlignment(.leading)
             .environment(\.locale, Locale(identifier: "de_CH"))
+            .allowsTightening(true)
+            .lineLimit(nil)
     }
     
     private var attributedString: AttributedString {
@@ -20,12 +22,8 @@ struct HyphenatedTextView: View {
         for (index, paragraph) in paragraphs.enumerated() {
             var paragraphString = AttributedString(paragraph)
             
-            // Apply bold font to subtitles (first paragraph)
-            if index == 0 {
-                paragraphString.font = .footnote.bold()
-            } else {
-                paragraphString.font = .footnote
-            }
+            // Make paragraph bold if it's a subtitle
+            paragraphString.font = subtitles.contains(paragraph) ? .footnote.bold() : .footnote
             
             // Add paragraph to main string
             if index > 0 {
@@ -35,5 +33,13 @@ struct HyphenatedTextView: View {
         }
         
         return attributedString
+    }
+}
+
+// Helper for cleaner NSMutableParagraphStyle configuration
+extension NSMutableParagraphStyle {
+    func apply(_ block: (NSMutableParagraphStyle) -> Void) -> NSMutableParagraphStyle {
+        block(self)
+        return self
     }
 } 
