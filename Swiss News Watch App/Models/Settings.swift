@@ -14,6 +14,9 @@ class Settings: ObservableObject {
     private var isBatchUpdating = false
     private var hasChanges = false
     
+    private var pendingCategoryChanges: Set<String>?
+    private var pendingSourceChanges: Set<String>?
+    
     var isFirstLaunch: Bool {
         get {
             // Check if we've stored the first launch key
@@ -151,6 +154,40 @@ class Settings: ObservableObject {
     func resetFirstLaunch() {
         print("Resetting first launch state")
         UserDefaults.standard.removeObject(forKey: Settings.firstLaunchKey)
+    }
+    
+    func beginSettingsSession() {
+        // Store current state as pending changes
+        pendingCategoryChanges = selectedCategories
+        pendingSourceChanges = selectedSources
+    }
+    
+    func commitSettingsChanges() {
+        // Only save if there were actual changes
+        if pendingCategoryChanges != selectedCategories {
+            saveSelectedCategories()
+        }
+        if pendingSourceChanges != selectedSources {
+            saveSelectedSources()
+        }
+        
+        // Clear pending changes
+        pendingCategoryChanges = nil
+        pendingSourceChanges = nil
+    }
+    
+    func discardSettingsChanges() {
+        // Restore original state if needed
+        if let originalCategories = pendingCategoryChanges {
+            selectedCategories = originalCategories
+        }
+        if let originalSources = pendingSourceChanges {
+            selectedSources = originalSources
+        }
+        
+        // Clear pending changes
+        pendingCategoryChanges = nil
+        pendingSourceChanges = nil
     }
 }
 

@@ -10,7 +10,7 @@ class RSSFeedParser: ObservableObject {
     
     private var settingsObserver: AnyCancellable?
     private var refreshTask: Task<Void, Never>?
-    private var isSettingsViewActive = false
+    @Published private(set) var isSettingsViewActive = false
     
     // Neuer State Manager
     private enum RefreshState {
@@ -80,11 +80,12 @@ class RSSFeedParser: ObservableObject {
         print("🔧 Settings view active state changed to: \(active)")
         isSettingsViewActive = active
         
-        if !active && currentState == .pendingRefresh {
+        if !active {
             Task {
                 try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
                 print("🔄 Settings view closed, executing pending refresh")
                 await tryRefresh()
+                isSettingsViewActive = false  // Ensure we reset the state
             }
         }
     }

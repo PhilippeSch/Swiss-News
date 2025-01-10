@@ -3,7 +3,6 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var settings: Settings
     @ObservedObject var rssParser: RSSFeedParser
-    @State private var expandedSource: String?
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -16,20 +15,13 @@ struct SettingsView: View {
         .onAppear {
             print("📱 SettingsView Body appeared")
             rssParser.setSettingsViewActive(true)
+            settings.beginSettingsSession()
         }
         .onDisappear {
-            print("📱 SettingsView Body disappeared")
-            rssParser.setSettingsViewActive(false)
-        }
-        .onChange(of: settings.selectedCategories) { oldValue, newValue in
-            print("🔄 Selected categories changed in SettingsView")
-            print("Old value: \(oldValue)")
-            print("New value: \(newValue)")
-        }
-        .onChange(of: settings.selectedSources) { oldValue, newValue in
-            print("🔄 Selected sources changed in SettingsView")
-            print("Old value: \(oldValue)")
-            print("New value: \(newValue)")
+            if !rssParser.isSettingsViewActive {  // Only commit if actually dismissing
+                print("📱 SettingsView Body disappeared - committing changes")
+                settings.commitSettingsChanges()
+            }
         }
     }
     
@@ -45,18 +37,44 @@ struct SettingsView: View {
     }
     
     private var sourcesSection: some View {
-        Section(header: Text("Nachrichtenquellen")) {
+        Section(
+            header: Text("Nachrichtenquellen"),
+            footer: Text("Tippe auf eine Quelle um die Kategorien auszuwählen →")
+                .font(.caption)
+                .foregroundColor(.gray)
+        ) {
             ForEach(NewsSource.available) { source in
-                SourceRow(
-                    source: source,
-                    isExpanded: expandedSource == source.id,
-                    settings: settings,
-                    onToggle: { isExpanded in
-                        withAnimation {
-                            expandedSource = isExpanded ? source.id : nil
-                        }
+                NavigationLink {
+                    SourceCategoriesView(source: source, settings: settings, rssParser: rssParser)
+                } label: {
+                    HStack {
+                        Image(source.logoName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 20)
+                        
+                        Text(source.name)
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: Binding(
+                            get: { settings.selectedSources.contains(source.id) },
+                            set: { isSelected in
+                                if isSelected {
+                                    settings.selectedSources.insert(source.id)
+                                } else {
+                                    settings.selectedSources.remove(source.id)
+                                    settings.selectedCategories = settings.selectedCategories.filter { !$0.starts(with: "\(source.id)_") }
+                                }
+                                settings.saveSelectedSources()
+                            }
+                        ))
+                        
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.gray)
+                            .font(.caption)
                     }
-                )
+                }
             }
         }
     }
@@ -71,94 +89,37 @@ struct SettingsView: View {
     }
 }
 
-private struct SourceRow: View {
+private struct SourceCategoriesView: View {
     let source: NewsSource
-    let isExpanded: Bool
     @ObservedObject var settings: Settings
-    let onToggle: (Bool) -> Void
+    @ObservedObject var rssParser: RSSFeedParser
     
     var body: some View {
-        VStack(spacing: 0) {
-            sourceHeader
-            if isExpanded {
-                categoryList
-            }
-        }
-    }
-    
-    private var sourceHeader: some View {
-        Button(action: { onToggle(!isExpanded) }) {
-            HStack {
-                Image(source.logoName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 20)
-                
-                Text(source.name)
-                
-                Spacer()
-                
-                Toggle("", isOn: Binding(
-                    get: { settings.selectedSources.contains(source.id) },
-                    set: { isSelected in
-                        if isSelected {
-                            settings.selectedSources.insert(source.id)
-                        } else {
-                            settings.selectedSources.remove(source.id)
-                            settings.selectedCategories = settings.selectedCategories.filter { !$0.starts(with: "\(source.id)_") }
-                        }
-                        settings.saveSelectedSources()
-                    }
-                ))
-                
-                Image(systemName: "chevron.right")
-                    .rotationEffect(.degrees(isExpanded ? 90 : 0))
-            }
-        }
-        .foregroundColor(.primary)
-    }
-    
-    private var categoryList: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        Form {
             ForEach(settings.categoryOrder) { group in
                 let sourceCategories = NewsCategory.categoriesByGroup()[group]?
                     .filter { $0.sourceId == source.id } ?? []
                 
                 if !sourceCategories.isEmpty {
-                    CategoryGroup(
-                        group: group,
-                        categories: sourceCategories,
-                        settings: settings,
-                        sourceId: source.id
-                    )
+                    Section(header: Text(group.title)) {
+                        ForEach(sourceCategories) { category in
+                            CategoryToggle(
+                                category: category,
+                                settings: settings,
+                                sourceId: source.id
+                            )
+                        }
+                    }
                 }
             }
         }
-        .padding(.leading)
-        .padding(.top, 8)
-    }
-}
-
-private struct CategoryGroup: View {
-    let group: NewsCategory.CategoryGroup
-    let categories: [NewsCategory]
-    @ObservedObject var settings: Settings
-    let sourceId: String
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(group.title)
-                .font(.caption)
-                .foregroundColor(.gray)
-                .padding(.top, 4)
-            
-            ForEach(categories) { category in
-                CategoryToggle(
-                    category: category,
-                    settings: settings,
-                    sourceId: sourceId
-                )
-            }
+        .navigationTitle(source.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            print("📱 Category selector appeared")
+        }
+        .onDisappear {
+            print("📱 Category selector disappeared")
         }
     }
 }
@@ -167,19 +128,17 @@ private struct CategoryToggle: View {
     let category: NewsCategory
     @ObservedObject var settings: Settings
     let sourceId: String
+    @State private var isToggled: Bool = false
     
     var body: some View {
-        Toggle(category.title, isOn: Binding(
-            get: { settings.selectedCategories.contains(category.id) },
-            set: { isSelected in
-                settings.beginBatchUpdate()
-                updateSettings(isSelected)
-                settings.saveSelectedCategories()
-                settings.saveSelectedSources()
-                settings.endBatchUpdate()
+        Toggle(category.title, isOn: $isToggled)
+            .disabled(!settings.selectedSources.contains(sourceId))
+            .onAppear {
+                isToggled = settings.selectedCategories.contains(category.id)
             }
-        ))
-        .disabled(!settings.selectedSources.contains(sourceId))
+            .onChange(of: isToggled) { _, newValue in
+                updateSettings(newValue)
+            }
     }
     
     private func checkOtherCategories() -> Bool {
