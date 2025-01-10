@@ -38,7 +38,6 @@ struct ArticleView: View {
             .padding()
         }
         .navigationTitle("Artikel")
-        .interactiveDismissDisabled(isLoading)
         .task {
             await fetchArticleContent()
         }

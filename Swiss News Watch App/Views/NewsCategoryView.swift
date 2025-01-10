@@ -4,6 +4,7 @@ struct NewsCategoryView: View {
     let title: String
     let newsItems: [NewsItem]
     @ObservedObject var readArticlesManager: ReadArticlesManager
+    @State private var isViewingArticle = false
     
     var body: some View {
         ScrollView {
@@ -12,13 +13,19 @@ struct NewsCategoryView: View {
             } else {
                 ArticleListView(
                     newsItems: newsItems,
-                    readArticlesManager: readArticlesManager
+                    readArticlesManager: readArticlesManager,
+                    isViewingArticle: $isViewingArticle
                 )
             }
         }
         .navigationTitle(title)
         .onDisappear {
-            readArticlesManager.markAllViewedAsRead()
+            if !isViewingArticle {
+                readArticlesManager.markAllViewedAsRead()
+            }
+        }
+        .onAppear {
+            isViewingArticle = false
         }
     }
 }
@@ -40,13 +47,15 @@ private struct EmptyStateView: View {
 private struct ArticleListView: View {
     let newsItems: [NewsItem]
     @ObservedObject var readArticlesManager: ReadArticlesManager
+    @Binding var isViewingArticle: Bool
     
     var body: some View {
         LazyVStack(spacing: 12) {
             ForEach(newsItems) { item in
                 ArticleRowView(
                     item: item,
-                    readArticlesManager: readArticlesManager
+                    readArticlesManager: readArticlesManager,
+                    isViewingArticle: $isViewingArticle
                 )
             }
         }
@@ -57,6 +66,7 @@ private struct ArticleListView: View {
 private struct ArticleRowView: View {
     let item: NewsItem
     @ObservedObject var readArticlesManager: ReadArticlesManager
+    @Binding var isViewingArticle: Bool
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -93,7 +103,8 @@ private struct ArticleRowView: View {
                 ReadButton(
                     title: item.title,
                     url: item.link,
-                    readArticlesManager: readArticlesManager
+                    readArticlesManager: readArticlesManager,
+                    isViewingArticle: $isViewingArticle
                 )
             }
         }
@@ -101,9 +112,6 @@ private struct ArticleRowView: View {
         .background(Color(white: 0.3, opacity: 0.4))
         .cornerRadius(12)
         .padding(.horizontal)
-        .onAppear {
-            readArticlesManager.markAsViewed(item.link)
-        }
     }
 }
 
@@ -136,16 +144,14 @@ private struct ReadButton: View {
     let title: String
     let url: String
     @ObservedObject var readArticlesManager: ReadArticlesManager
+    @Binding var isViewingArticle: Bool
     
     var body: some View {
         NavigationLink {
             ArticleView(title: title, url: url)
                 .onAppear {
-                    print("📖 Article View appeared")
+                    isViewingArticle = true
                     readArticlesManager.markAsViewed(url)
-                }
-                .onDisappear {
-                    print("📕 Article View disappeared")
                 }
         } label: {
             Text("Lesen")
@@ -157,11 +163,5 @@ private struct ReadButton: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
-        .onAppear {
-            print("🔵 ReadButton appeared")
-        }
-        .onDisappear {
-            print("🔴 ReadButton disappeared")
-        }
     }
 } 
