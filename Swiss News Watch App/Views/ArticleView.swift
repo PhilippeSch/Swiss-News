@@ -67,7 +67,7 @@ struct ArticleView: View {
                     if !elementText.isEmpty {
                         switch componentType {
                         case "subtitle":
-                            content += "**\(elementText)**\n\n"
+                            content += "\(elementText)\n\n"
                         case "p":
                             content += "\(elementText)\n\n"
                         default:
