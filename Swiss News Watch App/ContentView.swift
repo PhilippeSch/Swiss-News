@@ -122,6 +122,7 @@ private struct SettingsButton: View {
         .buttonStyle(.plain)
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
+        .accessibilityIdentifier("settingsButton")
     }
 }
 
@@ -169,6 +170,7 @@ private struct HeaderView: View {
             Text("Swiss News")
                 .font(.title3)
                 .fontWeight(.bold)
+                .accessibilityIdentifier("appHeader")
             if rssParser.state.isLoading {
                 Text("News Feeds updating...")
                     .font(.caption2)

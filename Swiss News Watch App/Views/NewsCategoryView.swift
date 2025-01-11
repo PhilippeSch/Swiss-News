@@ -16,9 +16,11 @@ struct NewsCategoryView: View {
                     readArticlesManager: readArticlesManager,
                     isViewingArticle: $isViewingArticle
                 )
+                .accessibilityIdentifier("articleList")
             }
         }
         .navigationTitle(title)
+        .accessibilityIdentifier("newsCategoryView")
         .onDisappear {
             if !isViewingArticle {
                 readArticlesManager.markAllViewedAsRead()
@@ -57,9 +59,11 @@ private struct ArticleListView: View {
                     readArticlesManager: readArticlesManager,
                     isViewingArticle: $isViewingArticle
                 )
+                .accessibilityIdentifier("articleRow_\(item.guid)")
             }
         }
         .padding(.vertical)
+        .accessibilityIdentifier("articleListContent")
     }
 }
 
@@ -161,6 +165,7 @@ private struct ReadButton: View {
                 .background(Color.accentColor)
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+                .accessibilityIdentifier("readButton")
         }
         .buttonStyle(.plain)
     }

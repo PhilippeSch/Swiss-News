@@ -22,6 +22,7 @@ struct CategoryRowView: View {
                 categoryId: category.id
             )
         }
+        .accessibilityIdentifier("categoryRow_\(category.id)")
     }
 }
 

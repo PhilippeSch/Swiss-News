@@ -1,0 +1,37 @@
+{
+  "configurations" : [
+    {
+      "id" : "FC307B67-17E3-4842-AEC9-AFE4EBA1BB40",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Swiss News.xcodeproj",
+      "identifier" : "3745C8822D24009100194BDA",
+      "name" : "Swiss News Watch App"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Swiss News.xcodeproj",
+        "identifier" : "3745C8942D24009200194BDA",
+        "name" : "Swiss News Watch AppTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Swiss News.xcodeproj",
+        "identifier" : "3745C89E2D24009200194BDA",
+        "name" : "Swiss News Watch AppUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

@@ -13,13 +13,11 @@ struct SettingsView: View {
         }
         .navigationTitle("Einstellungen")
         .onAppear {
-            print("📱 SettingsView Body appeared")
             rssParser.setSettingsViewActive(true)
             settings.beginSettingsSession()
         }
         .onDisappear {
             if !rssParser.isSettingsViewActive {  // Only commit if actually dismissing
-                print("📱 SettingsView Body disappeared - committing changes")
                 settings.commitSettingsChanges()
             }
         }
@@ -115,12 +113,6 @@ private struct SourceCategoriesView: View {
         }
         .navigationTitle(source.name)
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            print("📱 Category selector appeared")
-        }
-        .onDisappear {
-            print("📱 Category selector disappeared")
-        }
     }
 }
 

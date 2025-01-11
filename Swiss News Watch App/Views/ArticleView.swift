@@ -39,6 +39,7 @@ struct ArticleView: View {
             }
             .padding()
         }
+        .accessibilityIdentifier("articleDetailView")
         .navigationTitle("Artikel")
         .task {
             await fetchArticleContent()

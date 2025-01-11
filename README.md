@@ -1,2 +1,3 @@
-# Swiss News
-An Apple Watch app to display News of Swiss newspapers.
+# Swiss News Watch App
+
+![Tests](https://github.com/{username}/{repository}/actions/workflows/tests.yml/badge.svg)

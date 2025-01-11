@@ -50,6 +50,7 @@
 		3745C8832D24009100194BDA /* Swiss News Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3745C8952D24009200194BDA /* Swiss News Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3745C89F2D24009200194BDA /* Swiss News Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3791C1602D32AA5400D703DC /* Swiss News Watch App.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Swiss News Watch App.xctestplan"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -107,6 +108,7 @@
 		3745C8762D24009100194BDA = {
 			isa = PBXGroup;
 			children = (
+				3791C1602D32AA5400D703DC /* Swiss News Watch App.xctestplan */,
 				3745C8872D24009100194BDA /* Swiss News Watch App */,
 				3745C8982D24009200194BDA /* Swiss News Watch AppTests */,
 				3745C8A22D24009200194BDA /* Swiss News Watch AppUITests */,
