@@ -20,16 +20,16 @@ jobs:
     - name: Select Xcode
       run: sudo xcode-select -s /Applications/Xcode.app
       
-    - name: Setup iOS Simulator
+    - name: Setup WatchOS Simulator
       run: |
         xcrun simctl list
-        UDID=$(xcrun simctl create "iPhone 16 Plus" com.apple.CoreSimulator.SimDeviceType.iPhone-16-Plus)
+        UDID=$(xcrun simctl create "Apple Watch Ultra 2 (49mm)" com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Ultra-2-49mm)
         xcrun simctl boot $UDID
-        
+      
     - name: Build and Test
       run: |
         xcodebuild test -scheme "Swiss News Watch App" \
-          -destination "platform=iOS Simulator,name=iPhone 16 Plus,OS=latest" \
+          -destination "platform=WatchOS Simulator,name=Apple Watch Ultra 2 (49mm),OS=latest" \
           -enableCodeCoverage YES \
           -resultBundlePath TestResults
           
