@@ -25,11 +25,12 @@ jobs:
         xcrun simctl list
         UDID=$(xcrun simctl create "Apple Watch Ultra 2 (49mm)" com.apple.CoreSimulator.SimDeviceType.Apple-Watch-Ultra-2-49mm)
         xcrun simctl boot $UDID
-      
+        echo "UDID=$UDID" >> $GITHUB_ENV
+    
     - name: Build and Test
       run: |
         xcodebuild test -scheme "Swiss News Watch App" \
-          -destination "platform=watchOS Simulator,name=Apple Watch Ultra 2 (49mm),OS=latest" \
+          -destination "id=${{ env.UDID }}" \
           -enableCodeCoverage YES \
           -resultBundlePath TestResults
           
@@ -54,10 +55,10 @@ jobs:
         script: |
           const fs = require('fs');
           const coverage = fs.readFileSync('coverage.txt', 'utf8');
-          const comment = `## Test Coverage Report\n\`\`\`\n${coverage}\n\`\`\``;
+          const comment = `## Test Coverage Report\n\n\`\`\`\n${coverage}\n\`\`\``;
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
             body: comment
-          }); 
+          });
