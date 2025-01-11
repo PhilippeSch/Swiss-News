@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: Run Tests
-    runs-on: macos-latest
+    runs-on: macos-15
     
     env:
       DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
@@ -23,13 +23,13 @@ jobs:
     - name: Setup iOS Simulator
       run: |
         xcrun simctl list
-        UDID=$(xcrun simctl create "iPhone 15 Pro" com.apple.CoreSimulator.SimDeviceType.iPhone-15-Pro)
+        UDID=$(xcrun simctl create "iPhone 16 Pro" com.apple.CoreSimulator.SimDeviceType.iPhone-16-Pro)
         xcrun simctl boot $UDID
         
     - name: Build and Test
       run: |
         xcodebuild test -scheme "Swiss News Watch App" \
-          -destination "platform=iOS Simulator,name=iPhone 15 Pro,OS=latest" \
+          -destination "platform=iOS Simulator,name=iPhone 16 Pro,OS=latest" \
           -enableCodeCoverage YES \
           -resultBundlePath TestResults
           
