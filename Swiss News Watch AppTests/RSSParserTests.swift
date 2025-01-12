@@ -39,9 +39,25 @@ final class RSSParserTests: XCTestCase {
         
         // Give time for state to update
         try await Task.sleep(nanoseconds: 100_000_000)
-        XCTAssertEqual(parser.state, .loading, "State should be loading during fetch")
+        XCTAssertEqual(parser.state, .loading(lastUpdate: nil), "State should be loading during fetch")
         
         await task.value
+    }
+    
+    func testFetchAllFeeds() async throws {
+        // Given
+        XCTAssertEqual(parser.state, .idle, "Initial state should be idle")
+        
+        // When
+        let task = Task {
+            await parser.fetchAllFeeds()
+        }
+        
+        // Then
+        try await Task.sleep(nanoseconds: 100_000_000)  // Wait for state update
+        XCTAssertEqual(parser.state, .loading(lastUpdate: nil), "State should be loading during fetch")
+        
+        await task.value  // Wait for completion
     }
     
     // Helper methods
