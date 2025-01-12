@@ -13,7 +13,7 @@ struct SourceSelectionView: View {
         self._settings = ObservedObject(wrappedValue: settings)
         self._rssParser = ObservedObject(wrappedValue: rssParser)
         self._showWelcome = showWelcome
-        self._selectedSources = State(initialValue: Set<String>())
+        self._selectedSources = State(initialValue: settings.selectedSources)
         self._currentSourceIndex = State(initialValue: 0)
     }
     
@@ -96,7 +96,6 @@ struct SourceSelectionView: View {
     
     private func moveToNextSource() {
         settings.selectedSources = selectedSources
-        settings.selectedCategories.removeAll()
         currentSourceIndex = 0
         showCategorySelection = true
     }
