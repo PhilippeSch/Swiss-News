@@ -31,7 +31,7 @@ final class SwissNewsUITests: XCTestCase {
             
             // Scroll until we find the button or reach bottom
             var attempts = 0
-            while !settingsButton.isHittable && attempts < 3 {
+            while !settingsButton.isHittable && attempts < 5 {
                 mainList.swipeUp()
                 attempts += 1
             }
