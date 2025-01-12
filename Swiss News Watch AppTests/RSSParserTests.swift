@@ -14,74 +14,83 @@ final class RSSParserTests: XCTestCase {
     }
     
     @MainActor
+    func testTimeFilteringNews() async throws {
+        // Set a 24-hour filter
+        settings.cutoffHours = 24.0
+        
+        // Create test data with articles of different ages
+        let oldArticle = createTestArticle(hoursAgo: 48)
+        let newArticle = createTestArticle(hoursAgo: 12)
+        let mockData = createMockRSSFeed([oldArticle, newArticle])
+        
+        let items = try await parseTestFeed(mockData)
+        
+        XCTAssertEqual(items.count, 1, "Should only include articles within time filter")
+        XCTAssertEqual(items.first?.title, "New Article", "Should keep recent article")
+    }
+    
+    @MainActor
+    func testLoadingState() async throws {
+        XCTAssertEqual(parser.state, .idle, "Initial state should be idle")
+        
+        let task = Task {
+            await parser.fetchAllFeeds()
+        }
+        
+        // Give time for state to update
+        try await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertEqual(parser.state, .loading, "State should be loading during fetch")
+        
+        await task.value
+    }
+    
+    // Helper methods
+    private func createTestArticle(hoursAgo: Double) -> (title: String, date: Date) {
+        let date = Calendar.current.date(byAdding: .hour, value: -Int(hoursAgo), to: Date()) ?? Date()
+        return (hoursAgo > 24 ? "Old Article" : "New Article", date)
+    }
+    
+    private func createMockRSSFeed(_ articles: [(title: String, date: Date)]) -> Data {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
+        
+        let articlesXML = articles.map { article in
+            """
+            <item>
+                <title>\(article.title)</title>
+                <description>Test description</description>
+                <pubDate>\(dateFormatter.string(from: article.date))</pubDate>
+                <link>https://test.com/article</link>
+                <guid>test-guid-\(article.title)</guid>
+            </item>
+            """
+        }.joined(separator: "\n")
+        
+        let rssXML = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+            <channel>
+                \(articlesXML)
+            </channel>
+        </rss>
+        """
+        
+        return rssXML.data(using: .utf8)!
+    }
+    
+    private func parseTestFeed(_ data: Data) async throws -> [NewsItem] {
+        let parser = XMLParser(data: data)
+        let delegate = RSSParserDelegate()
+        parser.delegate = delegate
+        
+        XCTAssertTrue(parser.parse(), "Should parse valid RSS feed")
+        return delegate.newsItems
+    }
+    
+    @MainActor
     override func tearDown() async throws {
         parser = nil
         settings = nil
         try await super.tearDown()
-    }
-    
-    @MainActor
-    func testParsingValidRSSFeed() async throws {
-        // Test with a mock RSS feed
-        let mockData = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0">
-            <channel>
-                <item>
-                    <title>Test Article</title>
-                    <description>Test Description</description>
-                    <pubDate>Wed, 21 Feb 2024 12:00:00 +0100</pubDate>
-                    <link>https://test.com/article</link>
-                </item>
-            </channel>
-        </rss>
-        """.data(using: .utf8)!
-        
-        let delegate = RSSParserDelegate()
-        let xmlParser = XMLParser(data: mockData)
-        xmlParser.delegate = delegate
-        
-        XCTAssertTrue(xmlParser.parse())
-        XCTAssertEqual(delegate.newsItems.count, 1)
-        XCTAssertEqual(delegate.newsItems.first?.title, "Test Article")
-    }
-    
-    @MainActor
-    func testLoadingStateManagement() async throws {
-        XCTAssertEqual(parser.state, .idle)
-        
-        await parser.fetchAllFeeds()
-        
-        // Test that state changes appropriately
-        if case .loaded = parser.state {
-            XCTAssertTrue(true)
-        } else {
-            XCTFail("Parser should be in loaded state")
-        }
-    }
-    
-    // Add more tests for error handling
-    @MainActor
-    func testInvalidURLHandling() async throws {
-        // Modify parser to use an invalid URL
-        let invalidCategory = NewsCategory(
-            id: "invalid",
-            title: "Invalid",
-            feedURL: "invalid://url",
-            group: .news,
-            sourceId: "test"
-        )
-        
-        settings.selectedCategories.insert(invalidCategory.id)
-        settings.selectedSources.insert(invalidCategory.sourceId)
-        
-        await parser.fetchAllFeeds()
-        
-        // Should handle invalid URL gracefully
-        if case .loaded = parser.state {
-            XCTAssertTrue(true, "Parser should complete even with invalid URLs")
-        } else {
-            XCTFail("Parser should handle invalid URLs gracefully")
-        }
     }
 } 

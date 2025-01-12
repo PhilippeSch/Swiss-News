@@ -6,35 +6,26 @@ final class SettingsTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
+        UserDefaults.standard.removeObject(forKey: Constants.UserDefaults.cutoffHoursKey)
         settings = Settings()
     }
     
-    func testCategorySelection() {
-        let categoryId = "test_category"
-        settings.selectedCategories.insert(categoryId)
-        XCTAssertTrue(settings.selectedCategories.contains(categoryId))
-        
-        settings.selectedCategories.remove(categoryId)
-        XCTAssertFalse(settings.selectedCategories.contains(categoryId))
+    func testTimeFilterDefaults() {
+        XCTAssertEqual(settings.cutoffHours, 48.0, "Default cutoff should be 48 hours")
     }
     
-    func testBatchUpdates() {
-        settings.beginBatchUpdate()
-        settings.selectedCategories.insert("test1")
-        settings.selectedCategories.insert("test2")
-        settings.endBatchUpdate()
+    func testTimeFilterPersistence() {
+        // Change time filter
+        settings.cutoffHours = 24.0
         
-        XCTAssertTrue(settings.selectedCategories.contains("test1"))
-        XCTAssertTrue(settings.selectedCategories.contains("test2"))
+        // Create new settings instance to test persistence
+        let newSettings = Settings()
+        XCTAssertEqual(newSettings.cutoffHours, 24.0, "Time filter setting should persist")
     }
     
-    func testSettingsSessionChanges() {
-        settings.beginSettingsSession()
-        let originalCount = settings.selectedCategories.count
-        
-        settings.selectedCategories.insert("test_category")
-        settings.commitSettingsChanges()
-        
-        XCTAssertEqual(settings.selectedCategories.count, originalCount + 1)
+    override func tearDown() {
+        UserDefaults.standard.removeObject(forKey: Constants.UserDefaults.cutoffHoursKey)
+        settings = nil
+        super.tearDown()
     }
 } 

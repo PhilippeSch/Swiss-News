@@ -70,6 +70,24 @@ final class SwissNewsUITests: XCTestCase {
         XCTAssertTrue(articleView.waitForExistence(timeout: timeout), "Article detail view should exist")
     }
     
+    func testSettingsTimeFilter() throws {
+        // Navigate to settings
+        let settingsButton = app.buttons["settingsButton"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: timeout), "Settings button should exist")
+        settingsButton.tap()
+        
+        // Verify time filter exists
+        let picker = app.pickers.firstMatch
+        XCTAssertTrue(picker.waitForExistence(timeout: timeout), "Time filter picker should exist")
+        
+        // Test picker interaction
+        picker.tap()
+        app.buttons["24 Stunden"].tap()
+        
+        // Verify navigation back works
+        app.navigationBars["Einstellungen"].buttons.firstMatch.tap()
+    }
+    
     override func tearDown() {
         app.terminate()
         super.tearDown()
