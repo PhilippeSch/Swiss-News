@@ -30,6 +30,7 @@ struct SettingsView: View {
                 Text("48 Stunden").tag(48.0)
                 Text("72 Stunden").tag(72.0)
             }
+            .accessibilityIdentifier("timeFilterPicker")
         }
     }
     

@@ -4,92 +4,83 @@ final class SwissNewsUITests: XCTestCase {
     var app: XCUIApplication!
     let timeout: TimeInterval = 10
     
-    override func setUp() {
-        super.setUp()
+    override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
         app.launchArguments = ["UI-Testing"]
         app.launch()
         
         // Wait for initial load
-        waitForAppReady()
+        try waitForAppReady()
     }
     
-    private func waitForAppReady() {
+    private func waitForAppReady() throws {
         let headerTitle = app.staticTexts["Swiss News"]
         XCTAssertTrue(headerTitle.waitForExistence(timeout: timeout), "App header should exist")
     }
     
-    func testSettingsNavigation() throws {
-        // Find settings button without scrolling first
+    func testSettingsNavigation() async throws {
+        // Wait for initial load
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        
+        // Find settings button and scroll to it
         let settingsButton = app.buttons["settingsButton"]
+        let list = app.collectionViews.firstMatch
         
-        // If button isn't immediately visible, scroll to find it
-        if !settingsButton.isHittable {
-            // Find the main scroll view
-            let mainList = app.collectionViews.firstMatch // List is actually a UICollectionView
-            
-            // Scroll until we find the button or reach bottom
-            var attempts = 0
-            while !settingsButton.isHittable && attempts < 5 {
-                mainList.swipeUp()
-                attempts += 1
-            }
-        }
+        // Scroll to bottom
+        await list.swipeUp(velocity: .slow)
         
-        // Verify and tap button
         XCTAssertTrue(settingsButton.waitForExistence(timeout: timeout), "Settings button should exist")
-        XCTAssertTrue(settingsButton.isHittable, "Settings button should be hittable")
-        settingsButton.tap()
+        await settingsButton.tap()
         
         // Verify navigation
         let settingsTitle = app.navigationBars["Einstellungen"]
         XCTAssertTrue(settingsTitle.waitForExistence(timeout: timeout), "Settings title should exist")
     }
     
-    func testArticleInteraction() throws {
-        // Wait for content to load and find first news category
-        let categoryRow = app.buttons.matching(identifier: "categoryRow_srf_news_all").firstMatch
-        XCTAssertTrue(categoryRow.waitForExistence(timeout: timeout), "News category should exist")
-        categoryRow.tap()
+    func testArticleInteraction() async throws {
+        // Wait for content to load
+        try await Task.sleep(nanoseconds: 2_000_000_000)
         
-        // Wait for article list content
-        let scrollView = app.scrollViews.firstMatch
-        XCTAssertTrue(scrollView.waitForExistence(timeout: timeout), "Article scroll view should exist")
-        
-        // Look for any "Lesen" button
-        let readButton = scrollView.buttons["Lesen"].firstMatch
-        guard readButton.waitForExistence(timeout: timeout) else {
-            XCTFail("No read buttons found")
-            return
-        }
-        readButton.tap()
+        // Find and tap first article
+        let readButton = app.buttons["readButton"].firstMatch
+        XCTAssertTrue(readButton.waitForExistence(timeout: timeout), "Read button should exist")
+        await readButton.tap()
         
         // Verify article detail view
         let articleView = app.scrollViews["articleDetailView"]
         XCTAssertTrue(articleView.waitForExistence(timeout: timeout), "Article detail view should exist")
     }
     
-    func testSettingsTimeFilter() throws {
+    func testSettingsTimeFilter() async throws {
+        // Wait for initial load
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+        
         // Navigate to settings
         let settingsButton = app.buttons["settingsButton"]
+        let list = app.collectionViews.firstMatch
+        
+        // Scroll to bottom
+        await list.swipeUp(velocity: .slow)
+        
         XCTAssertTrue(settingsButton.waitForExistence(timeout: timeout), "Settings button should exist")
-        settingsButton.tap()
+        await settingsButton.tap()
         
         // Verify time filter exists
         let picker = app.pickers.firstMatch
         XCTAssertTrue(picker.waitForExistence(timeout: timeout), "Time filter picker should exist")
         
         // Test picker interaction
-        picker.tap()
-        app.buttons["24 Stunden"].tap()
+        await picker.tap()
+        await app.buttons["24 Stunden"].tap()
         
         // Verify navigation back works
-        app.navigationBars["Einstellungen"].buttons.firstMatch.tap()
+        await app.navigationBars["Einstellungen"].buttons.firstMatch.tap()
     }
     
-    override func tearDown() {
+    override func tearDownWithError() throws {
         app.terminate()
-        super.tearDown()
+        app = nil
+        try super.tearDownWithError()
     }
 } 

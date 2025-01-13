@@ -17,6 +17,7 @@ final class SettingsTests: XCTestCase {
     func testTimeFilterPersistence() {
         // Change time filter
         settings.cutoffHours = 24.0
+        settings.saveCutoffHours()
         
         // Create new settings instance to test persistence
         let newSettings = Settings()
