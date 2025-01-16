@@ -6,11 +6,20 @@ struct NewsItem: Identifiable {
     let pubDate: Date
     let link: String
     let guid: String
-    let imageUrl: URL?
     
     var id: String { guid }
     
     var cleanDescription: String {
         description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+    }
+    
+    var imageUrl: URL? {
+        let pattern = "<enclosure url=\"([^\"]+)\""
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: description, range: NSRange(description.startIndex..., in: description)),
+              let range = Range(match.range(at: 1), in: description) else {
+            return nil
+        }
+        return URL(string: String(description[range]))
     }
 } 
