@@ -1,10 +1,22 @@
 import Foundation
 
 class Settings: ObservableObject {
-    @Published var cutoffHours: Double
-    @Published var selectedCategories: Set<String>
+    @Published var cutoffHours: Double {
+        didSet {
+            saveCutoffHours()
+        }
+    }
+    @Published var selectedCategories: Set<String> {
+        didSet {
+            saveSelectedCategories()
+        }
+    }
     @Published var categoryOrder: [NewsCategory.CategoryGroup]
-    @Published var selectedSources: Set<String>
+    @Published var selectedSources: Set<String> {
+        didSet {
+            saveSelectedSources()
+        }
+    }
     
     private let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
     private let lastLaunchedVersion = UserDefaults.standard.string(forKey: "lastLaunchedVersion")
@@ -17,30 +29,34 @@ class Settings: ObservableObject {
     private var pendingCategoryChanges: Set<String>?
     private var pendingSourceChanges: Set<String>?
     
+    private let defaults = UserDefaults.standard
+    
     var isFirstLaunch: Bool {
-        get {
-            // Check if we've stored the first launch key
-            let hasKey = UserDefaults.standard.object(forKey: Settings.firstLaunchKey) != nil
-            return !hasKey
-        }
-        set {
-            if !newValue {
-                UserDefaults.standard.set(true, forKey: Settings.firstLaunchKey)
-            }
-        }
+        get { defaults.object(forKey: Constants.UserDefaults.firstLaunchKey) as? Bool ?? true }
+        set { defaults.set(newValue, forKey: Constants.UserDefaults.firstLaunchKey) }
     }
     
     init() {
-        // Initialize all stored properties first
-        let storedHours = UserDefaults.standard.double(forKey: "cutoffHours")
-        self.cutoffHours = storedHours == 0 ? 48 : storedHours
+        // First initialize all stored properties
+        let storedHours = UserDefaults.standard.double(forKey: Constants.UserDefaults.cutoffHoursKey)
+        self.cutoffHours = storedHours == 0 ? 48.0 : storedHours
         
-        // Initialize selected categories
-        if let data = UserDefaults.standard.data(forKey: "selectedCategories"),
-           let decoded = try? JSONDecoder().decode([String].self, from: data) {
-            self.selectedCategories = Set(decoded)
+        // Initialize categories
+        if let data = UserDefaults.standard.data(forKey: Constants.UserDefaults.selectedCategoriesKey),
+           let decoded = try? JSONDecoder().decode(Set<String>.self, from: data) {
+            self.selectedCategories = decoded
         } else {
-            self.selectedCategories = NewsCategory.defaultCategories
+            self.selectedCategories = Set(NewsCategory.available
+                .filter { $0.sourceId == "srf" && ($0.id.contains("news") || $0.id == "srf_sport_all") }
+                .map { $0.id })
+        }
+        
+        // Initialize sources
+        if let data = UserDefaults.standard.data(forKey: Constants.UserDefaults.selectedSourcesKey),
+           let decoded = try? JSONDecoder().decode(Set<String>.self, from: data) {
+            self.selectedSources = decoded
+        } else {
+            self.selectedSources = ["srf"]
         }
         
         // Initialize category order
@@ -51,15 +67,7 @@ class Settings: ObservableObject {
             self.categoryOrder = NewsCategory.CategoryGroup.allCases.sorted(by: { $0.sortOrder < $1.sortOrder })
         }
         
-        // Initialize selected sources
-        if let data = UserDefaults.standard.data(forKey: "selectedSources"),
-           let decoded = try? JSONDecoder().decode(Set<String>.self, from: data) {
-            self.selectedSources = decoded
-        } else {
-            self.selectedSources = NewsSource.defaultSources
-        }
-        
-        // Setup observers after initialization
+        // After all properties are initialized, setup observers
         setupObservers()
     }
     
@@ -104,9 +112,10 @@ class Settings: ObservableObject {
     #endif
     
     func resetToDefaults() {
-        selectedCategories = NewsCategory.defaultCategories
-        selectedSources = NewsSource.defaultSources
-        categoryOrder = NewsCategory.CategoryGroup.allCases.sorted(by: { $0.sortOrder < $1.sortOrder })
+        selectedCategories = Set(NewsCategory.available
+            .filter { $0.sourceId == "srf" && ($0.id.contains("news") || $0.id == "srf_sport_all") }
+            .map { $0.id })
+        selectedSources = ["srf"]
         cutoffHours = 48.0
         
         // Speichert die Standardwerte
@@ -128,32 +137,24 @@ class Settings: ObservableObject {
     }
     
     func saveSelectedCategories() {
-        if isBatchUpdating {
-            hasChanges = true
-            UserDefaults.standard.set(Array(selectedCategories), forKey: Constants.UserDefaults.selectedCategoriesKey)
-        } else {
-            objectWillChange.send()
-            UserDefaults.standard.set(Array(selectedCategories), forKey: Constants.UserDefaults.selectedCategoriesKey)
+        if let encoded = try? JSONEncoder().encode(selectedCategories) {
+            defaults.set(encoded, forKey: Constants.UserDefaults.selectedCategoriesKey)
         }
     }
     
     func saveSelectedSources() {
-        if isBatchUpdating {
-            hasChanges = true
-            UserDefaults.standard.set(Array(selectedSources), forKey: "selectedSources")
-        } else {
-            objectWillChange.send()
-            UserDefaults.standard.set(Array(selectedSources), forKey: "selectedSources")
+        if let encoded = try? JSONEncoder().encode(selectedSources) {
+            defaults.set(encoded, forKey: Constants.UserDefaults.selectedSourcesKey)
         }
     }
     
     func saveCutoffHours() {
-        UserDefaults.standard.set(cutoffHours, forKey: "cutoffHours")
+        defaults.set(cutoffHours, forKey: Constants.UserDefaults.cutoffHoursKey)
     }
     
     func resetFirstLaunch() {
         print("Resetting first launch state")
-        UserDefaults.standard.removeObject(forKey: Settings.firstLaunchKey)
+        isFirstLaunch = true
     }
     
     func beginSettingsSession() {
