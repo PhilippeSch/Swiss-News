@@ -75,6 +75,13 @@ struct ContentView: View {
                 await rssParser.fetchAllFeeds()
             }
         }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            if newPhase == .active {
+                Task {
+                    await rssParser.fetchAllFeeds()
+                }
+            }
+        }
         .onReceive(timer) { time in
             currentTime = time
         }
