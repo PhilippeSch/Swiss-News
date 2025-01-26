@@ -198,11 +198,11 @@
 				};
 			};
 			buildConfigurationList = 3745C87A2D24009100194BDA /* Build configuration list for PBXProject "Swiss News" */;
-			developmentRegion = en;
+			developmentRegion = de;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				de,
 			);
 			mainGroup = 3745C8762D24009100194BDA;
 			minimizedProjectReferenceProxies = 1;
