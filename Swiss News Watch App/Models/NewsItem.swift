@@ -10,7 +10,11 @@ struct NewsItem: Identifiable, Equatable {
     var id: String { guid }
     
     var cleanDescription: String {
-        description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+        description
+            .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "\n", with: " ")
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     var imageUrl: URL? {
