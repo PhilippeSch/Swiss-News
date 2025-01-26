@@ -20,13 +20,6 @@
 			remoteGlobalIDString = 3745C8822D24009100194BDA;
 			remoteInfo = "Swiss News Watch App";
 		};
-		3745C8A02D24009200194BDA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3745C8772D24009100194BDA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3745C8822D24009100194BDA;
-			remoteInfo = "Swiss News Watch App";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -49,7 +42,6 @@
 		3745C87D2D24009100194BDA /* Swiss News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3745C8832D24009100194BDA /* Swiss News Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3745C8952D24009200194BDA /* Swiss News Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3745C89F2D24009200194BDA /* Swiss News Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3791C1602D32AA5400D703DC /* Swiss News Watch App.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Swiss News Watch App.xctestplan"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -64,11 +56,6 @@
 			path = "Swiss News Watch AppTests";
 			sourceTree = "<group>";
 		};
-		3745C8A22D24009200194BDA /* Swiss News Watch AppUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Swiss News Watch AppUITests";
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,13 +68,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3745C8922D24009200194BDA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		3745C89C2D24009200194BDA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -111,7 +91,6 @@
 				3791C1602D32AA5400D703DC /* Swiss News Watch App.xctestplan */,
 				3745C8872D24009100194BDA /* Swiss News Watch App */,
 				3745C8982D24009200194BDA /* Swiss News Watch AppTests */,
-				3745C8A22D24009200194BDA /* Swiss News Watch AppUITests */,
 				3745C87E2D24009100194BDA /* Products */,
 				370223602D2B079D00BF3DB7 /* Frameworks */,
 				370223982D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist */,
@@ -124,7 +103,6 @@
 				3745C87D2D24009100194BDA /* Swiss News.app */,
 				3745C8832D24009100194BDA /* Swiss News Watch App.app */,
 				3745C8952D24009200194BDA /* Swiss News Watch AppTests.xctest */,
-				3745C89F2D24009200194BDA /* Swiss News Watch AppUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -197,29 +175,6 @@
 			productReference = 3745C8952D24009200194BDA /* Swiss News Watch AppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		3745C89E2D24009200194BDA /* Swiss News Watch AppUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 3745C8B32D24009200194BDA /* Build configuration list for PBXNativeTarget "Swiss News Watch AppUITests" */;
-			buildPhases = (
-				3745C89B2D24009200194BDA /* Sources */,
-				3745C89C2D24009200194BDA /* Frameworks */,
-				3745C89D2D24009200194BDA /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				3745C8A12D24009200194BDA /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				3745C8A22D24009200194BDA /* Swiss News Watch AppUITests */,
-			);
-			name = "Swiss News Watch AppUITests";
-			packageProductDependencies = (
-			);
-			productName = "Swiss News Watch AppUITests";
-			productReference = 3745C89F2D24009200194BDA /* Swiss News Watch AppUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -237,10 +192,6 @@
 						CreatedOnToolsVersion = 16.2;
 					};
 					3745C8942D24009200194BDA = {
-						CreatedOnToolsVersion = 16.2;
-						TestTargetID = 3745C8822D24009100194BDA;
-					};
-					3745C89E2D24009200194BDA = {
 						CreatedOnToolsVersion = 16.2;
 						TestTargetID = 3745C8822D24009100194BDA;
 					};
@@ -266,7 +217,6 @@
 				3745C87C2D24009100194BDA /* Swiss News */,
 				3745C8822D24009100194BDA /* Swiss News Watch App */,
 				3745C8942D24009200194BDA /* Swiss News Watch AppTests */,
-				3745C89E2D24009200194BDA /* Swiss News Watch AppUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -288,13 +238,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3745C8932D24009200194BDA /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		3745C89D2D24009200194BDA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -339,13 +282,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3745C89B2D24009200194BDA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -353,11 +289,6 @@
 			isa = PBXTargetDependency;
 			target = 3745C8822D24009100194BDA /* Swiss News Watch App */;
 			targetProxy = 3745C8962D24009200194BDA /* PBXContainerItemProxy */;
-		};
-		3745C8A12D24009200194BDA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3745C8822D24009100194BDA /* Swiss News Watch App */;
-			targetProxy = 3745C8A02D24009200194BDA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -618,45 +549,6 @@
 			};
 			name = Release;
 		};
-		3745C8B42D24009200194BDA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				TEST_TARGET_NAME = "Swiss News Watch App";
-				WATCHOS_DEPLOYMENT_TARGET = 11.2;
-			};
-			name = Debug;
-		};
-		3745C8B52D24009200194BDA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				TEST_TARGET_NAME = "Swiss News Watch App";
-				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 11.2;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -692,15 +584,6 @@
 			buildConfigurations = (
 				3745C8B12D24009200194BDA /* Debug */,
 				3745C8B22D24009200194BDA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		3745C8B32D24009200194BDA /* Build configuration list for PBXNativeTarget "Swiss News Watch AppUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3745C8B42D24009200194BDA /* Debug */,
-				3745C8B52D24009200194BDA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

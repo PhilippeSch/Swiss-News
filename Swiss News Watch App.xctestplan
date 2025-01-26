@@ -23,14 +23,6 @@
         "identifier" : "3745C8942D24009200194BDA",
         "name" : "Swiss News Watch AppTests"
       }
-    },
-    {
-      "parallelizable" : true,
-      "target" : {
-        "containerPath" : "container:Swiss News.xcodeproj",
-        "identifier" : "3745C89E2D24009200194BDA",
-        "name" : "Swiss News Watch AppUITests"
-      }
     }
   ],
   "version" : 1

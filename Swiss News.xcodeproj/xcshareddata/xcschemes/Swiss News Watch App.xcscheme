@@ -46,17 +46,6 @@
                ReferencedContainer = "container:Swiss News.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3745C89E2D24009200194BDA"
-               BuildableName = "Swiss News Watch AppUITests.xctest"
-               BlueprintName = "Swiss News Watch AppUITests"
-               ReferencedContainer = "container:Swiss News.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

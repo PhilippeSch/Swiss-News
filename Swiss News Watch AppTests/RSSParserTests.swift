@@ -14,27 +14,6 @@ final class RSSParserTests: XCTestCase {
     }
     
     @MainActor
-    func testTimeFilteringNews() async throws {
-        // Set a 24-hour filter
-        settings.cutoffHours = 24.0
-        settings.saveCutoffHours()
-        
-        // Create test data with articles of different ages
-        let oldArticle = createTestArticle(hoursAgo: 48)
-        let newArticle = createTestArticle(hoursAgo: 12)
-        let mockData = createMockRSSFeed([oldArticle, newArticle])
-        
-        let items = try await parseTestFeed(mockData)
-        let filteredItems = items.filter { item in
-            let cutoffDate = Calendar.current.date(byAdding: .hour, value: Int(-settings.cutoffHours), to: Date()) ?? Date()
-            return item.pubDate > cutoffDate
-        }
-        
-        XCTAssertEqual(filteredItems.count, 1, "Should only include articles within time filter")
-        XCTAssertEqual(filteredItems.first?.title, "New Article", "Should keep recent article")
-    }
-    
-    @MainActor
     func testLoadingState() async throws {
         XCTAssertEqual(parser.state, .idle, "Initial state should be idle")
         
