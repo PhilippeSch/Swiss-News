@@ -32,8 +32,11 @@ class RSSFeedParser: ObservableObject {
     }
     
     func fetchAllFeeds() async {
-        state = LoadingState.loading(lastUpdate: state.lastUpdate)
+        state = .loading(lastUpdate: state.lastUpdate)
         loadingCategories.removeAll()
+        
+        var hasNewData = false
+        var errors: [AppError] = []
         
         // Mark categories that should be fetched
         for category in NewsCategory.available {
@@ -52,19 +55,28 @@ class RSSFeedParser: ObservableObject {
             if shouldFetch {
                 do {
                     let items = try await fetchNews(from: category.feedURL)
-                    newsItems[category.id] = items
+                    // Only mark as new data if the items are different
+                    if newsItems[category.id] != items {
+                        newsItems[category.id] = items
+                        hasNewData = true
+                    }
                 } catch let error as AppError {
-                    state = LoadingState.error(error)
-                    return
+                    errors.append(error)
                 } catch {
-                    state = LoadingState.error(AppError.networkError(error.localizedDescription))
-                    return
+                    errors.append(AppError.networkError(error.localizedDescription))
                 }
                 loadingCategories.remove(category.id)
             }
         }
         
-        state = LoadingState.loaded(Date())
+        // Update state based on results
+        if !errors.isEmpty {
+            state = .error(errors.first!) // Show first error
+        } else if hasNewData {
+            state = .loaded(Date()) // Only update timestamp if we got new data
+        } else {
+            state = .loaded(state.lastUpdate ?? Date()) // Keep existing timestamp
+        }
     }
     
     private func fetchNews(from urlString: String) async throws -> [NewsItem] {

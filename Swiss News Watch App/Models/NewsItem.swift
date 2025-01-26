@@ -1,6 +1,6 @@
 import Foundation
 
-struct NewsItem: Identifiable {
+struct NewsItem: Identifiable, Equatable {
     let title: String
     let description: String
     let pubDate: Date
@@ -21,5 +21,12 @@ struct NewsItem: Identifiable {
             return nil
         }
         return URL(string: String(description[range]))
+    }
+    
+    static func == (lhs: NewsItem, rhs: NewsItem) -> Bool {
+        lhs.guid == rhs.guid &&
+        lhs.title == rhs.title &&
+        lhs.description == rhs.description &&
+        lhs.pubDate == rhs.pubDate
     }
 } 
