@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		370223992D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 370223982D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist */; };
 		3745C8842D24009100194BDA /* Swiss News Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3745C8832D24009100194BDA /* Swiss News Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		374849682D593C92004B352F /* ExportOptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 374849672D593C92004B352F /* ExportOptions.plist */; };
+		374849692D593C92004B352F /* ExportOptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 374849672D593C92004B352F /* ExportOptions.plist */; };
+		3748496A2D593C92004B352F /* ExportOptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 374849672D593C92004B352F /* ExportOptions.plist */; };
 		3749E3E32D2AD6B9005B62F7 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 3749E3E22D2AD6B9005B62F7 /* SwiftSoup */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +45,7 @@
 		3745C87D2D24009100194BDA /* Swiss News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3745C8832D24009100194BDA /* Swiss News Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3745C8952D24009200194BDA /* Swiss News Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		374849672D593C92004B352F /* ExportOptions.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ExportOptions.plist; sourceTree = "<group>"; };
 		3791C1602D32AA5400D703DC /* Swiss News Watch App.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Swiss News Watch App.xctestplan"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,6 +92,7 @@
 		3745C8762D24009100194BDA = {
 			isa = PBXGroup;
 			children = (
+				374849672D593C92004B352F /* ExportOptions.plist */,
 				3791C1602D32AA5400D703DC /* Swiss News Watch App.xctestplan */,
 				3745C8872D24009100194BDA /* Swiss News Watch App */,
 				3745C8982D24009200194BDA /* Swiss News Watch AppTests */,
@@ -225,6 +230,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				374849692D593C92004B352F /* ExportOptions.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -233,6 +239,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				370223992D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist in Resources */,
+				3748496A2D593C92004B352F /* ExportOptions.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,6 +247,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				374849682D593C92004B352F /* ExportOptions.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
