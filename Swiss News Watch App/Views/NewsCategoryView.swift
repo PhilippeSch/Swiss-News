@@ -149,14 +149,15 @@ private struct ReadButton: View {
     let url: String
     @ObservedObject var readArticlesManager: ReadArticlesManager
     @Binding var isViewingArticle: Bool
+    @State private var isNavigationActive = false
     
     var body: some View {
         NavigationLink {
-            ArticleView(title: title, url: url)
-                .onAppear {
-                    isViewingArticle = true
-                    readArticlesManager.markAsViewed(url)
-                }
+            ArticleView(
+                title: title,
+                url: url,
+                isPresented: $isNavigationActive
+            )
         } label: {
             Text("Lesen")
                 .font(.system(size: 14))
@@ -168,5 +169,9 @@ private struct ReadButton: View {
                 .accessibilityIdentifier("readButton")
         }
         .buttonStyle(.plain)
+        .simultaneousGesture(TapGesture().onEnded {
+            isViewingArticle = true
+            readArticlesManager.markAsViewed(url)
+        })
     }
 } 

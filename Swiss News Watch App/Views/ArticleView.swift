@@ -10,6 +10,7 @@ struct ArticleView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var hasSubtitle = false
     @State private var subtitles: Set<String> = []
+    @Binding var isPresented: Bool
     
     var body: some View {
         ScrollView {
@@ -36,98 +37,127 @@ struct ArticleView: View {
                     HyphenatedTextView(text: articleContent, subtitles: subtitles)
                         .padding(.horizontal, 4)
                 }
+                
+                if !isLoading {
+                    Button("Zurück") {
+                        isPresented = false
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top)
+                }
             }
             .padding()
         }
         .accessibilityIdentifier("articleDetailView")
         .navigationTitle("Artikel")
+        .interactiveDismissDisabled(isLoading)
         .task {
-            await fetchArticleContent()
+            await loadContent()
         }
     }
     
-    private func fetchArticleContent() async {
+    private func loadContent() async {
+        isLoading = true
+        
         do {
-            guard let url = URL(string: url) else {
-                throw URLError(.badURL)
-            }
+            try await fetchArticleContent()
+            isLoading = false
+        } catch {
+            self.error = error
+            isLoading = false
+        }
+    }
+    
+    private func fetchArticleContent() async throws {
+        guard let url = URL(string: url) else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 30
+        request.setValue("Mozilla/5.0 (watchOS) SwissNewsApp/1.0", forHTTPHeaderField: "User-Agent")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200...299).contains(httpResponse.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        
+        guard let html = String(data: data, encoding: .utf8) else {
+            throw URLError(.cannotDecodeContentData)
+        }
+        
+        let document = try SwiftSoup.parse(html)
+        var content = ""
+        
+        if url.absoluteString.contains("nzz.ch") {
+            subtitles.removeAll()
             
-            let (data, _) = try await URLSession.shared.data(from: url)
-            
-            guard let html = String(data: data, encoding: .utf8) else {
-                throw URLError(.cannotDecodeContentData)
-            }
-            
-            let document = try SwiftSoup.parse(html)
-            var content = ""
-            
-            if url.absoluteString.contains("nzz.ch") {
-                subtitles.removeAll()
+            let articleElements = try document.select("[pagetype='Article']")
+            for element in articleElements {
+                let componentType = try element.attr("componenttype")
+                let elementText = try element.text()
                 
-                let articleElements = try document.select("[pagetype='Article']")
-                for element in articleElements {
-                    let componentType = try element.attr("componenttype")
-                    let elementText = try element.text()
-                    
-                    if !elementText.isEmpty {
-                        switch componentType {
-                        case "subtitle":
-                            content += "\(elementText)\n\n"
-                            subtitles.insert(elementText)
-                        case "p":
-                            content += "\(elementText)\n\n"
-                        default:
-                            break
-                        }
-                    }
-                }
-            } else {
-                subtitles.removeAll()
-                let possibleSelectors = [
-                    "section.articlepage__article-content",
-                    "div.article-content",
-                    "article",
-                    ".article__body"
-                ]
-                
-                for selector in possibleSelectors {
-                    if let articleSection = try document.select(selector).first() {
-                        let lists = try articleSection.select("ul")
-                        let paragraphs = try articleSection.select("p")
-                        
-                        for list in lists {
-                            let items = try list.select("li")
-                            for item in items {
-                                let itemText = try item.text()
-                                content += "• \(itemText)\n"
-                            }
-                            content += "\n"
-                        }
-                        
-                        for paragraph in paragraphs {
-                            let paragraphText = try paragraph.text()
-                            if !paragraphText.isEmpty {
-                                content += "\(paragraphText)\n\n"
-                            }
-                        }
-                        
+                if !elementText.isEmpty {
+                    switch componentType {
+                    case "subtitle":
+                        content += "\(elementText)\n\n"
+                        subtitles.insert(elementText)
+                    case "p":
+                        content += "\(elementText)\n\n"
+                    default:
                         break
                     }
                 }
             }
+        } else {
+            subtitles.removeAll()
+            let possibleSelectors = [
+                "section.articlepage__article-content",
+                "div.article-content",
+                "article",
+                ".article__body"
+            ]
             
-            let cleanedContent = content.replacingOccurrences(of: "\n{3,}", with: "\n\n", options: .regularExpression)
-            articleContent = cleanedContent.trimmingCharacters(in: .whitespacesAndNewlines)
-            
-            if articleContent.isEmpty {
-                articleContent = "No content was found."
+            var foundContent = false
+            for selector in possibleSelectors {
+                if let articleSection = try document.select(selector).first() {
+                    let lists = try articleSection.select("ul")
+                    let paragraphs = try articleSection.select("p")
+                    
+                    for list in lists {
+                        let items = try list.select("li")
+                        for item in items {
+                            let itemText = try item.text()
+                            content += "• \(itemText)\n"
+                        }
+                        content += "\n"
+                    }
+                    
+                    for paragraph in paragraphs {
+                        let paragraphText = try paragraph.text()
+                        if !paragraphText.isEmpty {
+                            content += "\(paragraphText)\n\n"
+                        }
+                    }
+                    
+                    foundContent = true
+                    break
+                }
             }
             
-            isLoading = false
-            
-        } catch {
-            self.error = error
-            isLoading = false
+            if !foundContent {
+                throw URLError(.cannotParseResponse)
+            }
+        }
+        
+        let cleanedContent = content.replacingOccurrences(of: "\n{3,}", with: "\n\n", options: .regularExpression)
+        articleContent = cleanedContent.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if articleContent.isEmpty {
+            throw URLError(.zeroByteResource)
         }
     }
 } 
