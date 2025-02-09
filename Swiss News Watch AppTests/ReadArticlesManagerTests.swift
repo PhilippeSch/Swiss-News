@@ -3,49 +3,40 @@ import XCTest
 
 final class ReadArticlesManagerTests: XCTestCase {
     var manager: ReadArticlesManager!
+    let testUrl1 = "https://test.com/article1"
+    let testUrl2 = "https://test.com/article2"
     
     override func setUp() {
         super.setUp()
-        UserDefaults.standard.removeObject(forKey: Constants.UserDefaults.readArticlesKey)
+        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         manager = ReadArticlesManager()
     }
     
-    func testArticleReadStateManagement() {
-        let articleLink = "https://nzz.ch/article"
+    func testMarkAsViewed() {
+        XCTAssertFalse(manager.isRead(testUrl1))
         
-        // Initially, article should not be marked as read
-        XCTAssertFalse(manager.isRead(articleLink), "New article should not be marked as read")
+        manager.markAsViewed(testUrl1)
+        XCTAssertTrue(manager.isRead(testUrl1))
+    }
+    
+    func testMultipleArticles() {
+        XCTAssertFalse(manager.isRead(testUrl1))
+        XCTAssertFalse(manager.isRead(testUrl2))
         
-        // Mark article as viewed
-        manager.markAsViewed(articleLink)
+        manager.markAsViewed(testUrl1)
+        XCTAssertTrue(manager.isRead(testUrl1))
+        XCTAssertFalse(manager.isRead(testUrl2))
         
-        // Article should still not be read until markAllViewedAsRead is called
-        XCTAssertFalse(manager.isRead(articleLink), "Viewed article should not be marked as read until markAllViewedAsRead is called")
-        
-        // Mark all viewed articles as read
-        manager.markAllViewedAsRead()
-        
-        // Now the article should be marked as read
-        XCTAssertTrue(manager.isRead(articleLink), "Article should be marked as read after markAllViewedAsRead")
+        manager.markAsViewed(testUrl2)
+        XCTAssertTrue(manager.isRead(testUrl1))
+        XCTAssertTrue(manager.isRead(testUrl2))
     }
     
     func testPersistence() {
-        let articleLink = "https://test.com/article"
+        manager.markAsViewed(testUrl1)
         
-        // Mark article as read
-        manager.markAsViewed(articleLink)
-        manager.markAllViewedAsRead()
-        
-        // Create new manager instance to test persistence
+        // Create new instance to test persistence
         let newManager = ReadArticlesManager()
-        
-        // Article should still be marked as read
-        XCTAssertTrue(newManager.isRead(articleLink))
-    }
-    
-    override func tearDown() {
-        UserDefaults.standard.removeObject(forKey: Constants.UserDefaults.readArticlesKey)
-        manager = nil
-        super.tearDown()
+        XCTAssertTrue(newManager.isRead(testUrl1))
     }
 } 
