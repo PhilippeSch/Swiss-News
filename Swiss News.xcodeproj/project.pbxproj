@@ -132,10 +132,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3745C8A92D24009200194BDA /* Build configuration list for PBXNativeTarget "Swiss News Watch App" */;
 			buildPhases = (
+				3749E3E42D2AD79E005B62F7 /* Set Build Number */,
 				3745C87F2D24009100194BDA /* Sources */,
 				3745C8802D24009100194BDA /* Frameworks */,
 				3745C8812D24009100194BDA /* Resources */,
-				3749E3E42D2AD79E005B62F7 /* Set Build Number */,
 			);
 			buildRules = (
 			);
@@ -435,7 +435,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
+				SKIP_INSTALL = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -471,7 +471,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
+				SKIP_INSTALL = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
