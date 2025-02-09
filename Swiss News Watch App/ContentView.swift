@@ -71,11 +71,8 @@ struct ContentView: View {
         }
         .onAppear {
             showWelcome = settings.isFirstLaunch
-            Task {
-                await rssParser.fetchAllFeeds()
-            }
         }
-        .onChange(of: scenePhase) { oldPhase, newPhase in
+        .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 Task {
                     await rssParser.fetchAllFeeds()

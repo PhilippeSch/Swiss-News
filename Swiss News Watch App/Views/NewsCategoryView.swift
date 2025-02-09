@@ -5,6 +5,7 @@ struct NewsCategoryView: View {
     let newsItems: [NewsItem]
     @ObservedObject var readArticlesManager: ReadArticlesManager
     @State private var isViewingArticle = false
+    @State private var viewedArticles: Set<String> = []
     
     var body: some View {
         ScrollView {
@@ -14,20 +15,25 @@ struct NewsCategoryView: View {
                 ArticleListView(
                     newsItems: newsItems,
                     readArticlesManager: readArticlesManager,
-                    isViewingArticle: $isViewingArticle
+                    isViewingArticle: $isViewingArticle,
+                    viewedArticles: $viewedArticles
                 )
                 .accessibilityIdentifier("articleList")
             }
         }
         .navigationTitle(title)
         .accessibilityIdentifier("newsCategoryView")
-        .onDisappear {
-            if !isViewingArticle {
-                readArticlesManager.markAllViewedAsRead()
-            }
-        }
         .onAppear {
             isViewingArticle = false
+            viewedArticles.removeAll()
+        }
+        .onDisappear {
+            // Only mark articles as read when leaving the view if not going to read an article
+            if !isViewingArticle {
+                for articleUrl in viewedArticles {
+                    readArticlesManager.markAsViewed(articleUrl)
+                }
+            }
         }
     }
 }
@@ -50,6 +56,7 @@ private struct ArticleListView: View {
     let newsItems: [NewsItem]
     @ObservedObject var readArticlesManager: ReadArticlesManager
     @Binding var isViewingArticle: Bool
+    @Binding var viewedArticles: Set<String>
     
     var body: some View {
         LazyVStack(spacing: 12) {
@@ -60,6 +67,9 @@ private struct ArticleListView: View {
                     isViewingArticle: $isViewingArticle
                 )
                 .accessibilityIdentifier("articleRow_\(item.guid)")
+                .onAppear {
+                    viewedArticles.insert(item.link)
+                }
             }
         }
         .padding(.vertical)

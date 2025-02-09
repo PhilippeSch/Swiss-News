@@ -2,7 +2,6 @@ import Foundation
 
 class ReadArticlesManager: ObservableObject {
     @Published private(set) var readArticles: Set<String>
-    @Published private var viewedArticles: Set<String>
     private let defaults = UserDefaults.standard
     private let readArticlesKey = Constants.UserDefaults.readArticlesKey
     
@@ -13,16 +12,10 @@ class ReadArticlesManager: ObservableObject {
         } else {
             readArticles = []
         }
-        viewedArticles = []
     }
     
     func markAsViewed(_ articleLink: String) {
-        viewedArticles.insert(articleLink)
-    }
-    
-    func markAllViewedAsRead() {
-        readArticles.formUnion(viewedArticles)
-        viewedArticles.removeAll()
+        readArticles.insert(articleLink)
         saveReadArticles()
     }
     
