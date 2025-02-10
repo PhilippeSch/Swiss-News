@@ -40,7 +40,7 @@ struct ArticleView: View {
                 
                 if !isLoading {
                     Button("Zurück") {
-                        isPresented = false
+                        dismiss()
                     }
                     .buttonStyle(.bordered)
                     .frame(maxWidth: .infinity)
