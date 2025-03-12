@@ -6,6 +6,19 @@
 //
 
 import SwiftUI
+import WatchKit
+
+// Add this at the top of the file, outside any struct
+private struct ScrollPositionIdKey: EnvironmentKey {
+    static let defaultValue: Binding<String?> = .constant(nil)
+}
+
+extension EnvironmentValues {
+    var scrollPositionId: Binding<String?> {
+        get { self[ScrollPositionIdKey.self] }
+        set { self[ScrollPositionIdKey.self] = newValue }
+    }
+}
 
 struct ContentView: View {
     @StateObject private var settings = Settings()
@@ -15,6 +28,8 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isRefreshing = false
     @State private var showWelcome = false
+    @State private var scrollPosition: String? = nil
+    @State private var categories: [String] = []
     
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
@@ -26,89 +41,102 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            ScrollViewReader { proxy in
-                List {
-                    HeaderView(
-                        lastUpdate: rssParser.state.lastUpdate,
-                        currentTime: currentTime,
-                        rssParser: rssParser
-                    )
-                    .id("top")
-                    
-                    NewsFeedView(
-                        settings: settings,
-                        rssParser: rssParser,
-                        readArticlesManager: readArticlesManager
-                    )
-                    
-                    SettingsButton(settings: settings, rssParser: rssParser)
-                    
-                    #if DEBUG
-                    DebugSection(
-                        settings: settings,
-                        rssParser: rssParser,
-                        showWelcome: $showWelcome
-                    )
-                    #endif
-                }
-                .listStyle(.plain)
-                .refreshable {
-                    await rssParser.fetchAllFeeds()
-                }
-                .task {
-                    await MainActor.run {
-                        withAnimation {
-                            proxy.scrollTo("top", anchor: .top)
-                        }
+            List {
+                HeaderView(
+                    lastUpdate: rssParser.state.lastUpdate,
+                    currentTime: currentTime,
+                    rssParser: rssParser
+                )
+                .id("top")
+                .listRowInsets(EdgeInsets(top: -20, leading: 15, bottom: -8, trailing: 15))
+                .listRowBackground(Color.clear)
+                
+                .overlay {
+                    GeometryReader { geo in
+                        Color.clear
+                            .preference(key: ScrollOffsetPreferenceKey.self, value: geo.frame(in: .global).minY)
                     }
                 }
-                .onChange(of: rssParser.state.lastUpdate) { _, _ in
+                
+                NewsFeedView(
+                    settings: settings,
+                    rssParser: rssParser,
+                    readArticlesManager: readArticlesManager
+                )
+                
+                SettingsButton(settings: settings, rssParser: rssParser)
+                
+                #if DEBUG
+                DebugSection(
+                    settings: settings,
+                    rssParser: rssParser,
+                    showWelcome: $showWelcome
+                )
+                #endif
+            }
+            .listStyle(.plain)
+            .refreshable {
+                await rssParser.fetchAllFeeds()
+            }
+            .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
+                if scrollPosition == nil {
+                    let categoryId = findClosestCategory(to: offset)
+                    scrollPosition = categoryId.map { "category_\($0)" }
+                }
+            }
+            .onAppear {
+                categories = settings.selectedCategories.sorted()
+                
+                if let position = scrollPosition {
                     withAnimation {
-                        proxy.scrollTo("top", anchor: .top)
+                        scrollPosition = position
+                    }
+                }
+                showWelcome = settings.isFirstLaunch
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    Task {
+                        await rssParser.fetchAllFeeds()
+                    }
+                }
+            }
+            .onReceive(timer) { time in
+                currentTime = time
+            }
+            .sheet(isPresented: $showWelcome) {
+                SourceSelectionView(
+                    settings: settings,
+                    rssParser: rssParser,
+                    showWelcome: $showWelcome
+                )
+            }
+            .alert("Fehler beim Laden", isPresented: .init(
+                get: { rssParser.state.error != nil },
+                set: { if !$0 { rssParser.resetState() } }
+            )) {
+                Button("OK", role: .cancel) {
+                    rssParser.resetState()
+                }
+                Button("Erneut versuchen") {
+                    Task {
+                        await rssParser.fetchAllFeeds()
+                    }
+                }
+            } message: {
+                if let error = rssParser.state.error {
+                    Text(error.localizedDescription)
+                    if let recovery = error.recoverySuggestion {
+                        Text(recovery)
                     }
                 }
             }
         }
-        .onAppear {
-            showWelcome = settings.isFirstLaunch
-        }
-        .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
-                Task {
-                    await rssParser.fetchAllFeeds()
-                }
-            }
-        }
-        .onReceive(timer) { time in
-            currentTime = time
-        }
-        .sheet(isPresented: $showWelcome) {
-            SourceSelectionView(
-                settings: settings,
-                rssParser: rssParser,
-                showWelcome: $showWelcome
-            )
-        }
-        .alert("Fehler beim Laden", isPresented: .init(
-            get: { rssParser.state.error != nil },
-            set: { if !$0 { rssParser.resetState() } }
-        )) {
-            Button("OK", role: .cancel) {
-                rssParser.resetState()
-            }
-            Button("Erneut versuchen") {
-                Task {
-                    await rssParser.fetchAllFeeds()
-                }
-            }
-        } message: {
-            if let error = rssParser.state.error {
-                Text(error.localizedDescription)
-                if let recovery = error.recoverySuggestion {
-                    Text(recovery)
-                }
-            }
-        }
+        .environment(\.scrollPositionId, $scrollPosition)
+    }
+    
+    private func findClosestCategory(to offset: Double) -> String? {
+        return scrollPosition?.replacingOccurrences(of: "category_", with: "")
     }
 }
 
@@ -188,6 +216,15 @@ private struct HeaderView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: -20, leading: 15, bottom: -8, trailing: 15))
+    }
+}
+
+// Keep using Double for the scroll offset tracking
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: Double = 0
+    
+    static func reduce(value: inout Double, nextValue: () -> Double) {
+        value = nextValue()
     }
 }
 

@@ -6,9 +6,11 @@ struct CategoryRowView: View {
     @ObservedObject var readArticlesManager: ReadArticlesManager
     @ObservedObject var rssParser: RSSFeedParser
     @State private var unreadCount: Int = 0
+    @Environment(\.scrollPositionId) private var scrollPositionId
+    @State private var isNavigating = false
     
     var body: some View {
-        NavigationLink {
+        NavigationLink(isActive: $isNavigating) {
             NewsCategoryView(
                 title: category.title,
                 newsItems: newsItems,
@@ -23,6 +25,7 @@ struct CategoryRowView: View {
                 categoryId: category.id
             )
         }
+        .id("category_\(category.id)")
         .accessibilityIdentifier("categoryRow_\(category.id)")
         .onAppear {
             updateUnreadCount()
@@ -35,6 +38,11 @@ struct CategoryRowView: View {
         }
         .onChange(of: rssParser.state.lastUpdate) { _, _ in
             updateUnreadCount()
+        }
+        .onChange(of: isNavigating) { _, newValue in
+            if newValue {
+                scrollPositionId.wrappedValue = "category_\(category.id)"
+            }
         }
         .task {
             updateUnreadCount()
