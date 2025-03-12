@@ -494,7 +494,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
+				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -512,7 +512,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
+				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
