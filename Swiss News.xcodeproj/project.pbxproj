@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		370223992D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 370223982D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist */; };
+		3707FF8D2D81B17A0007A90C /* app-store-exportoptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3707FF8C2D81B17A0007A90C /* app-store-exportoptions.plist */; };
+		3707FF8E2D81B17A0007A90C /* app-store-exportoptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3707FF8C2D81B17A0007A90C /* app-store-exportoptions.plist */; };
 		3745C8842D24009100194BDA /* Swiss News Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3745C8832D24009100194BDA /* Swiss News Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3749E3E32D2AD6B9005B62F7 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 3749E3E22D2AD6B9005B62F7 /* SwiftSoup */; };
 /* End PBXBuildFile section */
@@ -39,6 +41,7 @@
 /* Begin PBXFileReference section */
 		370223972D2B07E500BF3DB7 /* Swiss-News-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Swiss-News-Watch-App-Info.plist"; path = "../../../../../../Downloads/Swiss-News-Watch-App-Info.plist"; sourceTree = "<group>"; };
 		370223982D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Swiss-News-Watch-App-Info.plist"; sourceTree = "<group>"; };
+		3707FF8C2D81B17A0007A90C /* app-store-exportoptions.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "app-store-exportoptions.plist"; sourceTree = "<group>"; };
 		3745C87D2D24009100194BDA /* Swiss News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3745C8832D24009100194BDA /* Swiss News Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3745C8952D24009200194BDA /* Swiss News Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +97,7 @@
 				3745C87E2D24009100194BDA /* Products */,
 				370223602D2B079D00BF3DB7 /* Frameworks */,
 				370223982D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist */,
+				3707FF8C2D81B17A0007A90C /* app-store-exportoptions.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -225,6 +229,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3707FF8E2D81B17A0007A90C /* app-store-exportoptions.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,6 +237,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3707FF8D2D81B17A0007A90C /* app-store-exportoptions.plist in Resources */,
 				370223992D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
