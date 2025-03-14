@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		37C6E7002D845D820042F8EA /* privacy-policy.md in Resources */ = {isa = PBXBuildFile; fileRef = 37C6E6FF2D845D7E0042F8EA /* privacy-policy.md */; };
 		37D708152D84384800707EBC /* Swiss News Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 37D708142D84384800707EBC /* Swiss News Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		37D708F82D8439CD00707EBC /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 37D708F72D8439CD00707EBC /* SwiftSoup */; };
 /* End PBXBuildFile section */
@@ -50,6 +51,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		37C6E6FF2D845D7E0042F8EA /* privacy-policy.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "privacy-policy.md"; sourceTree = "<group>"; };
 		37D7080E2D84384800707EBC /* Swiss News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D708142D84384800707EBC /* Swiss News Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D708262D84384900707EBC /* Swiss News Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,6 +105,7 @@
 		37D708072D84384800707EBC = {
 			isa = PBXGroup;
 			children = (
+				37C6E6FF2D845D7E0042F8EA /* privacy-policy.md */,
 				37D708182D84384800707EBC /* Swiss News Watch App */,
 				37D708292D84384900707EBC /* Swiss News Watch AppTests */,
 				37D708332D84384900707EBC /* Swiss News Watch AppUITests */,
@@ -283,6 +286,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37C6E7002D845D820042F8EA /* privacy-policy.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
