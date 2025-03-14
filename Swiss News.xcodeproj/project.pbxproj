@@ -7,31 +7,42 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		370223992D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 370223982D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist */; };
-		3707FF8D2D81B17A0007A90C /* app-store-exportoptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3707FF8C2D81B17A0007A90C /* app-store-exportoptions.plist */; };
-		3707FF8E2D81B17A0007A90C /* app-store-exportoptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3707FF8C2D81B17A0007A90C /* app-store-exportoptions.plist */; };
-		3745C8842D24009100194BDA /* Swiss News Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3745C8832D24009100194BDA /* Swiss News Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		3749E3E32D2AD6B9005B62F7 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 3749E3E22D2AD6B9005B62F7 /* SwiftSoup */; };
+		37D708152D84384800707EBC /* Swiss News Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 37D708142D84384800707EBC /* Swiss News Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		37D708F82D8439CD00707EBC /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 37D708F72D8439CD00707EBC /* SwiftSoup */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3745C8962D24009200194BDA /* PBXContainerItemProxy */ = {
+		37D708162D84384800707EBC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 3745C8772D24009100194BDA /* Project object */;
+			containerPortal = 37D708082D84384800707EBC /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3745C8822D24009100194BDA;
+			remoteGlobalIDString = 37D708132D84384800707EBC;
+			remoteInfo = "Swiss News Watch App";
+		};
+		37D708272D84384900707EBC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37D708082D84384800707EBC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37D708132D84384800707EBC;
+			remoteInfo = "Swiss News Watch App";
+		};
+		37D708312D84384900707EBC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37D708082D84384800707EBC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37D708132D84384800707EBC;
 			remoteInfo = "Swiss News Watch App";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3745C8AC2D24009200194BDA /* Embed Watch Content */ = {
+		37D7083D2D84384900707EBC /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				3745C8842D24009100194BDA /* Swiss News Watch App.app in Embed Watch Content */,
+				37D708152D84384800707EBC /* Swiss News Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -39,38 +50,47 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		370223972D2B07E500BF3DB7 /* Swiss-News-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Swiss-News-Watch-App-Info.plist"; path = "../../../../../../Downloads/Swiss-News-Watch-App-Info.plist"; sourceTree = "<group>"; };
-		370223982D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Swiss-News-Watch-App-Info.plist"; sourceTree = "<group>"; };
-		3707FF8C2D81B17A0007A90C /* app-store-exportoptions.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "app-store-exportoptions.plist"; sourceTree = "<group>"; };
-		3745C87D2D24009100194BDA /* Swiss News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3745C8832D24009100194BDA /* Swiss News Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3745C8952D24009200194BDA /* Swiss News Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3791C1602D32AA5400D703DC /* Swiss News Watch App.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Swiss News Watch App.xctestplan"; sourceTree = "<group>"; };
+		37D7080E2D84384800707EBC /* Swiss News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D708142D84384800707EBC /* Swiss News Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D708262D84384900707EBC /* Swiss News Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		37D708302D84384900707EBC /* Swiss News Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3745C8872D24009100194BDA /* Swiss News Watch App */ = {
+		37D708182D84384800707EBC /* Swiss News Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Swiss News Watch App";
 			sourceTree = "<group>";
 		};
-		3745C8982D24009200194BDA /* Swiss News Watch AppTests */ = {
+		37D708292D84384900707EBC /* Swiss News Watch AppTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Swiss News Watch AppTests";
+			sourceTree = "<group>";
+		};
+		37D708332D84384900707EBC /* Swiss News Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Swiss News Watch AppUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		3745C8802D24009100194BDA /* Frameworks */ = {
+		37D708112D84384800707EBC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3749E3E32D2AD6B9005B62F7 /* SwiftSoup in Frameworks */,
+				37D708F82D8439CD00707EBC /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3745C8922D24009200194BDA /* Frameworks */ = {
+		37D708232D84384900707EBC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37D7082D2D84384900707EBC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -80,169 +100,200 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		370223602D2B079D00BF3DB7 /* Frameworks */ = {
+		37D708072D84384800707EBC = {
 			isa = PBXGroup;
 			children = (
-				370223972D2B07E500BF3DB7 /* Swiss-News-Watch-App-Info.plist */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		3745C8762D24009100194BDA = {
-			isa = PBXGroup;
-			children = (
-				3791C1602D32AA5400D703DC /* Swiss News Watch App.xctestplan */,
-				3745C8872D24009100194BDA /* Swiss News Watch App */,
-				3745C8982D24009200194BDA /* Swiss News Watch AppTests */,
-				3745C87E2D24009100194BDA /* Products */,
-				370223602D2B079D00BF3DB7 /* Frameworks */,
-				370223982D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist */,
-				3707FF8C2D81B17A0007A90C /* app-store-exportoptions.plist */,
+				37D708182D84384800707EBC /* Swiss News Watch App */,
+				37D708292D84384900707EBC /* Swiss News Watch AppTests */,
+				37D708332D84384900707EBC /* Swiss News Watch AppUITests */,
+				37D708F62D8439CD00707EBC /* Frameworks */,
+				37D7080F2D84384800707EBC /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		3745C87E2D24009100194BDA /* Products */ = {
+		37D7080F2D84384800707EBC /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3745C87D2D24009100194BDA /* Swiss News.app */,
-				3745C8832D24009100194BDA /* Swiss News Watch App.app */,
-				3745C8952D24009200194BDA /* Swiss News Watch AppTests.xctest */,
+				37D7080E2D84384800707EBC /* Swiss News.app */,
+				37D708142D84384800707EBC /* Swiss News Watch App.app */,
+				37D708262D84384900707EBC /* Swiss News Watch AppTests.xctest */,
+				37D708302D84384900707EBC /* Swiss News Watch AppUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		37D708F62D8439CD00707EBC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3745C87C2D24009100194BDA /* Swiss News */ = {
+		37D7080D2D84384800707EBC /* Swiss News */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3745C8AD2D24009200194BDA /* Build configuration list for PBXNativeTarget "Swiss News" */;
+			buildConfigurationList = 37D7083E2D84384900707EBC /* Build configuration list for PBXNativeTarget "Swiss News" */;
 			buildPhases = (
-				3745C87B2D24009100194BDA /* Resources */,
-				3745C8AC2D24009200194BDA /* Embed Watch Content */,
+				37D7080C2D84384800707EBC /* Resources */,
+				37D7083D2D84384900707EBC /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				37D708172D84384800707EBC /* PBXTargetDependency */,
 			);
 			name = "Swiss News";
 			packageProductDependencies = (
 			);
 			productName = "Swiss News";
-			productReference = 3745C87D2D24009100194BDA /* Swiss News.app */;
+			productReference = 37D7080E2D84384800707EBC /* Swiss News.app */;
 			productType = "com.apple.product-type.application.watchapp2-container";
 		};
-		3745C8822D24009100194BDA /* Swiss News Watch App */ = {
+		37D708132D84384800707EBC /* Swiss News Watch App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3745C8A92D24009200194BDA /* Build configuration list for PBXNativeTarget "Swiss News Watch App" */;
+			buildConfigurationList = 37D7083A2D84384900707EBC /* Build configuration list for PBXNativeTarget "Swiss News Watch App" */;
 			buildPhases = (
-				3749E3E42D2AD79E005B62F7 /* Set Build Number */,
-				3745C87F2D24009100194BDA /* Sources */,
-				3745C8802D24009100194BDA /* Frameworks */,
-				3745C8812D24009100194BDA /* Resources */,
+				37D708102D84384800707EBC /* Sources */,
+				37D708112D84384800707EBC /* Frameworks */,
+				37D708122D84384800707EBC /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3745C8872D24009100194BDA /* Swiss News Watch App */,
+				37D708182D84384800707EBC /* Swiss News Watch App */,
 			);
 			name = "Swiss News Watch App";
 			packageProductDependencies = (
-				3749E3E22D2AD6B9005B62F7 /* SwiftSoup */,
+				37D708F72D8439CD00707EBC /* SwiftSoup */,
 			);
 			productName = "Swiss News Watch App";
-			productReference = 3745C8832D24009100194BDA /* Swiss News Watch App.app */;
+			productReference = 37D708142D84384800707EBC /* Swiss News Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
-		3745C8942D24009200194BDA /* Swiss News Watch AppTests */ = {
+		37D708252D84384900707EBC /* Swiss News Watch AppTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3745C8B02D24009200194BDA /* Build configuration list for PBXNativeTarget "Swiss News Watch AppTests" */;
+			buildConfigurationList = 37D708412D84384900707EBC /* Build configuration list for PBXNativeTarget "Swiss News Watch AppTests" */;
 			buildPhases = (
-				3745C8912D24009200194BDA /* Sources */,
-				3745C8922D24009200194BDA /* Frameworks */,
-				3745C8932D24009200194BDA /* Resources */,
+				37D708222D84384900707EBC /* Sources */,
+				37D708232D84384900707EBC /* Frameworks */,
+				37D708242D84384900707EBC /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				3745C8972D24009200194BDA /* PBXTargetDependency */,
+				37D708282D84384900707EBC /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				3745C8982D24009200194BDA /* Swiss News Watch AppTests */,
+				37D708292D84384900707EBC /* Swiss News Watch AppTests */,
 			);
 			name = "Swiss News Watch AppTests";
 			packageProductDependencies = (
 			);
 			productName = "Swiss News Watch AppTests";
-			productReference = 3745C8952D24009200194BDA /* Swiss News Watch AppTests.xctest */;
+			productReference = 37D708262D84384900707EBC /* Swiss News Watch AppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		37D7082F2D84384900707EBC /* Swiss News Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37D708442D84384900707EBC /* Build configuration list for PBXNativeTarget "Swiss News Watch AppUITests" */;
+			buildPhases = (
+				37D7082C2D84384900707EBC /* Sources */,
+				37D7082D2D84384900707EBC /* Frameworks */,
+				37D7082E2D84384900707EBC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				37D708322D84384900707EBC /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				37D708332D84384900707EBC /* Swiss News Watch AppUITests */,
+			);
+			name = "Swiss News Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "Swiss News Watch AppUITests";
+			productReference = 37D708302D84384900707EBC /* Swiss News Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		3745C8772D24009100194BDA /* Project object */ = {
+		37D708082D84384800707EBC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					3745C87C2D24009100194BDA = {
+					37D7080D2D84384800707EBC = {
 						CreatedOnToolsVersion = 16.2;
 					};
-					3745C8822D24009100194BDA = {
+					37D708132D84384800707EBC = {
 						CreatedOnToolsVersion = 16.2;
 					};
-					3745C8942D24009200194BDA = {
+					37D708252D84384900707EBC = {
 						CreatedOnToolsVersion = 16.2;
-						TestTargetID = 3745C8822D24009100194BDA;
+						TestTargetID = 37D708132D84384800707EBC;
+					};
+					37D7082F2D84384900707EBC = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 37D708132D84384800707EBC;
 					};
 				};
 			};
-			buildConfigurationList = 3745C87A2D24009100194BDA /* Build configuration list for PBXProject "Swiss News" */;
-			developmentRegion = de;
+			buildConfigurationList = 37D7080B2D84384800707EBC /* Build configuration list for PBXProject "Swiss News" */;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				de,
+				en,
+				Base,
 			);
-			mainGroup = 3745C8762D24009100194BDA;
+			mainGroup = 37D708072D84384800707EBC;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				3749E3E12D2AD6B9005B62F7 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				37D708F52D84393200707EBC /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 3745C87E2D24009100194BDA /* Products */;
+			productRefGroup = 37D7080F2D84384800707EBC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3745C87C2D24009100194BDA /* Swiss News */,
-				3745C8822D24009100194BDA /* Swiss News Watch App */,
-				3745C8942D24009200194BDA /* Swiss News Watch AppTests */,
+				37D7080D2D84384800707EBC /* Swiss News */,
+				37D708132D84384800707EBC /* Swiss News Watch App */,
+				37D708252D84384900707EBC /* Swiss News Watch AppTests */,
+				37D7082F2D84384900707EBC /* Swiss News Watch AppUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		3745C87B2D24009100194BDA /* Resources */ = {
+		37D7080C2D84384800707EBC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3707FF8E2D81B17A0007A90C /* app-store-exportoptions.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3745C8812D24009100194BDA /* Resources */ = {
+		37D708122D84384800707EBC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3707FF8D2D81B17A0007A90C /* app-store-exportoptions.plist in Resources */,
-				370223992D2B07F000BF3DB7 /* Swiss-News-Watch-App-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3745C8932D24009200194BDA /* Resources */ = {
+		37D708242D84384900707EBC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37D7082E2D84384900707EBC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -251,36 +302,22 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		3749E3E42D2AD79E005B62F7 /* Set Build Number */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Set Build Number";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#!/bin/sh\n\n# Get the marketing version\nVERSION=$(/usr/libexec/PlistBuddy -c \"Print :CFBundleShortVersionString\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\n\n# Generate timestamp\nbuildNumber=$(date +%Y%m%d%H%M)\n\n# Combine version and timestamp\nFULL_VERSION=\"${VERSION}.${buildNumber}\"\n\n# Wait briefly for the file to be copied\nsleep 1\n\n# Update the built product's Info.plist\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $FULL_VERSION\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Info.plist\"\n\n# Print for debugging\necho \"Set build number to: $FULL_VERSION\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
-		3745C87F2D24009100194BDA /* Sources */ = {
+		37D708102D84384800707EBC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3745C8912D24009200194BDA /* Sources */ = {
+		37D708222D84384900707EBC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		37D7082C2D84384900707EBC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -290,15 +327,25 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3745C8972D24009200194BDA /* PBXTargetDependency */ = {
+		37D708172D84384800707EBC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3745C8822D24009100194BDA /* Swiss News Watch App */;
-			targetProxy = 3745C8962D24009200194BDA /* PBXContainerItemProxy */;
+			target = 37D708132D84384800707EBC /* Swiss News Watch App */;
+			targetProxy = 37D708162D84384800707EBC /* PBXContainerItemProxy */;
+		};
+		37D708282D84384900707EBC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37D708132D84384800707EBC /* Swiss News Watch App */;
+			targetProxy = 37D708272D84384900707EBC /* PBXContainerItemProxy */;
+		};
+		37D708322D84384900707EBC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37D708132D84384800707EBC /* Swiss News Watch App */;
+			targetProxy = 37D708312D84384900707EBC /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		3745C8A72D24009200194BDA /* Debug */ = {
+		37D708382D84384900707EBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -359,7 +406,7 @@
 			};
 			name = Debug;
 		};
-		3745C8A82D24009200194BDA /* Release */ = {
+		37D708392D84384900707EBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -408,29 +455,22 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
 		};
-		3745C8AA2D24009200194BDA /* Debug */ = {
+		37D7083B2D84384900707EBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Swiss News Watch App/Preview Content\"";
-				DEVELOPMENT_LANGUAGE = de;
 				DEVELOPMENT_TEAM = PZ2HQ4532Q;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Swiss-News-Watch-App-Info.plist";
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Swiss News";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
-				INFOPLIST_KEY_NSPasteboardUsageDescription = "This app does not use the pasteboard.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKWatchOnly = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -440,9 +480,8 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
-				SKIP_INSTALL = NO;
+				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -450,24 +489,18 @@
 			};
 			name = Debug;
 		};
-		3745C8AB2D24009200194BDA /* Release */ = {
+		37D7083C2D84384900707EBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Swiss News Watch App/Preview Content\"";
 				DEVELOPMENT_TEAM = PZ2HQ4532Q;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Swiss-News-Watch-App-Info.plist";
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Swiss News";
-				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
-				INFOPLIST_KEY_NSPasteboardUsageDescription = "This app does not use the pasteboard.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKWatchOnly = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -477,9 +510,8 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = watchos;
-				SKIP_INSTALL = NO;
+				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -488,10 +520,9 @@
 			};
 			name = Release;
 		};
-		3745C8AE2D24009200194BDA /* Debug */ = {
+		37D7083F2D84384900707EBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PZ2HQ4532Q;
@@ -499,17 +530,14 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
+				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
-		3745C8AF2D24009200194BDA /* Release */ = {
+		37D708402D84384900707EBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = PZ2HQ4532Q;
@@ -517,15 +545,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
+				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		3745C8B12D24009200194BDA /* Debug */ = {
+		37D708422D84384900707EBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -537,7 +563,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
-				SKIP_INSTALL = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -546,7 +571,7 @@
 			};
 			name = Debug;
 		};
-		3745C8B22D24009200194BDA /* Release */ = {
+		37D708432D84384900707EBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -558,11 +583,49 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
-				SKIP_INSTALL = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Swiss News Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Swiss News Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		37D708452D84384900707EBC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PZ2HQ4532Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "Swiss News Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		37D708462D84384900707EBC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PZ2HQ4532Q;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "Swiss News Watch App";
 				VALIDATE_PRODUCT = YES;
 				WATCHOS_DEPLOYMENT_TARGET = 11.2;
 			};
@@ -571,38 +634,47 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3745C87A2D24009100194BDA /* Build configuration list for PBXProject "Swiss News" */ = {
+		37D7080B2D84384800707EBC /* Build configuration list for PBXProject "Swiss News" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3745C8A72D24009200194BDA /* Debug */,
-				3745C8A82D24009200194BDA /* Release */,
+				37D708382D84384900707EBC /* Debug */,
+				37D708392D84384900707EBC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3745C8A92D24009200194BDA /* Build configuration list for PBXNativeTarget "Swiss News Watch App" */ = {
+		37D7083A2D84384900707EBC /* Build configuration list for PBXNativeTarget "Swiss News Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3745C8AA2D24009200194BDA /* Debug */,
-				3745C8AB2D24009200194BDA /* Release */,
+				37D7083B2D84384900707EBC /* Debug */,
+				37D7083C2D84384900707EBC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3745C8AD2D24009200194BDA /* Build configuration list for PBXNativeTarget "Swiss News" */ = {
+		37D7083E2D84384900707EBC /* Build configuration list for PBXNativeTarget "Swiss News" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3745C8AE2D24009200194BDA /* Debug */,
-				3745C8AF2D24009200194BDA /* Release */,
+				37D7083F2D84384900707EBC /* Debug */,
+				37D708402D84384900707EBC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3745C8B02D24009200194BDA /* Build configuration list for PBXNativeTarget "Swiss News Watch AppTests" */ = {
+		37D708412D84384900707EBC /* Build configuration list for PBXNativeTarget "Swiss News Watch AppTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3745C8B12D24009200194BDA /* Debug */,
-				3745C8B22D24009200194BDA /* Release */,
+				37D708422D84384900707EBC /* Debug */,
+				37D708432D84384900707EBC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		37D708442D84384900707EBC /* Build configuration list for PBXNativeTarget "Swiss News Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37D708452D84384900707EBC /* Debug */,
+				37D708462D84384900707EBC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -610,23 +682,23 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		3749E3E12D2AD6B9005B62F7 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+		37D708F52D84393200707EBC /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.7.6;
+				minimumVersion = 2.8.7;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		3749E3E22D2AD6B9005B62F7 /* SwiftSoup */ = {
+		37D708F72D8439CD00707EBC /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 3749E3E12D2AD6B9005B62F7 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			package = 37D708F52D84393200707EBC /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = 3745C8772D24009100194BDA /* Project object */;
+	rootObject = 37D708082D84384800707EBC /* Project object */;
 }
