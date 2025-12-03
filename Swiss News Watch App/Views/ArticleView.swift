@@ -95,23 +95,98 @@ struct ArticleView: View {
         if url.absoluteString.contains("nzz.ch") {
             subtitles.removeAll()
             
-            let articleElements = try document.select("[pagetype='Article']")
-            for element in articleElements {
-                let componentType = try element.attr("componenttype")
-                let elementText = try element.text()
-                
-                if !elementText.isEmpty {
-                    switch componentType {
-                    case "subtitle":
-                        content += "\(elementText)\n\n"
-                        subtitles.insert(elementText)
-                    case "p":
-                        content += "\(elementText)\n\n"
-                    default:
-                        break
+            var paragraphCount = 0
+            var subtitleCount = 0
+            var foundContent = false
+            
+            // Neue Struktur: Direkte Suche nach componenttype="p" und componenttype="subtitle"
+            let newStructureElements = try document.select("[componenttype='p'], [componenttype='subtitle']")
+            if !newStructureElements.isEmpty() {
+                print("DEBUG: Neue NZZ-Struktur gefunden - \(newStructureElements.count) Elemente")
+                for element in newStructureElements {
+                    let componentType = try element.attr("componenttype")
+                    let elementText = try element.text()
+                    
+                    if !elementText.isEmpty {
+                        switch componentType {
+                        case "subtitle":
+                            content += "\(elementText)\n\n"
+                            subtitles.insert(elementText)
+                            subtitleCount += 1
+                        case "p":
+                            content += "\(elementText)\n\n"
+                            paragraphCount += 1
+                        default:
+                            break
+                        }
                     }
                 }
+                foundContent = true
+                print("DEBUG: Neue Struktur - \(paragraphCount) Absätze, \(subtitleCount) Untertitel gefunden")
             }
+            
+            // Fallback 1: Alte Struktur [pagetype='Article']
+            if !foundContent {
+                print("DEBUG: Fallback zu alter Struktur [pagetype='Article']")
+                let articleElements = try document.select("[pagetype='Article']")
+                if !articleElements.isEmpty() {
+                    for element in articleElements {
+                        let componentType = try element.attr("componenttype")
+                        let elementText = try element.text()
+                        
+                        if !elementText.isEmpty {
+                            switch componentType {
+                            case "subtitle":
+                                content += "\(elementText)\n\n"
+                                subtitles.insert(elementText)
+                                subtitleCount += 1
+                            case "p":
+                                content += "\(elementText)\n\n"
+                                paragraphCount += 1
+                            default:
+                                break
+                            }
+                        }
+                    }
+                    foundContent = true
+                    print("DEBUG: Alte Struktur - \(paragraphCount) Absätze, \(subtitleCount) Untertitel gefunden")
+                }
+            }
+            
+            // Fallback 2: Klasse .articlecomponent
+            if !foundContent {
+                print("DEBUG: Fallback zu .articlecomponent")
+                let articleComponents = try document.select(".articlecomponent")
+                if !articleComponents.isEmpty() {
+                    for element in articleComponents {
+                        let componentType = try element.attr("componenttype")
+                        let elementText = try element.text()
+                        
+                        if !elementText.isEmpty {
+                            switch componentType {
+                            case "subtitle":
+                                content += "\(elementText)\n\n"
+                                subtitles.insert(elementText)
+                                subtitleCount += 1
+                            case "p":
+                                content += "\(elementText)\n\n"
+                                paragraphCount += 1
+                            default:
+                                break
+                            }
+                        }
+                    }
+                    foundContent = true
+                    print("DEBUG: .articlecomponent - \(paragraphCount) Absätze, \(subtitleCount) Untertitel gefunden")
+                }
+            }
+            
+            if !foundContent {
+                print("DEBUG: Keine NZZ-Artikel-Inhalte gefunden")
+                throw URLError(.cannotParseResponse)
+            }
+            
+            print("DEBUG: Final - \(paragraphCount) Absätze, \(subtitleCount) Untertitel")
         } else {
             subtitles.removeAll()
             let possibleSelectors = [
