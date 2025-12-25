@@ -132,10 +132,8 @@ struct ArticleView: View {
                             case "subtitle":
                                 content += "\(elementText)\n\n"
                                 subtitles.insert(elementText)
-                                subtitleCount += 1
                             case "p":
                                 content += "\(elementText)\n\n"
-                                paragraphCount += 1
                             default:
                                 break
                             }
@@ -158,10 +156,8 @@ struct ArticleView: View {
                             case "subtitle":
                                 content += "\(elementText)\n\n"
                                 subtitles.insert(elementText)
-                                subtitleCount += 1
                             case "p":
                                 content += "\(elementText)\n\n"
-                                paragraphCount += 1
                             default:
                                 break
                             }
