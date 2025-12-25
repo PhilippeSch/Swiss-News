@@ -27,6 +27,18 @@ struct NewsItem: Identifiable, Equatable {
         return URL(string: String(description[range]))
     }
     
+    /// Returns a watchOS-compatible image URL, converting WebP to JPEG if needed
+    var watchCompatibleImageUrl: URL? {
+        guard let url = imageUrl else { return nil }
+        let urlString = url.absoluteString
+        // Convert WebP to JPEG for watchOS compatibility
+        if urlString.hasSuffix(".webp") {
+            let jpgUrlString = urlString.replacingOccurrences(of: ".webp", with: ".jpg")
+            return URL(string: jpgUrlString)
+        }
+        return url
+    }
+    
     static func == (lhs: NewsItem, rhs: NewsItem) -> Bool {
         lhs.guid == rhs.guid &&
         lhs.title == rhs.title &&
