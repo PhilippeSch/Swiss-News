@@ -97,7 +97,7 @@ private struct ArticleRowView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .opacity(readArticlesManager.isRead(item.link) ? Constants.UI.readArticleOpacity : 1)
             
-            if let imageUrl = item.imageUrl {
+            if let imageUrl = item.watchCompatibleImageUrl ?? item.imageUrl {
                 ArticleImageView(imageUrl: imageUrl)
             }
             
