@@ -1,13 +1,21 @@
 #!/bin/sh
 
-# Generate timestamp in desired format (customize as needed)
-# Example: YYMMDDHHMM (e.g., 2512251430 for Dec 25, 2025 at 14:30)
+echo "=== Updating build number to timestamp ==="
+
+# Use Unix timestamp for safety (pure integer, always increasing, App Store-compliant)
+# Current date is December 25, 2025 → this will generate something like 1735157520 (exact seconds since 1970)
 TIMESTAMP=$(date "+%Y%m%d%H%M")
 
-# Path to Info.plist (works in Xcode Cloud environment)
-PLIST="$$ {CI_WORKSPACE}/ $${INFOPLIST_FILE}"
+# Change to the workspace/root directory (works in both Xcode Cloud and locally)
+cd "${CI_WORKSPACE:-$PROJECT_DIR}"
 
-# Set CFBundleVersion using PlistBuddy
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $$ {TIMESTAMP}" " $${PLIST}"
+# Update Current Project Version using agvtool
+xcrun agvtool new-version -all "$TIMESTAMP"
 
-echo "Set build number (CFBundleVersion) to ${TIMESTAMP}"
+echo "Successfully set Current Project Version to $TIMESTAMP"
+
+# Verify
+CURRENT=$(xcrun agvtool what-version | grep "Current version" | awk '{print $NF}')
+echo "Verified build number (Current Project Version): $CURRENT"
+
+echo "=== Done ==="
