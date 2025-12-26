@@ -141,6 +141,7 @@
 			buildPhases = (
 				37D7080C2D84384800707EBC /* Resources */,
 				37D7083D2D84384900707EBC /* Embed Watch Content */,
+				372B1AA32EFE96F7004E3FED /* Set Build Number */,
 			);
 			buildRules = (
 			);
@@ -306,6 +307,28 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		372B1AA32EFE96F7004E3FED /* Set Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Set Build Number";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\n\necho \"=== Updating build number to YYYY.MM.DD.HHMM timestamp ===\"\n\n# Generate your desired readable format\nTIMESTAMP=$(date \"+%Y%m%d%H%M\")  # e.g., 2025.12.26.1430\n\n# Explicitly set the project root directory (replace \"Swiss News.xcodeproj\" if your project name differs)\nPROJECT_ROOT=\"$(dirname \"$(dirname \"$SCRIPT_INPUT_FILE_0\")\")\"  # Robust way to get project root\n# Alternative if above fails: PROJECT_ROOT=\"${SRCROOT}\"\n\ncd \"$PROJECT_ROOT\"\n\necho \"Changed to directory: $(pwd)\"\n\n# Update Current Project Version\nxcrun agvtool new-version \"$TIMESTAMP\"\n\necho \"Successfully set Current Project Version to $TIMESTAMP\"\n\n# Verify\nCURRENT=$(xcrun agvtool what-version | grep \"Current version\" | awk '{print $NF}')\necho \"Verified build number: $CURRENT\"\n\n# Force Xcode to reload the changed project file\ntouch \"Swiss News.xcodeproj/project.pbxproj\"\n\necho \"Touched project file to force reload\"\n\necho \"=== Done ===\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		37D708102D84384800707EBC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -383,7 +406,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = PZ2HQ4532Q;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -402,12 +427,14 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
 		};
@@ -445,7 +472,9 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = PZ2HQ4532Q;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -458,10 +487,12 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};
@@ -471,9 +502,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202512251237;
+				CURRENT_PROJECT_VERSION = 202512261124;
 				DEVELOPMENT_ASSET_PATHS = "\"Swiss News Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Swiss News";
@@ -483,7 +513,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -501,9 +531,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202512251237;
+				CURRENT_PROJECT_VERSION = 202512261124;
 				DEVELOPMENT_ASSET_PATHS = "\"Swiss News Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Swiss News";
@@ -513,7 +542,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -531,10 +560,10 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202512251237;
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
+				CURRENT_PROJECT_VERSION = 202512261124;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = "Swiss News";
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -548,10 +577,10 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202512251237;
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
+				CURRENT_PROJECT_VERSION = 202512261124;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = "Swiss News";
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -566,8 +595,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
+				CURRENT_PROJECT_VERSION = 202512261124;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppTests";
@@ -586,8 +614,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
+				CURRENT_PROJECT_VERSION = 202512261124;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppTests";
@@ -606,8 +633,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
+				CURRENT_PROJECT_VERSION = 202512261124;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppUITests";
@@ -625,8 +651,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = PZ2HQ4532Q;
+				CURRENT_PROJECT_VERSION = 202512261124;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppUITests";
