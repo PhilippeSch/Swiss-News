@@ -6,15 +6,18 @@ func timeAgoText(from date: Date, relativeTo now: Date = Date()) -> String {
     
     if let minutes = components.minute {
         if minutes < 1 {
-            return "gerade jetzt"
+            return String(localized: "gerade jetzt")
         } else if minutes < 60 {
-            return "vor \(minutes) \(minutes == 1 ? "Minute" : "Minuten")"
+            let minuteText = minutes == 1 ? String(localized: "Minute") : String(localized: "Minuten")
+            return String(localized: "vor \(minutes) \(minuteText)")
         } else if let hours = components.hour, hours < 24 {
-            return "vor \(hours) \(hours == 1 ? "Stunde" : "Stunden")"
+            let hourText = hours == 1 ? String(localized: "Stunde") : String(localized: "Stunden")
+            return String(localized: "vor \(hours) \(hourText)")
         } else if let days = components.day {
-            return "vor \(days) \(days == 1 ? "Tag" : "Tagen")"
+            let dayText = days == 1 ? String(localized: "Tag") : String(localized: "Tagen")
+            return String(localized: "vor \(days) \(dayText)")
         }
     }
     
-    return "vor einiger Zeit"
+    return String(localized: "vor einiger Zeit")
 } 

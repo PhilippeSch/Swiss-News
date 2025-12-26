@@ -9,24 +9,24 @@ enum AppError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .networkError(let details):
-            return "Keine Internetverbindung: \(details)"
+            return String(localized: "Keine Internetverbindung: \(details)")
         case .parsingError(let details):
-            return "Fehler beim Laden der Daten: \(details)"
+            return String(localized: "Fehler beim Laden der Daten: \(details)")
         case .noData:
-            return "Keine Artikel verfügbar"
+            return String(localized: "Keine Artikel verfügbar")
         case .invalidURL(let url):
-            return "Ungültige URL: \(url)"
+            return String(localized: "Ungültige URL: \(url)")
         }
     }
     
     var recoverySuggestion: String? {
         switch self {
         case .networkError:
-            return "Bitte überprüfe deine Internetverbindung und versuche es erneut."
+            return String(localized: "Bitte überprüfe deine Internetverbindung und versuche es erneut.")
         case .parsingError, .invalidURL:
-            return "Bitte versuche es später erneut."
+            return String(localized: "Bitte versuche es später erneut.")
         case .noData:
-            return "Versuche die Filtereinstellungen anzupassen."
+            return String(localized: "Versuche die Filtereinstellungen anzupassen.")
         }
     }
     

@@ -111,14 +111,14 @@ struct ContentView: View {
                     showWelcome: $showWelcome
                 )
             }
-            .alert("Fehler beim Laden", isPresented: .init(
+            .alert(String(localized: "Fehler beim Laden"), isPresented: .init(
                 get: { rssParser.state.error != nil },
                 set: { if !$0 { rssParser.resetState() } }
             )) {
-                Button("OK", role: .cancel) {
+                Button(String(localized: "OK"), role: .cancel) {
                     rssParser.resetState()
                 }
-                Button("Erneut versuchen") {
+                Button(String(localized: "Erneut versuchen")) {
                     Task {
                         await rssParser.fetchAllFeeds()
                     }
@@ -167,14 +167,14 @@ private struct DebugSection: View {
     var body: some View {
         Section {
             ForEach([
-                ("Reset App State", {
+                (String(localized: "Reset App State"), {
                     Settings.resetAllSettings()
                     settings.resetToDefaults()
                     settings.resetFirstLaunch()
                     rssParser.reset()
                     showWelcome = true
                 }),
-                ("Show Welcome", {
+                (String(localized: "Show Welcome"), {
                     settings.resetFirstLaunch()
                     showWelcome = true
                 })
