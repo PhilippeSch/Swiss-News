@@ -1765,13 +1765,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actualités suisses"
+            "value" : "Swiss News"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Notizie svizzere"
+            "value" : "Swiss News"
           }
         }
       }
@@ -1985,24 +1985,24 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktualisiert: %@"
+            "value" : "Updated: %@"
           }
         },
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Updated: %@"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Mis à jour : %@"
           }
         },
         "it" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Aggiornato: %@"
           }
         }
@@ -2258,13 +2258,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bienvenue sur Actualités suisses 👋"
+            "value" : "Bienvenue chez Swiss News 👋"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Benvenuto in Notizie svizzere 👋"
+            "value" : "Benvenuti su Swiss News 👋"
           }
         }
       }
