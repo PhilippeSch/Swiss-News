@@ -112,7 +112,33 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         NewsCategory(id: "20min_knowledge_health", title: "Gesundheit", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/gesundheit", group: .knowledge, sourceId: "20min"),
         
         // 20 Minuten Culture Group
-        NewsCategory(id: "20min_culture_people", title: "People", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/people", group: .culture, sourceId: "20min")
+        NewsCategory(id: "20min_culture_people", title: "People", feedURL: "https://partner-feeds.beta.20min.ch/rss/20minuten/people", group: .culture, sourceId: "20min"),
+        
+        // RSI News Group
+        NewsCategory(id: "rsi_news_all", title: "Info", feedURL: "https://www.rsi.ch/info/?f=rss", group: .news, sourceId: "rsi"),
+        NewsCategory(id: "rsi_news_swiss", title: "Svizzera", feedURL: "https://www.rsi.ch/info/svizzera/?f=rss", group: .news, sourceId: "rsi"),
+        NewsCategory(id: "rsi_news_international", title: "Mondo", feedURL: "https://www.rsi.ch/info/mondo/?f=rss", group: .news, sourceId: "rsi"),
+        NewsCategory(id: "rsi_news_economy", title: "Economia", feedURL: "https://www.rsi.ch/info/economia/?f=rss", group: .news, sourceId: "rsi"),
+        
+        // RSI Sport Group
+        NewsCategory(id: "rsi_sport_all", title: "Sport", feedURL: "https://www.rsi.ch/sport/?f=rss", group: .sport, sourceId: "rsi"),
+        NewsCategory(id: "rsi_sport_hockey", title: "Hockey", feedURL: "https://www.rsi.ch/sport/hockey/?f=rss", group: .sport, sourceId: "rsi"),
+        NewsCategory(id: "rsi_sport_football", title: "Calcio", feedURL: "https://www.rsi.ch/sport/calcio/?f=rss", group: .sport, sourceId: "rsi"),
+        NewsCategory(id: "rsi_sport_winter", title: "Sport invernali", feedURL: "https://www.rsi.ch/sport/sci/?f=rss", group: .sport, sourceId: "rsi"),
+        NewsCategory(id: "rsi_sport_tennis", title: "Tennis", feedURL: "https://www.rsi.ch/sport/tennis/?f=rss", group: .sport, sourceId: "rsi"),
+        NewsCategory(id: "rsi_sport_motorsport", title: "Motori", feedURL: "https://www.rsi.ch/sport/motori/?f=rss", group: .sport, sourceId: "rsi"),
+        NewsCategory(id: "rsi_sport_cycling", title: "Ciclismo", feedURL: "https://www.rsi.ch/sport/ciclismo/?f=rss", group: .sport, sourceId: "rsi"),
+        NewsCategory(id: "rsi_sport_basketball", title: "Basket", feedURL: "https://www.rsi.ch/sport/basket/?f=rss", group: .sport, sourceId: "rsi"),
+        NewsCategory(id: "rsi_sport_swimming", title: "Nuoto", feedURL: "https://www.rsi.ch/sport/nuoto/?f=rss", group: .sport, sourceId: "rsi"),
+        NewsCategory(id: "rsi_sport_more", title: "Altri sport", feedURL: "https://www.rsi.ch/sport/altri/?f=rss", group: .sport, sourceId: "rsi"),
+        
+        // RSI Culture Group
+        NewsCategory(id: "rsi_culture_all", title: "Cultura", feedURL: "https://www.rsi.ch/info/cultura-e-spettacoli/?f=rss", group: .culture, sourceId: "rsi"),
+        
+        // RSI Knowledge Group
+        NewsCategory(id: "rsi_knowledge_environment", title: "Ambiente", feedURL: "https://www.rsi.ch/info/ambiente/?f=rss", group: .knowledge, sourceId: "rsi"),
+        NewsCategory(id: "rsi_knowledge_consumer", title: "Consumi", feedURL: "https://www.rsi.ch/info/consumi/?f=rss", group: .knowledge, sourceId: "rsi"),
+        NewsCategory(id: "rsi_knowledge_health", title: "Salute", feedURL: "https://www.rsi.ch/info/salute/?f=rss", group: .knowledge, sourceId: "rsi")
     ]
     
     static let defaultCategories: Set<String> = Set([

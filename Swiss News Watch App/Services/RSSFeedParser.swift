@@ -84,7 +84,11 @@ class RSSFeedParser: ObservableObject {
             throw AppError.invalidURL(urlString)
         }
         
-        let (data, response) = try await URLSession.shared.data(from: url)
+        var request = URLRequest(url: url)
+        request.setValue("Mozilla/5.0 (watchOS) SwissNewsApp/1.0", forHTTPHeaderField: "User-Agent")
+        request.timeoutInterval = 30
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             throw AppError.networkError("Invalid response")
@@ -107,14 +111,17 @@ class RSSFeedParser: ObservableObject {
         
         let items = delegate.newsItems
         
+        // If no items were parsed, that's an error
         if items.isEmpty {
             throw AppError.noData
         }
         
+        // If no time filter, return all items
         if settings.cutoffHours == 0 {
             return items
         }
         
+        // Filter by date - return empty array if all items are filtered out (not an error)
         let cutoffDate = Calendar.current.date(byAdding: .hour, value: Int(-settings.cutoffHours), to: Date()) ?? Date()
         return items.filter { $0.pubDate > cutoffDate }
     }
