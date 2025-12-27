@@ -10,7 +10,7 @@ struct SettingsView: View {
             timeFilterSection
             versionSection
         }
-        .navigationTitle("Einstellungen")
+        .navigationTitle(String(localized: "Einstellungen"))
         .onAppear {
             rssParser.setSettingsViewActive(true)
             settings.beginSettingsSession()
@@ -24,7 +24,7 @@ struct SettingsView: View {
     
     private var timeFilterSection: some View {
         Section(header: Text("Artikel Filter")) {
-            Picker("Zeitraum", selection: $settings.cutoffHours) {
+            Picker(String(localized: "Zeitraum"), selection: $settings.cutoffHours) {
                 Text("Keine Limite").tag(0.0)
                 Text("24 Stunden").tag(24.0)
                 Text("48 Stunden").tag(48.0)

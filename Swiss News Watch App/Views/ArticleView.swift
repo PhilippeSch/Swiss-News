@@ -21,7 +21,7 @@ struct ArticleView: View {
                 
                 if isLoading {
                     VStack {
-                        ProgressView("Wird aktualisiert...")
+                        ProgressView(String(localized: "Wird aktualisiert..."))
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
                 } else if let error = error {
@@ -39,7 +39,7 @@ struct ArticleView: View {
                 }
                 
                 if !isLoading {
-                    Button("Zurück") {
+                    Button(String(localized: "Zurück")) {
                         dismiss()
                     }
                     .buttonStyle(.bordered)
@@ -50,7 +50,7 @@ struct ArticleView: View {
             .padding()
         }
         .accessibilityIdentifier("articleDetailView")
-        .navigationTitle("Artikel")
+        .navigationTitle(String(localized: "Artikel"))
         .interactiveDismissDisabled(isLoading)
         .task {
             await loadContent()

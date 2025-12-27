@@ -68,7 +68,7 @@ struct WelcomeView: View {
                         }
                     }
                     
-                    Button("Fertig") {
+                    Button(String(localized: "Fertig")) {
                         handleCompletion()
                     }
                     .buttonStyle(.bordered)

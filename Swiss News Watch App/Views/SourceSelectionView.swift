@@ -54,7 +54,7 @@ struct SourceSelectionView: View {
                         .padding(.vertical, 5)
                     }
                     
-                    Button("Weiter") {
+                    Button(String(localized: "Weiter")) {
                         handleSourceSelection()
                     }
                     .buttonStyle(.bordered)
@@ -63,10 +63,10 @@ struct SourceSelectionView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Quellen")
+            .navigationTitle(String(localized: "Quellen"))
             .navigationBarTitleDisplayMode(.inline)
-            .alert("Keine Quelle ausgewählt", isPresented: $showAlert) {
-                Button("OK", role: .cancel) { }
+            .alert(String(localized: "Keine Quelle ausgewählt"), isPresented: $showAlert) {
+                Button(String(localized: "OK"), role: .cancel) { }
             } message: {
                 Text("Bitte wähle mindestens eine Nachrichtenquelle aus.")
             }
