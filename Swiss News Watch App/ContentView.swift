@@ -74,6 +74,18 @@ struct ContentView: View {
                 )
                 #endif
             }
+            .navigationDestination(for: CategoryNavigationValue.self) { navigationValue in
+                if let category = NewsCategory.available.first(where: { $0.id == navigationValue.categoryId }) {
+                    NewsCategoryView(
+                        title: category.title,
+                        newsItems: rssParser.newsItems[navigationValue.categoryId] ?? [],
+                        readArticlesManager: readArticlesManager
+                    )
+                    .onAppear {
+                        scrollPosition = "category_\(navigationValue.categoryId)"
+                    }
+                }
+            }
             .listStyle(.plain)
             .refreshable {
                 await rssParser.fetchAllFeeds()

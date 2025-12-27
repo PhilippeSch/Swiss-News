@@ -1,5 +1,9 @@
 import SwiftUI
 
+struct CategoryNavigationValue: Hashable {
+    let categoryId: String
+}
+
 struct CategoryRowView: View {
     let category: NewsCategory
     let newsItems: [NewsItem]
@@ -7,16 +11,9 @@ struct CategoryRowView: View {
     @ObservedObject var rssParser: RSSFeedParser
     @State private var unreadCount: Int = 0
     @Environment(\.scrollPositionId) private var scrollPositionId
-    @State private var isNavigating = false
     
     var body: some View {
-        NavigationLink(isActive: $isNavigating) {
-            NewsCategoryView(
-                title: category.title,
-                newsItems: newsItems,
-                readArticlesManager: readArticlesManager
-            )
-        } label: {
+        NavigationLink(value: CategoryNavigationValue(categoryId: category.id)) {
             SectionHeaderView(
                 title: category.title,
                 count: unreadCount,
@@ -38,11 +35,6 @@ struct CategoryRowView: View {
         }
         .onChange(of: rssParser.state.lastUpdate) { _, _ in
             updateUnreadCount()
-        }
-        .onChange(of: isNavigating) { _, newValue in
-            if newValue {
-                scrollPositionId.wrappedValue = "category_\(category.id)"
-            }
         }
         .task {
             updateUnreadCount()
