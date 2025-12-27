@@ -64,7 +64,7 @@ struct ContentView: View {
                     readArticlesManager: readArticlesManager
                 )
                 
-                SettingsButton(settings: settings, rssParser: rssParser)
+                SettingsButton(settings: settings, rssParser: rssParser, showWelcome: $showWelcome)
                 
                 #if DEBUG
                 DebugSection(
@@ -155,10 +155,11 @@ struct ContentView: View {
 private struct SettingsButton: View {
     let settings: Settings
     let rssParser: RSSFeedParser
+    @Binding var showWelcome: Bool
     
     var body: some View {
         NavigationLink {
-            SettingsView(settings: settings, rssParser: rssParser)
+            SettingsView(settings: settings, rssParser: rssParser, showWelcome: $showWelcome)
         } label: {
             Image(systemName: "gear")
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -178,26 +179,18 @@ private struct DebugSection: View {
     
     var body: some View {
         Section {
-            ForEach([
-                (String(localized: "Reset App State"), {
-                    Settings.resetAllSettings()
-                    settings.resetToDefaults()
-                    settings.resetFirstLaunch()
-                    rssParser.reset()
-                    showWelcome = true
-                }),
-                (String(localized: "Show Welcome"), {
-                    settings.resetFirstLaunch()
-                    showWelcome = true
-                })
-            ], id: \.0) { title, action in
-                Button(action: action) {
-                    Text(title)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                }
-                .buttonStyle(.bordered)
-                .listRowInsets(EdgeInsets(top: 4, leading: 15, bottom: 4, trailing: 15))
+            Button {
+                Settings.resetAllSettings()
+                settings.resetToDefaults()
+                settings.resetFirstLaunch()
+                rssParser.reset()
+                showWelcome = true
+            } label: {
+                Text(String(localized: "Reset App State"))
+                    .frame(maxWidth: .infinity, alignment: .center)
             }
+            .buttonStyle(.bordered)
+            .listRowInsets(EdgeInsets(top: 4, leading: 15, bottom: 4, trailing: 15))
         }
         .listRowBackground(Color.clear)
     }

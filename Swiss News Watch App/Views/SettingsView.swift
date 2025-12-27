@@ -3,11 +3,13 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var settings: Settings
     @ObservedObject var rssParser: RSSFeedParser
+    @Binding var showWelcome: Bool
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         Form {
             timeFilterSection
+            welcomeSection
             versionSection
         }
         .navigationTitle(String(localized: "Einstellungen"))
@@ -31,6 +33,19 @@ struct SettingsView: View {
                 Text("72 Stunden").tag(72.0)
             }
             .accessibilityIdentifier("timeFilterPicker")
+        }
+    }
+    
+    private var welcomeSection: some View {
+        Section {
+            Button {
+                settings.resetFirstLaunch()
+                showWelcome = true
+            } label: {
+                Text(String(localized: "Show Welcome"))
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
+            .buttonStyle(.bordered)
         }
     }
     
