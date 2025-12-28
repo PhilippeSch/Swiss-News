@@ -160,7 +160,29 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         
         // 24Heures Knowledge Group
         NewsCategory(id: "24heures_knowledge_all", title: "Savoir", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/savoirs", group: .knowledge, sourceId: "24heures"),
-        NewsCategory(id: "24heures_knowledge_tech", title: "Technologie", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/savoirs/technologie", group: .knowledge, sourceId: "24heures")
+        NewsCategory(id: "24heures_knowledge_tech", title: "Technologie", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/savoirs/technologie", group: .knowledge, sourceId: "24heures"),
+        
+        // Le Temps News Group
+        NewsCategory(id: "letemps_news_all", title: "Tous les articles", feedURL: "https://www.letemps.ch/articles.rss", group: .news, sourceId: "letemps"),
+        NewsCategory(id: "letemps_news_world", title: "Monde", feedURL: "https://www.letemps.ch/monde.rss", group: .news, sourceId: "letemps"),
+        NewsCategory(id: "letemps_news_switzerland", title: "Suisse", feedURL: "https://www.letemps.ch/suisse.rss", group: .news, sourceId: "letemps"),
+        NewsCategory(id: "letemps_news_economy", title: "Économie", feedURL: "https://www.letemps.ch/economie.rss", group: .news, sourceId: "letemps"),
+        NewsCategory(id: "letemps_news_opinions", title: "Opinions", feedURL: "https://www.letemps.ch/opinions.rss", group: .news, sourceId: "letemps"),
+        NewsCategory(id: "letemps_news_society", title: "Société", feedURL: "https://www.letemps.ch/societe.rss", group: .news, sourceId: "letemps"),
+        NewsCategory(id: "letemps_news_grands_formats", title: "Grands formats", feedURL: "https://www.letemps.ch/grands-formats.rss", group: .news, sourceId: "letemps"),
+        
+        // Le Temps Sport Group
+        NewsCategory(id: "letemps_sport_all", title: "Sport", feedURL: "https://www.letemps.ch/sport.rss", group: .sport, sourceId: "letemps"),
+        
+        // Le Temps Culture Group
+        NewsCategory(id: "letemps_culture_all", title: "Culture", feedURL: "https://www.letemps.ch/culture.rss", group: .culture, sourceId: "letemps"),
+        NewsCategory(id: "letemps_culture_gastronomie", title: "Gastronomie & Vin", feedURL: "https://www.letemps.ch/gastronomie-vin.rss", group: .culture, sourceId: "letemps"),
+        
+        // Le Temps Knowledge Group
+        NewsCategory(id: "letemps_knowledge_sciences", title: "Sciences", feedURL: "https://www.letemps.ch/sciences.rss", group: .knowledge, sourceId: "letemps"),
+        NewsCategory(id: "letemps_knowledge_cyber", title: "Cyber", feedURL: "https://www.letemps.ch/cyber.rss", group: .knowledge, sourceId: "letemps"),
+        NewsCategory(id: "letemps_knowledge_data", title: "Data", feedURL: "https://www.letemps.ch/data.rss", group: .knowledge, sourceId: "letemps"),
+        NewsCategory(id: "letemps_knowledge_immobilier", title: "Immobilier", feedURL: "https://www.letemps.ch/immobilier.rss", group: .knowledge, sourceId: "letemps")
     ]
     
     static let defaultCategories: Set<String> = Set([

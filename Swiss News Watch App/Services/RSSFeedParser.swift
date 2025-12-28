@@ -61,7 +61,13 @@ class RSSFeedParser: ObservableObject {
                         hasNewData = true
                     }
                 } catch let error as AppError {
-                    errors.append(error)
+                    // Skip 406 errors (Not Acceptable) - server doesn't serve this feed
+                    if case .networkError(let details) = error, details.contains("406") {
+                        // Silently skip this feed
+                        newsItems[category.id] = []
+                    } else {
+                        errors.append(error)
+                    }
                 } catch {
                     errors.append(AppError.networkError(error.localizedDescription))
                 }
@@ -86,6 +92,7 @@ class RSSFeedParser: ObservableObject {
         
         var request = URLRequest(url: url)
         request.setValue("Mozilla/5.0 (watchOS) SwissNewsApp/1.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("application/rss+xml, application/xml, text/xml, */*", forHTTPHeaderField: "Accept")
         request.timeoutInterval = 30
         
         let (data, response) = try await URLSession.shared.data(for: request)

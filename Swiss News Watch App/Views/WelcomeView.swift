@@ -30,6 +30,29 @@ struct WelcomeView: View {
         return filtered
     }
     
+    private var allRelevantCategoryIds: [String] {
+        relevantCategories.values.flatMap { $0.map { $0.id } }
+    }
+    
+    private var areAllSelected: Bool {
+        !allRelevantCategoryIds.isEmpty && allRelevantCategoryIds.allSatisfy { settings.selectedCategories.contains($0) }
+    }
+    
+    private func toggleAllCategories() {
+        if areAllSelected {
+            // Unselect all
+            for categoryId in allRelevantCategoryIds {
+                settings.selectedCategories.remove(categoryId)
+            }
+        } else {
+            // Select all
+            for categoryId in allRelevantCategoryIds {
+                settings.selectedCategories.insert(categoryId)
+            }
+        }
+        settings.saveSelectedCategories()
+    }
+    
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -41,6 +64,12 @@ struct WelcomeView: View {
                     Text("Wähle deine bevorzugten Kategorien:")
                         .font(.caption)
                         .multilineTextAlignment(.center)
+                    
+                    Button(areAllSelected ? String(localized: "Alle abwählen") : String(localized: "Alle auswählen")) {
+                        toggleAllCategories()
+                    }
+                    .buttonStyle(.bordered)
+                    .font(.caption)
                     
                     ForEach(settings.categoryOrder) { group in
                         if let categories = relevantCategories[group] {
