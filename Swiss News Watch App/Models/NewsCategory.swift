@@ -138,7 +138,29 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         // RSI Knowledge Group
         NewsCategory(id: "rsi_knowledge_environment", title: "Ambiente", feedURL: "https://www.rsi.ch/info/ambiente/?f=rss", group: .knowledge, sourceId: "rsi"),
         NewsCategory(id: "rsi_knowledge_consumer", title: "Consumi", feedURL: "https://www.rsi.ch/info/consumi/?f=rss", group: .knowledge, sourceId: "rsi"),
-        NewsCategory(id: "rsi_knowledge_health", title: "Salute", feedURL: "https://www.rsi.ch/info/salute/?f=rss", group: .knowledge, sourceId: "rsi")
+        NewsCategory(id: "rsi_knowledge_health", title: "Salute", feedURL: "https://www.rsi.ch/info/salute/?f=rss", group: .knowledge, sourceId: "rsi"),
+        
+        // 24Heures News Group
+        NewsCategory(id: "24heures_news_flash", title: "Flash info", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/la-une", group: .news, sourceId: "24heures"),
+        NewsCategory(id: "24heures_news_switzerland", title: "Suisse", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/suisse", group: .news, sourceId: "24heures"),
+        NewsCategory(id: "24heures_news_international", title: "Monde", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/monde", group: .news, sourceId: "24heures"),
+        NewsCategory(id: "24heures_news_economy", title: "Économie", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/economie", group: .news, sourceId: "24heures"),
+        NewsCategory(id: "24heures_news_opinion", title: "Opinion", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/opinion", group: .news, sourceId: "24heures"),
+        NewsCategory(id: "24heures_news_vaud", title: "Vaud", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/vaud-regions", group: .news, sourceId: "24heures"),
+        NewsCategory(id: "24heures_news_environment", title: "Environnement", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/environnement", group: .news, sourceId: "24heures"),
+        
+        // 24Heures Sport Group
+        NewsCategory(id: "24heures_sport_all", title: "Sport", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/sports", group: .sport, sourceId: "24heures"),
+        NewsCategory(id: "24heures_sport_ski", title: "Ski Alpin", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/sports/ski-alpin", group: .sport, sourceId: "24heures"),
+        NewsCategory(id: "24heures_sport_lhc", title: "Lausanne HC", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/sports/lhc", group: .sport, sourceId: "24heures"),
+        NewsCategory(id: "24heures_sport_ls", title: "Lausanne Sport", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/sports/ls", group: .sport, sourceId: "24heures"),
+        
+        // 24Heures Culture Group
+        NewsCategory(id: "24heures_culture_all", title: "Culture", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/culture", group: .culture, sourceId: "24heures"),
+        
+        // 24Heures Knowledge Group
+        NewsCategory(id: "24heures_knowledge_all", title: "Savoir", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/savoirs", group: .knowledge, sourceId: "24heures"),
+        NewsCategory(id: "24heures_knowledge_tech", title: "Technologie", feedURL: "https://partner-feeds.publishing.tamedia.ch/rss/24heures/savoirs/technologie", group: .knowledge, sourceId: "24heures")
     ]
     
     static let defaultCategories: Set<String> = Set([
