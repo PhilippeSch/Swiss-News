@@ -30,6 +30,7 @@ struct ContentView: View {
     @State private var showWelcome = false
     @State private var scrollPosition: String? = nil
     @State private var categories: [String] = []
+    @State private var hasCheckedFirstLaunch = false
     
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
@@ -104,7 +105,11 @@ struct ContentView: View {
                         scrollPosition = position
                     }
                 }
-                showWelcome = settings.isFirstLaunch
+                // Only check first launch once, not every time the view appears
+                if !hasCheckedFirstLaunch {
+                    showWelcome = settings.isFirstLaunch
+                    hasCheckedFirstLaunch = true
+                }
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {

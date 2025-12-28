@@ -37,16 +37,19 @@ struct SettingsView: View {
     }
     
     private var welcomeSection: some View {
-        Section {
+        HStack {
+            Spacer()
             Button {
                 settings.resetFirstLaunch()
                 showWelcome = true
             } label: {
                 Text(String(localized: "Show Welcome"))
-                    .frame(maxWidth: .infinity, alignment: .center)
             }
             .buttonStyle(.bordered)
+            Spacer()
         }
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
     }
     
     private var versionSection: some View {
