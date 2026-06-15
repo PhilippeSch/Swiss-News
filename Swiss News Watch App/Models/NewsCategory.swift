@@ -45,7 +45,7 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         
         // SRF Sport Group
         NewsCategory(id: "srf_sport_all", title: "Sport", feedURL: "https://www.srf.ch/sport/bnf/rss/718", group: .sport, sourceId: "srf"),
-        NewsCategory(id: "srf_sport_football", title: "Fussball", feedURL: "https://www.srf.ch//sport/bnf/rss/2562", group: .sport, sourceId: "srf"),
+        NewsCategory(id: "srf_sport_football", title: "Fussball", feedURL: "https://www.srf.ch/sport/bnf/rss/2562", group: .sport, sourceId: "srf"),
         NewsCategory(id: "srf_sport_hockey", title: "Eishockey", feedURL: "https://www.srf.ch/sport/bnf/rss/3418", group: .sport, sourceId: "srf"),
         NewsCategory(id: "srf_sport_tennis", title: "Tennis", feedURL: "https://www.srf.ch/sport/bnf/rss/2814", group: .sport, sourceId: "srf"),
         NewsCategory(id: "srf_sport_ski", title: "Ski Alpin", feedURL: "https://www.srf.ch/sport/bnf/rss/787950", group: .sport, sourceId: "srf"),
