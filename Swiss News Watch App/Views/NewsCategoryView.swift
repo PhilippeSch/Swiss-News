@@ -129,27 +129,54 @@ private struct ArticleRowView: View {
     }
 }
 
+/// Replaces AsyncImage, which downloads full-resolution press photos and does
+/// not keep decoded images across view reloads, so images re-download on scroll.
 private struct ArticleImageView: View {
     let imageUrl: URL
-    
+
+    @State private var image: UIImage?
+    @State private var didFail = false
+
     var body: some View {
-        AsyncImage(url: imageUrl) { phase in
-            switch phase {
-            case .empty:
-                ProgressView()
-            case .success(let image):
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxHeight: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            case .failure(_):
-                Image(systemName: "photo")
-                    .imageScale(.large)
-                    .foregroundColor(.gray)
-            @unknown default:
-                EmptyView()
+        content
+            .task(id: imageUrl) {
+                await load()
             }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if let image {
+            Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxHeight: 200)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        } else if didFail {
+            Image(systemName: "photo")
+                .imageScale(.large)
+                .foregroundColor(.gray)
+        } else {
+            ProgressView()
+        }
+    }
+
+    private func load() async {
+        let key = ArticleImageLoader.cacheKey(for: imageUrl)
+
+        if let cached = ImageCache.shared.image(forKey: key) {
+            image = cached
+            return
+        }
+
+        do {
+            let loaded = try await ArticleImageLoader.load(imageUrl)
+            guard !Task.isCancelled else { return }
+            ImageCache.shared.insert(loaded, forKey: key)
+            image = loaded
+        } catch {
+            guard !Task.isCancelled else { return }
+            didFail = true
         }
     }
 }
