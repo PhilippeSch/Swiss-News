@@ -21,6 +21,33 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(category.group, .news)
     }
     
+    func testEveryDefaultCategoryResolvesAgainstAvailable() {
+        let availableIds = Set(NewsCategory.available.map(\.id))
+        let dangling = NewsCategory.defaultCategories.subtracting(availableIds)
+
+        XCTAssertTrue(
+            dangling.isEmpty,
+            "defaultCategories references ids that do not exist in available: \(dangling.sorted())"
+        )
+    }
+
+    func testCategoryIdsAreUnique() {
+        let ids = NewsCategory.available.map(\.id)
+        let duplicates = Dictionary(grouping: ids, by: { $0 }).filter { $0.value.count > 1 }.keys
+
+        XCTAssertTrue(duplicates.isEmpty, "Duplicate category ids: \(duplicates.sorted())")
+    }
+
+    func testEveryCategoryHasAValidFeedURL() {
+        for category in NewsCategory.available {
+            XCTAssertNotNil(URL(string: category.feedURL), "\(category.id) has an unparseable feedURL")
+            XCTAssertFalse(
+                category.feedURL.dropFirst("https://".count).contains("//"),
+                "\(category.id) has a doubled slash in its path: \(category.feedURL)"
+            )
+        }
+    }
+
     func testSettingsDefaultValues() {
         let settings = Settings()
         XCTAssertEqual(settings.cutoffHours, 48.0)

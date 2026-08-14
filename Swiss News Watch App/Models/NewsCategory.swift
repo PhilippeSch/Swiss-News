@@ -190,7 +190,7 @@ struct NewsCategory: Identifiable, Codable, Hashable {
         "srf_sport_all",
         "srf_culture_all",
         "srf_knowledge_all",
-        "nzz_news_all",
+        "nzz_news_top",
         "nzz_sport_all",
         "nzz_culture_all",
         "20min_news_all",

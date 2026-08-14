@@ -11,9 +11,11 @@ class RSSFeedParser: ObservableObject {
     
     private var refreshTask: Task<Void, Never>?
     private var settingsObserver: AnyCancellable?
-    
-    init(settings: Settings) {
+    private let urlSession: URLSession
+
+    init(settings: Settings, urlSession: URLSession = .shared) {
         self.settings = settings
+        self.urlSession = urlSession
         setupSettingsObserver()
     }
     
@@ -93,9 +95,9 @@ class RSSFeedParser: ObservableObject {
         var request = URLRequest(url: url)
         request.setValue("Mozilla/5.0 (watchOS) SwissNewsApp/1.0", forHTTPHeaderField: "User-Agent")
         request.setValue("application/rss+xml, application/xml, text/xml, */*", forHTTPHeaderField: "Accept")
-        request.timeoutInterval = 30
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
+        request.timeoutInterval = Constants.Network.timeoutInterval
+
+        let (data, response) = try await urlSession.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             throw AppError.networkError("Invalid response")

@@ -1,4 +1,5 @@
 import XCTest
+import Combine
 @testable import Swiss_News_Watch_App
 
 @MainActor
@@ -6,44 +7,99 @@ final class RSSParserTests: XCTestCase {
     var parser: RSSFeedParser!
     var settings: Settings!
     
+    private var cancellables: Set<AnyCancellable> = []
+
     @MainActor
     override func setUp() async throws {
         try await super.setUp()
+        StubURLProtocol.reset()
+        StubURLProtocol.responder = { _ in (200, FeedFixture.feed()) }
         settings = Settings()
-        parser = RSSFeedParser(settings: settings)
+        // Exactly one feed, so assertions are about the parser and not the
+        // user's persisted category selection.
+        settings.selectedSources = ["srf"]
+        settings.selectedCategories = ["srf_news_all"]
+        parser = RSSFeedParser(settings: settings, urlSession: StubURLProtocol.makeSession())
     }
-    
+
     @MainActor
-    func testLoadingState() async throws {
-        XCTAssertEqual(parser.state, .idle, "Initial state should be idle")
-        
-        let task = Task {
-            await parser.fetchAllFeeds()
-        }
-        
-        // Give time for state to update
-        try await Task.sleep(nanoseconds: 100_000_000)
-        XCTAssertEqual(parser.state, .loading(lastUpdate: nil), "State should be loading during fetch")
-        
-        await task.value
+    override func tearDown() async throws {
+        cancellables.removeAll()
+        StubURLProtocol.reset()
+        parser = nil
+        settings = nil
+        try await super.tearDown()
     }
-    
-    func testFetchAllFeeds() async throws {
-        // Given
+
+    // MARK: - Loading state
+
+    func testFetchAllFeedsMovesThroughLoadingToLoaded() async throws {
         XCTAssertEqual(parser.state, .idle, "Initial state should be idle")
-        
-        // When
-        let task = Task {
-            await parser.fetchAllFeeds()
-        }
-        
-        // Then
-        try await Task.sleep(nanoseconds: 100_000_000)  // Wait for state update
-        XCTAssertEqual(parser.state, .loading(lastUpdate: nil), "State should be loading during fetch")
-        
-        await task.value  // Wait for completion
+
+        // Record every state the UI would observe, rather than sampling after a
+        // sleep — sampling races with how fast the fetch completes.
+        let recorder = StateRecorder()
+        parser.$state
+            .sink { recorder.append($0) }
+            .store(in: &cancellables)
+
+        await parser.fetchAllFeeds()
+
+        XCTAssertEqual(recorder.states.first, .idle)
+        XCTAssertTrue(
+            recorder.states.contains(.loading(lastUpdate: nil)),
+            "Should publish a loading state during the fetch, got \(recorder.states)"
+        )
+        XCTAssertNotNil(parser.state.lastUpdate, "Should finish with a timestamp")
+        XCTAssertNil(parser.state.error, "Should finish without error")
     }
-    
+
+    func testFetchAllFeedsPopulatesSelectedCategory() async throws {
+        await parser.fetchAllFeeds()
+
+        XCTAssertEqual(parser.newsItems["srf_news_all"]?.count, 2)
+        XCTAssertEqual(parser.newsItems["srf_news_all"]?.first?.title, "Artikel 1")
+        XCTAssertTrue(parser.loadingCategories.isEmpty, "Loading spinners should clear")
+    }
+
+    func testFetchAllFeedsRequestsOnlySelectedCategories() async throws {
+        await parser.fetchAllFeeds()
+
+        XCTAssertEqual(StubURLProtocol.requestedURLs.count, 1)
+        XCTAssertEqual(
+            StubURLProtocol.requestedURLs.first?.absoluteString,
+            "https://www.srf.ch/news/bnf/rss/1646"
+        )
+    }
+
+    func testServerErrorSurfacesAsErrorState() async throws {
+        StubURLProtocol.responder = { _ in (500, Data()) }
+
+        await parser.fetchAllFeeds()
+
+        XCTAssertNotNil(parser.state.error, "A 500 should surface as an error state")
+    }
+
+    func testNotAcceptableFeedIsSkippedSilently() async throws {
+        StubURLProtocol.responder = { _ in (406, Data()) }
+
+        await parser.fetchAllFeeds()
+
+        XCTAssertNil(parser.state.error, "406 feeds are skipped rather than surfaced")
+        XCTAssertEqual(parser.newsItems["srf_news_all"], [])
+    }
+
+    func testItemsOlderThanCutoffAreFiltered() async throws {
+        settings.cutoffHours = 48
+        let threeDaysAgo = Date().addingTimeInterval(-72 * 3600)
+        StubURLProtocol.responder = { _ in (200, FeedFixture.feed(publishedAt: threeDaysAgo)) }
+
+        await parser.fetchAllFeeds()
+
+        XCTAssertEqual(parser.newsItems["srf_news_all"], [], "Stale items should be filtered out")
+    }
+
+
     // MARK: - Parse-time derivation
 
     func testParsesPubDateFromRFC822() async throws {
@@ -145,52 +201,23 @@ final class RSSParserTests: XCTestCase {
         """.data(using: .utf8)!
     }
 
-    private func createTestArticle(hoursAgo: Double) -> (title: String, date: Date) {
-        let date = Calendar.current.date(byAdding: .hour, value: -Int(hoursAgo), to: Date()) ?? Date()
-        return (hoursAgo > 24 ? "Old Article" : "New Article", date)
-    }
-    
-    private func createMockRSSFeed(_ articles: [(title: String, date: Date)]) -> Data {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
-        
-        let articlesXML = articles.map { article in
-            """
-            <item>
-                <title>\(article.title)</title>
-                <description>Test description</description>
-                <pubDate>\(dateFormatter.string(from: article.date))</pubDate>
-                <link>https://test.com/article</link>
-                <guid>test-guid-\(article.title)</guid>
-            </item>
-            """
-        }.joined(separator: "\n")
-        
-        let rssXML = """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <rss version="2.0">
-            <channel>
-                \(articlesXML)
-            </channel>
-        </rss>
-        """
-        
-        return rssXML.data(using: .utf8)!
-    }
-    
     private func parseTestFeed(_ data: Data) async throws -> [NewsItem] {
         let parser = XMLParser(data: data)
         let delegate = RSSParserDelegate()
         parser.delegate = delegate
-        
+
         XCTAssertTrue(parser.parse(), "Should parse valid RSS feed")
         return delegate.newsItems
     }
-    
-    @MainActor
-    override func tearDown() async throws {
-        parser = nil
-        settings = nil
-        try await super.tearDown()
+}
+
+/// Collects published states so a test can assert on the whole transition
+/// sequence instead of sampling at one moment.
+private final class StateRecorder {
+    private(set) var states: [LoadingState] = []
+
+    func append(_ state: LoadingState) {
+        states.append(state)
     }
-} 
+}
+
