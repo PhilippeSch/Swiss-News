@@ -1,6 +1,6 @@
 import Foundation
 
-struct NewsItem: Identifiable, Equatable {
+struct NewsItem: Identifiable, Equatable, Sendable {
     let title: String
     let description: String
     /// HTML stripped and whitespace collapsed, derived once at init.

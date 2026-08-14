@@ -72,6 +72,65 @@ final class RSSParserTests: XCTestCase {
         )
     }
 
+    // MARK: - Concurrency
+
+    func testFeedsAreFetchedConcurrently() async throws {
+        settings.selectedCategories = Set(
+            NewsCategory.available.filter { $0.sourceId == "srf" }.prefix(10).map(\.id)
+        )
+        // Each feed sleeps, so a sequential run would take 10 x the delay while
+        // a bounded-concurrent run takes roughly ceil(10 / maxConcurrent) x it.
+        StubURLProtocol.responseDelay = 0.2
+        StubURLProtocol.responder = { _ in (200, FeedFixture.feed()) }
+
+        let start = Date()
+        await parser.fetchAllFeeds()
+        let elapsed = Date().timeIntervalSince(start)
+
+        XCTAssertEqual(StubURLProtocol.requestedURLs.count, 10)
+        XCTAssertLessThan(elapsed, 1.0, "10 feeds x 0.2s should overlap, not run sequentially (2.0s)")
+        XCTAssertGreaterThan(StubURLProtocol.maxConcurrentRequests, 1, "Fetches should overlap")
+        XCTAssertLessThanOrEqual(
+            StubURLProtocol.maxConcurrentRequests, 5,
+            "Concurrency should stay bounded, saw \(StubURLProtocol.maxConcurrentRequests) in flight"
+        )
+    }
+
+    func testOneSlowFeedDoesNotBlockTheOthers() async throws {
+        let slowURL = "https://www.srf.ch/news/bnf/rss/1646"
+        settings.selectedCategories = ["srf_news_all", "srf_sport_all", "srf_culture_all"]
+        StubURLProtocol.responseDelay = 0
+        StubURLProtocol.responder = { request in
+            // The slow one still answers, just last.
+            if request.url?.absoluteString == slowURL {
+                Thread.sleep(forTimeInterval: 0.4)
+            }
+            return (200, FeedFixture.feed())
+        }
+
+        await parser.fetchAllFeeds()
+
+        XCTAssertEqual(parser.newsItems["srf_sport_all"]?.count, 2)
+        XCTAssertEqual(parser.newsItems["srf_culture_all"]?.count, 2)
+        XCTAssertEqual(parser.newsItems["srf_news_all"]?.count, 2)
+        XCTAssertTrue(parser.loadingCategories.isEmpty)
+    }
+
+    func testOneFailingFeedDoesNotPreventOthersFromLoading() async throws {
+        settings.selectedCategories = ["srf_news_all", "srf_sport_all"]
+        StubURLProtocol.responder = { request in
+            request.url?.absoluteString.contains("/news/") == true
+                ? (500, Data())
+                : (200, FeedFixture.feed())
+        }
+
+        await parser.fetchAllFeeds()
+
+        XCTAssertEqual(parser.newsItems["srf_sport_all"]?.count, 2, "Healthy feed should still load")
+        XCTAssertNotNil(parser.state.error, "The failing feed should still surface an error")
+        XCTAssertTrue(parser.loadingCategories.isEmpty, "All spinners should clear")
+    }
+
     func testServerErrorSurfacesAsErrorState() async throws {
         StubURLProtocol.responder = { _ in (500, Data()) }
 
