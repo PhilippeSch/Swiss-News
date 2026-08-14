@@ -82,14 +82,14 @@ private struct ArticleRowView: View {
     @ObservedObject var readArticlesManager: ReadArticlesManager
     @Binding var isViewingArticle: Bool
     
-    private let dateFormatter: DateFormatter = {
+    /// Shared across rows — a stored property would allocate a formatter every
+    /// time the row struct is rebuilt during scrolling.
+    private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
         formatter.dateFormat = "dd.MM.yy\nHH:mm"
         return formatter
     }()
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(item.title)
@@ -97,7 +97,7 @@ private struct ArticleRowView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .opacity(readArticlesManager.isRead(item.link) ? Constants.UI.readArticleOpacity : 1)
             
-            if let imageUrl = item.watchCompatibleImageUrl ?? item.imageUrl {
+            if let imageUrl = item.imageUrl {
                 ArticleImageView(imageUrl: imageUrl)
             }
             
@@ -108,7 +108,7 @@ private struct ArticleRowView: View {
                 .opacity(readArticlesManager.isRead(item.link) ? Constants.UI.readArticleOpacity : 1)
             
             HStack {
-                Text(dateFormatter.string(from: item.pubDate))
+                Text(Self.dateFormatter.string(from: item.pubDate))
                     .font(.caption)
                     .foregroundColor(.gray)
                 

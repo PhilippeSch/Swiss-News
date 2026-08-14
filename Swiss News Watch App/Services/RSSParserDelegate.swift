@@ -52,42 +52,45 @@ final class RSSParserDelegate: NSObject, XMLParserDelegate, @unchecked Sendable 
         }
     }
     
+    /// RFC-822 dates as used by every feed we consume. Reused across items —
+    /// `DateFormatter` is expensive to create and parsing runs on a single
+    /// thread per `XMLParser` run.
+    private static let pubDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
+        return formatter
+    }()
+
+    private static let imageTagRegex = try! NSRegularExpression(pattern: "<img[^>]+src=\"([^\"]+)\"")
+
     private func extractImageFromDescription(_ description: String) -> String? {
-        let pattern = "<img[^>]+src=\"([^\"]+)\""
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: description, range: NSRange(description.startIndex..., in: description)),
-              let range = Range(match.range(at: 1), in: description) else {
+        let range = NSRange(description.startIndex..., in: description)
+        guard let match = Self.imageTagRegex.firstMatch(in: description, range: range),
+              let matchRange = Range(match.range(at: 1), in: description) else {
             return nil
         }
-        return String(description[range])
+        return String(description[matchRange])
     }
-    
+
+    /// First image reference found for the current item, in order of preference.
+    private var currentImageUrl: URL? {
+        let candidate = extractImageFromDescription(currentDescription)
+            ?? [currentMediaContent, currentMediaThumbnail, currentEnclosureUrl].first { !$0.isEmpty }
+        return candidate.flatMap(URL.init(string:))
+    }
+
     func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         if elementName == "item" {
-            let dateFormatter = DateFormatter()
-            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-            dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
-            
-            let pubDate = dateFormatter.date(from: currentPubDate.trimmingCharacters(in: .whitespacesAndNewlines)) ?? Date()
-            
-            var finalDescription = currentDescription
-            
-            if let descriptionImageUrl = extractImageFromDescription(currentDescription) {
-                finalDescription += "<enclosure url=\"\(descriptionImageUrl)\" type=\"image/jpeg\"/>"
-            } else if !currentMediaContent.isEmpty {
-                finalDescription += "<enclosure url=\"\(currentMediaContent)\" type=\"image/jpeg\"/>"
-            } else if !currentMediaThumbnail.isEmpty {
-                finalDescription += "<enclosure url=\"\(currentMediaThumbnail)\" type=\"image/jpeg\"/>"
-            } else if !currentEnclosureUrl.isEmpty {
-                finalDescription += "<enclosure url=\"\(currentEnclosureUrl)\" type=\"image/jpeg\"/>"
-            }
-            
+            let pubDate = Self.pubDateFormatter.date(from: currentPubDate.trimmingCharacters(in: .whitespacesAndNewlines)) ?? Date()
+
             let newsItem = NewsItem(
                 title: currentTitle.trimmingCharacters(in: .whitespacesAndNewlines),
-                description: finalDescription.trimmingCharacters(in: .whitespacesAndNewlines),
+                description: currentDescription.trimmingCharacters(in: .whitespacesAndNewlines),
                 pubDate: pubDate,
                 link: currentLink.trimmingCharacters(in: .whitespacesAndNewlines),
-                guid: currentGuid.trimmingCharacters(in: .whitespacesAndNewlines)
+                guid: currentGuid.trimmingCharacters(in: .whitespacesAndNewlines),
+                imageUrl: currentImageUrl
             )
             newsItems.append(newsItem)
             parsingItem = false

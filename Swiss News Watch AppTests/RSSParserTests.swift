@@ -44,7 +44,107 @@ final class RSSParserTests: XCTestCase {
         await task.value  // Wait for completion
     }
     
+    // MARK: - Parse-time derivation
+
+    func testParsesPubDateFromRFC822() async throws {
+        let items = try await parseTestFeed(feed(withItemBody: """
+            <title>Titel</title>
+            <description>Text</description>
+            <pubDate>Wed, 10 Jun 2026 14:30:00 +0200</pubDate>
+            <link>https://test.com/a</link>
+            <guid>g1</guid>
+        """))
+
+        var components = DateComponents()
+        components.year = 2026; components.month = 6; components.day = 10
+        components.hour = 14; components.minute = 30
+        components.timeZone = TimeZone(secondsFromGMT: 2 * 3600)
+        let expected = Calendar(identifier: .gregorian).date(from: components)
+
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items.first?.pubDate, expected)
+    }
+
+    func testCleanDescriptionStripsMarkupAndCollapsesWhitespace() async throws {
+        let items = try await parseTestFeed(feed(withItemBody: """
+            <title>Titel</title>
+            <description>&lt;p&gt;Erster   Satz.&lt;/p&gt;&lt;br/&gt;&lt;p&gt;Zweiter
+            Satz.&lt;/p&gt;</description>
+            <guid>g1</guid>
+        """))
+
+        XCTAssertEqual(items.first?.cleanDescription, "Erster Satz.Zweiter Satz.")
+    }
+
+    func testImageUrlPrefersDescriptionImageOverMediaAndEnclosure() async throws {
+        let items = try await parseTestFeed(feed(withItemBody: """
+            <title>Titel</title>
+            <description>&lt;img src="https://cdn.test/from-description.jpg"/&gt;Text</description>
+            <media:content url="https://cdn.test/from-media.jpg" type="image/jpeg"/>
+            <enclosure url="https://cdn.test/from-enclosure.jpg" type="image/jpeg"/>
+            <guid>g1</guid>
+        """))
+
+        XCTAssertEqual(items.first?.imageUrl?.absoluteString, "https://cdn.test/from-description.jpg")
+    }
+
+    func testImageUrlFallsBackThroughMediaThumbnailAndEnclosure() async throws {
+        let mediaThumbnail = try await parseTestFeed(feed(withItemBody: """
+            <description>Kein Bild im Text</description>
+            <media:thumbnail url="https://cdn.test/thumb.jpg"/>
+            <enclosure url="https://cdn.test/enclosure.jpg" type="image/jpeg"/>
+            <guid>g1</guid>
+        """))
+        XCTAssertEqual(mediaThumbnail.first?.imageUrl?.absoluteString, "https://cdn.test/thumb.jpg")
+
+        let enclosureOnly = try await parseTestFeed(feed(withItemBody: """
+            <description>Kein Bild im Text</description>
+            <enclosure url="https://cdn.test/enclosure.jpg" type="image/jpeg"/>
+            <guid>g1</guid>
+        """))
+        XCTAssertEqual(enclosureOnly.first?.imageUrl?.absoluteString, "https://cdn.test/enclosure.jpg")
+    }
+
+    func testImageUrlIsNilWhenFeedCarriesNoImage() async throws {
+        let items = try await parseTestFeed(feed(withItemBody: """
+            <description>Nur Text</description>
+            <guid>g1</guid>
+        """))
+        XCTAssertNil(items.first?.imageUrl)
+    }
+
+    func testWebPImageIsRewrittenToJPEGForWatchOS() async throws {
+        let items = try await parseTestFeed(feed(withItemBody: """
+            <description>Text</description>
+            <media:content url="https://cdn.test/bild.webp" type="image/webp"/>
+            <guid>g1</guid>
+        """))
+        XCTAssertEqual(items.first?.imageUrl?.absoluteString, "https://cdn.test/bild.jpg")
+    }
+
+    func testDescriptionNoLongerCarriesSyntheticEnclosure() async throws {
+        let items = try await parseTestFeed(feed(withItemBody: """
+            <description>Text</description>
+            <enclosure url="https://cdn.test/bild.jpg" type="image/jpeg"/>
+            <guid>g1</guid>
+        """))
+        XCTAssertEqual(items.first?.description, "Text")
+    }
+
     // Helper methods
+    private func feed(withItemBody itemBody: String) -> Data {
+        """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+            <channel>
+                <item>
+                \(itemBody)
+                </item>
+            </channel>
+        </rss>
+        """.data(using: .utf8)!
+    }
+
     private func createTestArticle(hoursAgo: Double) -> (title: String, date: Date) {
         let date = Calendar.current.date(byAdding: .hour, value: -Int(hoursAgo), to: Date()) ?? Date()
         return (hoursAgo > 24 ? "Old Article" : "New Article", date)
