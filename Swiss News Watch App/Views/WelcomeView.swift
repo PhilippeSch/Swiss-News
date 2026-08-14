@@ -128,7 +128,7 @@ struct WelcomeView: View {
             
             // Feeds initial laden
             Task {
-                await rssParser.fetchAllFeeds()
+                await rssParser.fetchAllFeeds(force: true)
             }
         }
     }

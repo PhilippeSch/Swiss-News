@@ -142,4 +142,24 @@ enum FeedFixture {
         </rss>
         """.data(using: .utf8)!
     }
+
+    /// A single item carrying an image, for checking derived fields survive a
+    /// round trip through the cache.
+    static func feedWithImage() -> Data {
+        """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+            <channel>
+                <item>
+                    <title>Mit Bild</title>
+                    <description>Mit Bild</description>
+                    <pubDate>\(rfc822.string(from: Date()))</pubDate>
+                    <link>https://test.ch/bild</link>
+                    <guid>guid-bild</guid>
+                    <media:content url="https://cdn.test/bild.jpg" type="image/jpeg"/>
+                </item>
+            </channel>
+        </rss>
+        """.data(using: .utf8)!
+    }
 }

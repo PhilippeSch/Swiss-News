@@ -81,6 +81,13 @@ struct ContentView: View {
             }
             .listStyle(.plain)
             .refreshable {
+                // Manual refresh always fetches, regardless of cache age.
+                await rssParser.fetchAllFeeds(force: true)
+            }
+            .task {
+                guard !ProcessInfo.processInfo.isRunningInPreview else { return }
+                // Show the last known articles first, then refresh behind them.
+                await rssParser.loadCachedContent()
                 await rssParser.fetchAllFeeds()
             }
             .onAppear {
@@ -93,6 +100,7 @@ struct ContentView: View {
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active, !ProcessInfo.processInfo.isRunningInPreview {
                     Task {
+                        // Throttled: a wrist-raise within the validity window is a no-op.
                         await rssParser.fetchAllFeeds()
                     }
                 }
@@ -116,7 +124,7 @@ struct ContentView: View {
                 }
                 Button(String(localized: "Erneut versuchen")) {
                     Task {
-                        await rssParser.fetchAllFeeds()
+                        await rssParser.fetchAllFeeds(force: true)
                     }
                 }
             } message: {

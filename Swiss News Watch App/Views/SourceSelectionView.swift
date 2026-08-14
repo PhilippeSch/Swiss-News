@@ -112,7 +112,8 @@ struct SourceSelectionView: View {
         settings.isFirstLaunch = false
         showWelcome = false
         Task {
-            await rssParser.fetchAllFeeds()
+            // The selection changed, so the cached set no longer applies.
+            await rssParser.fetchAllFeeds(force: true)
         }
     }
 }

@@ -72,6 +72,81 @@ final class RSSParserTests: XCTestCase {
         )
     }
 
+    // MARK: - Throttling and persistence
+
+    func testSecondFetchWithinValidityWindowIsSkipped() async throws {
+        await parser.fetchAllFeeds()
+        XCTAssertEqual(StubURLProtocol.requestedURLs.count, 1)
+
+        // Simulates a wrist-raise moments later.
+        await parser.fetchAllFeeds()
+
+        XCTAssertEqual(StubURLProtocol.requestedURLs.count, 1, "Should not refetch inside the validity window")
+    }
+
+    func testForcedFetchBypassesTheThrottle() async throws {
+        await parser.fetchAllFeeds()
+        XCTAssertEqual(StubURLProtocol.requestedURLs.count, 1)
+
+        // Pull-to-refresh.
+        await parser.fetchAllFeeds(force: true)
+
+        XCTAssertEqual(StubURLProtocol.requestedURLs.count, 2, "Pull-to-refresh must always fetch")
+    }
+
+    func testFetchedContentIsPersistedAndRestored() async throws {
+        let cache = NewsCacheStore(fileName: "test-cache-\(UUID().uuidString).json")
+        let writer = RSSFeedParser(settings: settings, urlSession: StubURLProtocol.makeSession(), cache: cache)
+        await writer.fetchAllFeeds()
+        XCTAssertEqual(writer.newsItems["srf_news_all"]?.count, 2)
+
+        // A fresh launch: same cache, nothing fetched yet.
+        let reader = RSSFeedParser(settings: settings, urlSession: StubURLProtocol.makeSession(), cache: cache)
+        XCTAssertEqual(reader.state, .idle)
+        XCTAssertTrue(reader.newsItems.isEmpty)
+
+        await reader.loadCachedContent()
+
+        XCTAssertEqual(reader.newsItems["srf_news_all"]?.count, 2, "Cached articles should render immediately")
+        XCTAssertEqual(reader.newsItems["srf_news_all"]?.first?.title, "Artikel 1")
+        XCTAssertNotNil(reader.state.lastUpdate)
+        XCTAssertEqual(StubURLProtocol.requestedURLs.count, 1, "Restoring should not hit the network")
+
+        await cache.clear()
+    }
+
+    func testCachedContentSurvivesAnImageURL() async throws {
+        let cache = NewsCacheStore(fileName: "test-cache-\(UUID().uuidString).json")
+        StubURLProtocol.responder = { _ in (200, FeedFixture.feedWithImage()) }
+        let writer = RSSFeedParser(settings: settings, urlSession: StubURLProtocol.makeSession(), cache: cache)
+        await writer.fetchAllFeeds()
+
+        let reader = RSSFeedParser(settings: settings, urlSession: StubURLProtocol.makeSession(), cache: cache)
+        await reader.loadCachedContent()
+
+        XCTAssertEqual(
+            reader.newsItems["srf_news_all"]?.first?.imageUrl?.absoluteString,
+            "https://cdn.test/bild.jpg",
+            "Derived fields must round-trip through the cache"
+        )
+        XCTAssertEqual(reader.newsItems["srf_news_all"]?.first?.cleanDescription, "Mit Bild")
+
+        await cache.clear()
+    }
+
+    func testLoadingCacheDoesNotOverwriteFetchedContent() async throws {
+        let cache = NewsCacheStore(fileName: "test-cache-\(UUID().uuidString).json")
+        let parser = RSSFeedParser(settings: settings, urlSession: StubURLProtocol.makeSession(), cache: cache)
+        await parser.fetchAllFeeds()
+        let fetched = parser.newsItems
+
+        await parser.loadCachedContent()
+
+        XCTAssertEqual(parser.newsItems, fetched, "Cache restore must not clobber a completed fetch")
+
+        await cache.clear()
+    }
+
     // MARK: - Concurrency
 
     func testFeedsAreFetchedConcurrently() async throws {

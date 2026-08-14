@@ -12,25 +12,38 @@ class RSSFeedParser: ObservableObject {
     private var refreshTask: Task<Void, Never>?
     private var settingsObserver: AnyCancellable?
     private let urlSession: URLSession
+    private let cache: NewsCacheStore?
 
-    init(settings: Settings, urlSession: URLSession = .shared) {
+    init(settings: Settings, urlSession: URLSession = .shared, cache: NewsCacheStore? = NewsCacheStore()) {
         self.settings = settings
         self.urlSession = urlSession
+        self.cache = cache
         setupSettingsObserver()
     }
-    
+
     private func setupSettingsObserver() {
         settingsObserver = settings.$cutoffHours
             .debounce(for: .seconds(2), scheduler: DispatchQueue.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                
+
                 if !self.isSettingsViewActive {
                     Task {
-                        await self.fetchAllFeeds()
+                        // A changed time filter must re-filter regardless of age.
+                        await self.fetchAllFeeds(force: true)
                     }
                 }
             }
+    }
+
+    /// Restores the last persisted articles so the first frame has content.
+    /// Does nothing once a fetch has already produced results.
+    func loadCachedContent() async {
+        guard case .idle = state, let cache else { return }
+        guard let snapshot = await cache.load(), !snapshot.itemsByCategory.isEmpty else { return }
+
+        newsItems = snapshot.itemsByCategory
+        state = .loaded(snapshot.savedAt)
     }
     
     /// How many feeds may be in flight at once. Enough to hide latency without
@@ -43,7 +56,14 @@ class RSSFeedParser: ObservableObject {
         let error: AppError?
     }
 
-    func fetchAllFeeds() async {
+    /// - Parameter force: bypasses the freshness check. Pull-to-refresh and an
+    ///   explicit retry always fetch; a wrist-raise does not.
+    func fetchAllFeeds(force: Bool = false) async {
+        if !force, let lastUpdate = state.lastUpdate,
+           Date().timeIntervalSince(lastUpdate) < Constants.Network.cacheValidityDuration {
+            return
+        }
+
         state = .loading(lastUpdate: state.lastUpdate)
 
         let categories = NewsCategory.available.filter {
@@ -99,6 +119,13 @@ class RSSFeedParser: ObservableObject {
         } else {
             state = .loaded(state.lastUpdate ?? Date()) // Keep existing timestamp
         }
+
+        await persistCache()
+    }
+
+    private func persistCache() async {
+        guard let cache, !newsItems.isEmpty else { return }
+        await cache.save(itemsByCategory: newsItems, savedAt: state.lastUpdate ?? Date())
     }
 
     /// Fetches and parses one feed. `nonisolated` on purpose: the network wait
@@ -180,7 +207,8 @@ class RSSFeedParser: ObservableObject {
         if !active {
             Task {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
-                await fetchAllFeeds()
+                // Settings just closed, so honour whatever changed there.
+                await fetchAllFeeds(force: true)
                 isSettingsViewActive = false
             }
         }
@@ -192,6 +220,10 @@ class RSSFeedParser: ObservableObject {
         loadingCategories.removeAll()
         refreshTask?.cancel()
         refreshTask = nil
+
+        if let cache {
+            Task { await cache.clear() }
+        }
     }
     
     func resetState() {
