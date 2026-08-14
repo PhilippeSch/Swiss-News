@@ -1,0 +1,3 @@
+# Keeps the plain "Open a blank issue" escape hatch alongside the forms above,
+# for anything the templates do not fit.
+blank_issues_enabled: true

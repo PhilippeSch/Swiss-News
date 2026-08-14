@@ -1,0 +1,110 @@
+name: 🐞 Bug report
+description: Something in the watch app behaves incorrectly
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. The more precisely you can
+        describe what you saw, the faster it gets fixed.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the incorrect behaviour.
+      placeholder: Tapping a category shows an empty list even though the badge says 42 unread.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+      placeholder: The 42 articles should be listed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps someone else can follow on their own watch.
+      value: |
+        1. Open Swiss News
+        2. Scroll to …
+        3. Tap …
+        4. See …
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the app?
+      options:
+        - Home screen / category list
+        - Article list within a category
+        - Reading an article
+        - Settings (sources, categories, time filter)
+        - First launch / welcome screen
+        - Complication or widget
+        - Images
+        - Something else / not sure
+    validations:
+      required: true
+
+  - type: input
+    id: sources
+    attributes:
+      label: Which news source(s) are affected?
+      description: SRF, NZZ, 20 Minuten, RSI, 24 heures, Le Temps — and the category if you know it.
+      placeholder: SRF → Sport → Fussball
+    validations:
+      required: false
+
+  - type: input
+    id: watch
+    attributes:
+      label: Watch model
+      placeholder: Apple Watch Ultra 3 (49mm)
+    validations:
+      required: true
+
+  - type: input
+    id: watchos
+    attributes:
+      label: watchOS version
+      placeholder: "26.5"
+    validations:
+      required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: App version
+      description: Found at the bottom of Settings.
+      placeholder: "1.2 (202608142206)"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: How often does it happen?
+      options:
+        - Every time
+        - Often, but not always
+        - Only once so far
+        - Only under specific conditions (describe above)
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or anything else
+      description: Screenshots from the watch help a lot. Drag them in here.
+    validations:
+      required: false
