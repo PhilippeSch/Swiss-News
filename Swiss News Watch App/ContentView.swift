@@ -29,7 +29,6 @@ struct ContentView: View {
     @State private var isRefreshing = false
     @State private var showWelcome = false
     @State private var scrollPosition: String? = nil
-    @State private var categories: [String] = []
     @State private var hasCheckedFirstLaunch = false
     
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
@@ -51,14 +50,7 @@ struct ContentView: View {
                 .id("top")
                 .listRowInsets(EdgeInsets(top: -20, leading: 15, bottom: -8, trailing: 15))
                 .listRowBackground(Color.clear)
-                
-                .overlay {
-                    GeometryReader { geo in
-                        Color.clear
-                            .preference(key: ScrollOffsetPreferenceKey.self, value: geo.frame(in: .global).minY)
-                    }
-                }
-                
+
                 NewsFeedView(
                     settings: settings,
                     rssParser: rssParser,
@@ -91,20 +83,7 @@ struct ContentView: View {
             .refreshable {
                 await rssParser.fetchAllFeeds()
             }
-            .onPreferenceChange(ScrollOffsetPreferenceKey.self) { offset in
-                if scrollPosition == nil {
-                    let categoryId = findClosestCategory(to: offset)
-                    scrollPosition = categoryId.map { "category_\($0)" }
-                }
-            }
             .onAppear {
-                categories = settings.selectedCategories.sorted()
-                
-                if let position = scrollPosition {
-                    withAnimation {
-                        scrollPosition = position
-                    }
-                }
                 // Only check first launch once, not every time the view appears
                 if !hasCheckedFirstLaunch {
                     showWelcome = settings.isFirstLaunch
@@ -112,7 +91,7 @@ struct ContentView: View {
                 }
             }
             .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active {
+                if newPhase == .active, !ProcessInfo.processInfo.isRunningInPreview {
                     Task {
                         await rssParser.fetchAllFeeds()
                     }
@@ -150,10 +129,6 @@ struct ContentView: View {
             }
         }
         .environment(\.scrollPositionId, $scrollPosition)
-    }
-    
-    private func findClosestCategory(to offset: Double) -> String? {
-        return scrollPosition?.replacingOccurrences(of: "category_", with: "")
     }
 }
 
@@ -229,12 +204,10 @@ private struct HeaderView: View {
     }
 }
 
-// Keep using Double for the scroll offset tracking
-private struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: Double = 0
-    
-    static func reduce(value: inout Double, nextValue: () -> Double) {
-        value = nextValue()
+extension ProcessInfo {
+    /// True when the process is running inside an Xcode SwiftUI preview.
+    var isRunningInPreview: Bool {
+        environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
     }
 }
 

@@ -42,4 +42,14 @@ extension NSMutableParagraphStyle {
         block(self)
         return self
     }
-} 
+}
+
+#Preview {
+    ScrollView {
+        HyphenatedTextView(
+            text: "Erster Abschnitt mit etwas Fliesstext, der über mehrere Zeilen geht.\n\nDies ist ein Untertitel\n\nZweiter Abschnitt mit weiterem Inhalt zur Demonstration der Silbentrennung.",
+            subtitles: ["Dies ist ein Untertitel"]
+        )
+        .padding()
+    }
+}

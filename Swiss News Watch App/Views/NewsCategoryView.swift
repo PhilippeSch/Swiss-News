@@ -184,4 +184,29 @@ private struct ReadButton: View {
             readArticlesManager.markAsViewed(url)
         })
     }
-} 
+}
+
+#Preview {
+    NavigationStack {
+        NewsCategoryView(
+            title: "News",
+            newsItems: [
+                NewsItem(
+                    title: "Bundesrat beschliesst neue Massnahmen",
+                    description: "Die Landesregierung hat an ihrer Sitzung weitreichende Entscheide gefällt und informiert die Öffentlichkeit.",
+                    pubDate: Date().addingTimeInterval(-3600),
+                    link: "https://example.com/1",
+                    guid: "preview-1"
+                ),
+                NewsItem(
+                    title: "SCB gewinnt das Spitzenspiel",
+                    description: "In einer umkämpften Partie setzte sich der SC Bern im Penaltyschiessen durch.",
+                    pubDate: Date().addingTimeInterval(-7200),
+                    link: "https://example.com/2",
+                    guid: "preview-2"
+                )
+            ],
+            readArticlesManager: ReadArticlesManager()
+        )
+    }
+}
