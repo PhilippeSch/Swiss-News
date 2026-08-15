@@ -205,8 +205,9 @@ private struct ReadButton: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
-        // On the link itself, not its label, so it is exposed as a button.
-        .accessibilityIdentifier("readButton")
+        // No identifier here: ArticleRowView's articleRow_<guid> identifier
+        // propagates onto every child element and would override it. UI tests
+        // match this button by its "Lesen" label instead.
         .simultaneousGesture(TapGesture().onEnded {
             isViewingArticle = true
             readArticlesManager.markAsViewed(url)

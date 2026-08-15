@@ -76,19 +76,35 @@ final class SwissNewsUITests: XCTestCase {
     }
 
     func testReadArticleIsMarkedAsReadOnReturn() throws {
-        openFirstCategory()
+        let row = categoryRow("srf_news_all")
+        XCTAssertTrue(row.waitForExistence(timeout: timeout))
 
+        let before = try XCTUnwrap(
+            unreadCount(of: row),
+            "Row label should end in the unread count, got '\(row.label)'"
+        )
+        XCTAssertEqual(before, UITestLaunch.articlesPerCategory, "All articles start unread")
+
+        row.tap()
         firstReadButton().tap()
         XCTAssertTrue(app.scrollViews["articleDetailView"].waitForExistence(timeout: timeout))
 
         goBack()
         XCTAssertTrue(app.otherElements["articleList"].waitForExistence(timeout: timeout))
-
         goBack()
-        // One article of the four was read, so the badge should drop by one.
-        let remaining = "\(UITestLaunch.articlesPerCategory - 1)"
-        XCTAssertTrue(
-            app.staticTexts[remaining].waitForExistence(timeout: timeout),
+
+        XCTAssertTrue(row.waitForExistence(timeout: timeout))
+
+        // The badge updates once the read state propagates.
+        let deadline = Date().addingTimeInterval(timeout)
+        var after = unreadCount(of: row)
+        while (after ?? before) >= before, Date() < deadline {
+            usleep(200_000)
+            after = unreadCount(of: row)
+        }
+
+        XCTAssertLessThan(
+            try XCTUnwrap(after), before,
             "Unread count should drop after reading an article"
         )
     }
@@ -191,14 +207,15 @@ final class SwissNewsUITests: XCTestCase {
         category.tap()
     }
 
-    /// SwiftUI exposes these rows as plain `Other` elements on watchOS rather
-    /// than buttons, so match on identifier across any element type. The row's
-    /// title and image also fill the screen, so scroll until it shows up.
+    /// Matched by label, not identifier: ArticleRowView's `articleRow_<guid>`
+    /// identifier propagates onto its children, so every element in the row —
+    /// including this button — reports that identifier instead of its own. The
+    /// row's title and image also fill the screen, so scroll until it shows up.
     @discardableResult
     private func firstReadButton() -> XCUIElement {
         XCTAssertTrue(app.otherElements["articleList"].waitForExistence(timeout: timeout), "Articles should load")
 
-        let readButton = app.descendants(matching: .any).matching(identifier: "readButton").firstMatch
+        let readButton = app.buttons.matching(NSPredicate(format: "label == %@", "Lesen")).firstMatch
 
         var attempts = 0
         while !readButton.exists && attempts < 8 {
@@ -208,6 +225,12 @@ final class SwissNewsUITests: XCTestCase {
 
         XCTAssertTrue(readButton.waitForExistence(timeout: timeout), "Read button should be reachable")
         return readButton
+    }
+
+    /// Category rows label themselves "Titel, N" where N is the unread count.
+    private func unreadCount(of row: XCUIElement) -> Int? {
+        guard let trailing = row.label.split(separator: ",").last else { return nil }
+        return Int(trailing.trimmingCharacters(in: .whitespaces))
     }
 
     private func openSettings() {
