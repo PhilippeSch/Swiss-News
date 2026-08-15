@@ -50,7 +50,7 @@ struct WelcomeView: View {
                 settings.selectedCategories.insert(categoryId)
             }
         }
-        settings.saveSelectedCategories()
+        // selectedCategories' didSet already persists.
     }
     
     var body: some View {
@@ -87,7 +87,7 @@ struct WelcomeView: View {
                                                 } else {
                                                     settings.selectedCategories.remove(category.id)
                                                 }
-                                                settings.saveSelectedCategories()
+                                                // selectedCategories' didSet already persists.
                                             }
                                         ))
                                     }

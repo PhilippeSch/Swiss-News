@@ -15,7 +15,9 @@ enum Constants {
     
     enum UserDefaults {
         static let selectedCategoriesKey = "selectedCategories"
+        static let selectedCategoriesInitializedKey = "selectedCategoriesInitialized"
         static let selectedSourcesKey = "selectedSources"
+        static let categoryOrderKey = "categoryOrder"
         static let cutoffHoursKey = "cutoffHours"
         static let firstLaunchKey = "firstLaunch"
         static let readArticlesKey = "readArticles"
