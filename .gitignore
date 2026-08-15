@@ -63,3 +63,6 @@ fastlane/test_output
 
 ## macOS
 .DS_Store
+
+## Xcode Cloud log bundles copied in for debugging
+cloud-logs/
