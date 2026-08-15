@@ -21,20 +21,6 @@
                ReferencedContainer = "container:Swiss News.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "37D7080D2D84384800707EBC"
-               BuildableName = "Swiss News.app"
-               BlueprintName = "Swiss News"
-               ReferencedContainer = "container:Swiss News.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
