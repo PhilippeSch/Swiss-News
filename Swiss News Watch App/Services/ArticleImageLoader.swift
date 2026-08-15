@@ -52,18 +52,10 @@ enum ArticleImageLoader {
         "\(url.absoluteString)|\(Int(maxPixelSize))"
     }
 
-    static var defaultSession: URLSession {
-        #if DEBUG
-        UITestSupport.isActive ? UITestSupport.makeSession() : .shared
-        #else
-        .shared
-        #endif
-    }
-
     /// Downloads and downsamples in one step. Not actor-isolated, so the decode
     /// stays off the main actor.
     static func load(_ url: URL, using session: URLSession? = nil) async throws -> UIImage {
-        let (data, response) = try await (session ?? defaultSession).data(from: url)
+        let (data, response) = try await (session ?? AppURLSession.default).data(from: url)
 
         if let http = response as? HTTPURLResponse, http.statusCode != 200 {
             throw LoadError.badResponse

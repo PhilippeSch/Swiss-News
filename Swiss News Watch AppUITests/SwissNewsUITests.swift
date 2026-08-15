@@ -66,8 +66,7 @@ final class SwissNewsUITests: XCTestCase {
     func testReadingAnArticleOpensTheDetailView() throws {
         openFirstCategory()
 
-        let readButton = app.buttons["readButton"].firstMatch
-        XCTAssertTrue(readButton.waitForExistence(timeout: timeout), "Read button should exist")
+        let readButton = firstReadButton()
         readButton.tap()
 
         XCTAssertTrue(
@@ -79,9 +78,7 @@ final class SwissNewsUITests: XCTestCase {
     func testReadArticleIsMarkedAsReadOnReturn() throws {
         openFirstCategory()
 
-        let readButton = app.buttons["readButton"].firstMatch
-        XCTAssertTrue(readButton.waitForExistence(timeout: timeout))
-        readButton.tap()
+        firstReadButton().tap()
         XCTAssertTrue(app.scrollViews["articleDetailView"].waitForExistence(timeout: timeout))
 
         goBack()
@@ -192,6 +189,25 @@ final class SwissNewsUITests: XCTestCase {
         let category = categoryRow("srf_news_all")
         XCTAssertTrue(category.waitForExistence(timeout: timeout), "First category should exist")
         category.tap()
+    }
+
+    /// SwiftUI exposes these rows as plain `Other` elements on watchOS rather
+    /// than buttons, so match on identifier across any element type. The row's
+    /// title and image also fill the screen, so scroll until it shows up.
+    @discardableResult
+    private func firstReadButton() -> XCUIElement {
+        XCTAssertTrue(app.otherElements["articleList"].waitForExistence(timeout: timeout), "Articles should load")
+
+        let readButton = app.descendants(matching: .any).matching(identifier: "readButton").firstMatch
+
+        var attempts = 0
+        while !readButton.exists && attempts < 8 {
+            app.swipeUp()
+            attempts += 1
+        }
+
+        XCTAssertTrue(readButton.waitForExistence(timeout: timeout), "Read button should be reachable")
+        return readButton
     }
 
     private func openSettings() {

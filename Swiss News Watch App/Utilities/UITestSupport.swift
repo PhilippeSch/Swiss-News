@@ -91,6 +91,16 @@ final class UITestFeedProtocol: URLProtocol {
             return jpegPixel
         }
 
+        // Article pages, which ArticleView scrapes with SwiftSoup.
+        if url.host == "test.local" {
+            return """
+            <html><body><article>
+                <p>Erster Absatz des Testartikels für die UI-Tests.</p>
+                <p>Zweiter Absatz mit weiterem Inhalt.</p>
+            </article></body></html>
+            """.data(using: .utf8)!
+        }
+
         // Name articles after the feed so each category is distinguishable.
         let slug = url.lastPathComponent
         let items = (1...UITestSupport.articlesPerCategory).map { index in
