@@ -33,6 +33,7 @@
 
 /* Begin PBXFileReference section */
 		37C6E6FF2D845D7E0042F8EA /* privacy-policy.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "privacy-policy.md"; sourceTree = "<group>"; };
+		37AA10012F0000010000AAA1 /* BuildNumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = BuildNumber.xcconfig; sourceTree = "<group>"; };
 		37D708142D84384800707EBC /* Swiss News Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Swiss News Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D708262D84384900707EBC /* Swiss News Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37D708302D84384900707EBC /* Swiss News Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Swiss News Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,6 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				37C6E6FF2D845D7E0042F8EA /* privacy-policy.md */,
+				37AA10012F0000010000AAA1 /* BuildNumber.xcconfig */,
 				37D708182D84384800707EBC /* Swiss News Watch App */,
 				37D708292D84384900707EBC /* Swiss News Watch AppTests */,
 				37D708332D84384900707EBC /* Swiss News Watch AppUITests */,
@@ -277,7 +279,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/sh\n\necho \"=== Updating build number to YYYY.MM.DD.HHMM timestamp ===\"\n\n# Generate your desired readable format\nTIMESTAMP=$(date \"+%Y%m%d%H%M\")  # e.g., 2025.12.26.1430\n\n# Explicitly set the project root directory (replace \"Swiss News.xcodeproj\" if your project name differs)\nPROJECT_ROOT=\"$(dirname \"$(dirname \"$SCRIPT_INPUT_FILE_0\")\")\"  # Robust way to get project root\n# Alternative if above fails: PROJECT_ROOT=\"${SRCROOT}\"\n\ncd \"$PROJECT_ROOT\"\n\necho \"Changed to directory: $(pwd)\"\n\n# Update Current Project Version\nxcrun agvtool new-version \"$TIMESTAMP\"\n\necho \"Successfully set Current Project Version to $TIMESTAMP\"\n\n# Verify\nCURRENT=$(xcrun agvtool what-version | grep \"Current version\" | awk '{print $NF}')\necho \"Verified build number: $CURRENT\"\n\n# Force Xcode to reload the changed project file\ntouch \"Swiss News.xcodeproj/project.pbxproj\"\n\necho \"Touched project file to force reload\"\n\necho \"=== Done ===\"\n";
+			shellScript = "#!/bin/sh\nset -euo pipefail\n\n# Rewrites the single CURRENT_PROJECT_VERSION line in BuildNumber.xcconfig,\n# which every target inherits from the project level. Nothing else changes.\nCONFIG=\"${SRCROOT}/BuildNumber.xcconfig\"\nTIMESTAMP=$(date \"+%Y%m%d%H%M\")\n\nif [ ! -f \"$CONFIG\" ]; then\n    echo \"error: $CONFIG not found\" >&2\n    exit 1\nfi\n\nif ! grep -q \"^CURRENT_PROJECT_VERSION = \" \"$CONFIG\"; then\n    echo \"error: no CURRENT_PROJECT_VERSION line in $CONFIG\" >&2\n    exit 1\nfi\n\n# Write via a temp file so a failure cannot truncate the config.\nTMP=$(mktemp)\nsed \"s/^CURRENT_PROJECT_VERSION = .*/CURRENT_PROJECT_VERSION = ${TIMESTAMP}/\" \"$CONFIG\" > \"$TMP\"\nmv \"$TMP\" \"$CONFIG\"\n\nWRITTEN=$(sed -n \"s/^CURRENT_PROJECT_VERSION = //p\" \"$CONFIG\")\nif [ \"$WRITTEN\" != \"$TIMESTAMP\" ]; then\n    echo \"error: build number not written, file still says '${WRITTEN}'\" >&2\n    exit 1\nfi\n\n# Build settings were already resolved when this phase runs, so stamp the\n# product too. Without this the app would carry the previous build's number.\nPLIST=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\nif [ -f \"$PLIST\" ]; then\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion ${TIMESTAMP}\" \"$PLIST\"\n    echo \"Build number set to ${TIMESTAMP} (config and product)\"\nelse\n    echo \"Build number set to ${TIMESTAMP} (config only; product plist not written yet)\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -321,6 +323,7 @@
 /* Begin XCBuildConfiguration section */
 		37D708382D84384900707EBC /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 37AA10012F0000010000AAA1 /* BuildNumber.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -388,6 +391,7 @@
 		};
 		37D708392D84384900707EBC /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 37AA10012F0000010000AAA1 /* BuildNumber.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -448,10 +452,10 @@
 		37D7083B2D84384900707EBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606141435;
 				DEVELOPMENT_ASSET_PATHS = "\"Swiss News Watch App/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -477,10 +481,10 @@
 		37D7083C2D84384900707EBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606141435;
 				DEVELOPMENT_ASSET_PATHS = "\"Swiss News Watch App/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -509,7 +513,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606141435;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppTests";
@@ -528,7 +531,6 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606141435;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppTests";
@@ -547,7 +549,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606141435;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppUITests";
@@ -565,7 +566,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202606141435;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "Scheuber.Swiss-News-Watch-AppUITests";

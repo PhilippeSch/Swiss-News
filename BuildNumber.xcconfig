@@ -1,0 +1,9 @@
+// Single source of truth for the build number.
+//
+// The "Set Build Number" script phase rewrites the line below on every build,
+// so this is the only file that changes. Every target inherits it from the
+// project level; none of them define CURRENT_PROJECT_VERSION themselves.
+//
+// Format: YYYYMMDDHHMM, which increases monotonically, as App Store Connect
+// requires. The marketing version (1.3) lives in the project, not here.
+CURRENT_PROJECT_VERSION = 202608151646
