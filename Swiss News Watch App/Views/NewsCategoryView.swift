@@ -82,14 +82,14 @@ private struct ArticleRowView: View {
     @ObservedObject var readArticlesManager: ReadArticlesManager
     @Binding var isViewingArticle: Bool
     
-    private let dateFormatter: DateFormatter = {
+    /// Shared across rows — a stored property would allocate a formatter every
+    /// time the row struct is rebuilt during scrolling.
+    private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
         formatter.dateFormat = "dd.MM.yy\nHH:mm"
         return formatter
     }()
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(item.title)
@@ -97,7 +97,7 @@ private struct ArticleRowView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .opacity(readArticlesManager.isRead(item.link) ? Constants.UI.readArticleOpacity : 1)
             
-            if let imageUrl = item.watchCompatibleImageUrl ?? item.imageUrl {
+            if let imageUrl = item.imageUrl {
                 ArticleImageView(imageUrl: imageUrl)
             }
             
@@ -108,7 +108,7 @@ private struct ArticleRowView: View {
                 .opacity(readArticlesManager.isRead(item.link) ? Constants.UI.readArticleOpacity : 1)
             
             HStack {
-                Text(dateFormatter.string(from: item.pubDate))
+                Text(Self.dateFormatter.string(from: item.pubDate))
                     .font(.caption)
                     .foregroundColor(.gray)
                 
@@ -129,27 +129,54 @@ private struct ArticleRowView: View {
     }
 }
 
+/// Replaces AsyncImage, which downloads full-resolution press photos and does
+/// not keep decoded images across view reloads, so images re-download on scroll.
 private struct ArticleImageView: View {
     let imageUrl: URL
-    
+
+    @State private var image: UIImage?
+    @State private var didFail = false
+
     var body: some View {
-        AsyncImage(url: imageUrl) { phase in
-            switch phase {
-            case .empty:
-                ProgressView()
-            case .success(let image):
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxHeight: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-            case .failure(_):
-                Image(systemName: "photo")
-                    .imageScale(.large)
-                    .foregroundColor(.gray)
-            @unknown default:
-                EmptyView()
+        content
+            .task(id: imageUrl) {
+                await load()
             }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if let image {
+            Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(maxHeight: 200)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        } else if didFail {
+            Image(systemName: "photo")
+                .imageScale(.large)
+                .foregroundColor(.gray)
+        } else {
+            ProgressView()
+        }
+    }
+
+    private func load() async {
+        let key = ArticleImageLoader.cacheKey(for: imageUrl)
+
+        if let cached = ImageCache.shared.image(forKey: key) {
+            image = cached
+            return
+        }
+
+        do {
+            let loaded = try await ArticleImageLoader.load(imageUrl)
+            guard !Task.isCancelled else { return }
+            ImageCache.shared.insert(loaded, forKey: key)
+            image = loaded
+        } catch {
+            guard !Task.isCancelled else { return }
+            didFail = true
         }
     }
 }
@@ -176,9 +203,11 @@ private struct ReadButton: View {
                 .background(Color.accentColor)
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-                .accessibilityIdentifier("readButton")
         }
         .buttonStyle(.plain)
+        // No identifier here: ArticleRowView's articleRow_<guid> identifier
+        // propagates onto every child element and would override it. UI tests
+        // match this button by its "Lesen" label instead.
         .simultaneousGesture(TapGesture().onEnded {
             isViewingArticle = true
             readArticlesManager.markAsViewed(url)

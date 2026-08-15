@@ -9,6 +9,12 @@ import SwiftUI
 
 @main
 struct Swiss_News_Watch_AppApp: App {
+    init() {
+        #if DEBUG
+        UITestSupport.prepare()
+        #endif
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

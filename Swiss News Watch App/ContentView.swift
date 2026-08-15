@@ -8,18 +8,6 @@
 import SwiftUI
 import WatchKit
 
-// Add this at the top of the file, outside any struct
-private struct ScrollPositionIdKey: EnvironmentKey {
-    static let defaultValue: Binding<String?> = .constant(nil)
-}
-
-extension EnvironmentValues {
-    var scrollPositionId: Binding<String?> {
-        get { self[ScrollPositionIdKey.self] }
-        set { self[ScrollPositionIdKey.self] = newValue }
-    }
-}
-
 struct ContentView: View {
     @StateObject private var settings = Settings()
     @StateObject private var rssParser: RSSFeedParser
@@ -28,8 +16,11 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isRefreshing = false
     @State private var showWelcome = false
-    @State private var scrollPosition: String? = nil
     @State private var hasCheckedFirstLaunch = false
+    /// Drives navigation so returning to the root can be detected.
+    @State private var navigationPath: [CategoryNavigationValue] = []
+    /// The category last opened, so the list can scroll back to it.
+    @State private var lastVisitedCategoryId: String?
     
     let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
@@ -40,32 +31,40 @@ struct ContentView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            List {
-                HeaderView(
-                    lastUpdate: rssParser.state.lastUpdate,
-                    currentTime: currentTime,
-                    rssParser: rssParser
-                )
-                .id("top")
-                .listRowInsets(EdgeInsets(top: -20, leading: 15, bottom: -8, trailing: 15))
-                .listRowBackground(Color.clear)
+        NavigationStack(path: $navigationPath) {
+            ScrollViewReader { proxy in
+                List {
+                    HeaderView(
+                        lastUpdate: rssParser.state.lastUpdate,
+                        currentTime: currentTime,
+                        rssParser: rssParser
+                    )
+                    .id("top")
+                    .listRowInsets(EdgeInsets(top: -20, leading: 15, bottom: -8, trailing: 15))
+                    .listRowBackground(Color.clear)
 
-                NewsFeedView(
-                    settings: settings,
-                    rssParser: rssParser,
-                    readArticlesManager: readArticlesManager
-                )
-                
-                SettingsButton(settings: settings, rssParser: rssParser, showWelcome: $showWelcome)
-                
-                #if DEBUG
-                DebugSection(
-                    settings: settings,
-                    rssParser: rssParser,
-                    showWelcome: $showWelcome
-                )
-                #endif
+                    NewsFeedView(
+                        settings: settings,
+                        rssParser: rssParser,
+                        readArticlesManager: readArticlesManager
+                    )
+
+                    SettingsButton(settings: settings, rssParser: rssParser, showWelcome: $showWelcome)
+
+                    #if DEBUG
+                    DebugSection(
+                        settings: settings,
+                        rssParser: rssParser,
+                        showWelcome: $showWelcome
+                    )
+                    #endif
+                }
+                .onChange(of: navigationPath) { _, newPath in
+                    // Returned to the home screen: put the category the user
+                    // came back from back under their eyes, instead of the top.
+                    guard newPath.isEmpty, let categoryId = lastVisitedCategoryId else { return }
+                    proxy.scrollTo("category_\(categoryId)", anchor: .center)
+                }
             }
             .navigationDestination(for: CategoryNavigationValue.self) { navigationValue in
                 if let category = NewsCategory.available.first(where: { $0.id == navigationValue.categoryId }) {
@@ -75,12 +74,19 @@ struct ContentView: View {
                         readArticlesManager: readArticlesManager
                     )
                     .onAppear {
-                        scrollPosition = "category_\(navigationValue.categoryId)"
+                        lastVisitedCategoryId = navigationValue.categoryId
                     }
                 }
             }
             .listStyle(.plain)
             .refreshable {
+                // Manual refresh always fetches, regardless of cache age.
+                await rssParser.fetchAllFeeds(force: true)
+            }
+            .task {
+                guard !ProcessInfo.processInfo.isRunningInPreview else { return }
+                // Show the last known articles first, then refresh behind them.
+                await rssParser.loadCachedContent()
                 await rssParser.fetchAllFeeds()
             }
             .onAppear {
@@ -93,6 +99,7 @@ struct ContentView: View {
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active, !ProcessInfo.processInfo.isRunningInPreview {
                     Task {
+                        // Throttled: a wrist-raise within the validity window is a no-op.
                         await rssParser.fetchAllFeeds()
                     }
                 }
@@ -116,7 +123,7 @@ struct ContentView: View {
                 }
                 Button(String(localized: "Erneut versuchen")) {
                     Task {
-                        await rssParser.fetchAllFeeds()
+                        await rssParser.fetchAllFeeds(force: true)
                     }
                 }
             } message: {
@@ -128,7 +135,6 @@ struct ContentView: View {
                 }
             }
         }
-        .environment(\.scrollPositionId, $scrollPosition)
     }
 }
 

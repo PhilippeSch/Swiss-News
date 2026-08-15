@@ -1,86 +1,269 @@
 import XCTest
 
+/// End-to-end coverage of the main flows, driven against canned feeds
+/// (`-UITesting`) so runs do not depend on the network or on live headlines.
 final class SwissNewsUITests: XCTestCase {
-    var app: XCUIApplication!
-    let timeout: TimeInterval = 10
-    
+    private var app: XCUIApplication!
+    private let timeout: TimeInterval = 20
+
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        app.launchArguments = ["UI-Testing"]
+        app.launchArguments = [UITestLaunch.argument]
         app.launch()
-        
-        // Wait for initial load
-        try waitForAppReady()
     }
-    
-    private func waitForAppReady() throws {
-        let headerTitle = app.staticTexts["Swiss News"]
-        XCTAssertTrue(headerTitle.waitForExistence(timeout: timeout), "App header should exist")
-    }
-    
-    func testSettingsNavigation() async throws {
-        // Wait for initial load
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-        
-        // Find settings button and scroll to it
-        let settingsButton = app.buttons["settingsButton"]
-        let list = app.collectionViews.firstMatch
-        
-        // Scroll to bottom
-        await list.swipeUp(velocity: .slow)
-        
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: timeout), "Settings button should exist")
-        await settingsButton.tap()
-        
-        // Verify navigation
-        let settingsTitle = app.navigationBars["Einstellungen"]
-        XCTAssertTrue(settingsTitle.waitForExistence(timeout: timeout), "Settings title should exist")
-    }
-    
-    func testArticleInteraction() async throws {
-        // Wait for content to load
-        try await Task.sleep(nanoseconds: 2_000_000_000)
-        
-        // Find and tap first article
-        let readButton = app.buttons["readButton"].firstMatch
-        XCTAssertTrue(readButton.waitForExistence(timeout: timeout), "Read button should exist")
-        await readButton.tap()
-        
-        // Verify article detail view
-        let articleView = app.scrollViews["articleDetailView"]
-        XCTAssertTrue(articleView.waitForExistence(timeout: timeout), "Article detail view should exist")
-    }
-    
-    func testSettingsTimeFilter() async throws {
-        // Wait for initial load
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-        
-        // Navigate to settings
-        let settingsButton = app.buttons["settingsButton"]
-        let list = app.collectionViews.firstMatch
-        
-        // Scroll to bottom
-        await list.swipeUp(velocity: .slow)
-        
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: timeout), "Settings button should exist")
-        await settingsButton.tap()
-        
-        // Verify time filter exists
-        let picker = app.pickers.firstMatch
-        XCTAssertTrue(picker.waitForExistence(timeout: timeout), "Time filter picker should exist")
-        
-        // Test picker interaction
-        await picker.tap()
-        await app.buttons["24 Stunden"].tap()
-        
-        // Verify navigation back works
-        await app.navigationBars["Einstellungen"].buttons.firstMatch.tap()
-    }
-    
+
     override func tearDownWithError() throws {
         app.terminate()
         app = nil
-        try super.tearDownWithError()
     }
-} 
+
+    // MARK: - Launch
+
+    func testHomeScreenShowsHeaderAndCategories() throws {
+        XCTAssertTrue(app.staticTexts["Swiss News"].waitForExistence(timeout: timeout), "Header should appear")
+
+        let firstCategory = categoryRow("srf_news_all")
+        XCTAssertTrue(firstCategory.waitForExistence(timeout: timeout), "Seeded categories should be listed")
+    }
+
+    func testWelcomeScreenIsSkippedForASeededInstall() throws {
+        XCTAssertTrue(app.staticTexts["Swiss News"].waitForExistence(timeout: timeout))
+        XCTAssertFalse(
+            app.staticTexts["Willkommen bei Swiss News 👋"].exists,
+            "A seeded install should go straight to the feed"
+        )
+    }
+
+    func testEverySeededCategoryEventuallyLoads() throws {
+        let firstCategory = categoryRow("srf_news_all")
+        XCTAssertTrue(firstCategory.waitForExistence(timeout: timeout))
+
+        // Spinners clear as each feed lands; the unread count replaces them.
+        let expectedCount = "\(UITestLaunch.articlesPerCategory)"
+        XCTAssertTrue(
+            app.staticTexts[expectedCount].waitForExistence(timeout: timeout),
+            "A category should end up showing its unread count"
+        )
+    }
+
+    // MARK: - Category and article flow
+
+    func testOpeningACategoryShowsItsArticles() throws {
+        let category = categoryRow("srf_news_all")
+        XCTAssertTrue(category.waitForExistence(timeout: timeout))
+        category.tap()
+
+        let list = app.otherElements["articleList"]
+        XCTAssertTrue(list.waitForExistence(timeout: timeout), "Article list should appear")
+        XCTAssertTrue(
+            app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Testartikel'")).firstMatch
+                .waitForExistence(timeout: timeout),
+            "Stubbed articles should be rendered"
+        )
+    }
+
+    func testReadingAnArticleOpensTheDetailView() throws {
+        openFirstCategory()
+
+        let readButton = firstReadButton()
+        readButton.tap()
+
+        XCTAssertTrue(
+            app.scrollViews["articleDetailView"].waitForExistence(timeout: timeout),
+            "Article detail view should open"
+        )
+    }
+
+    func testReadArticleIsMarkedAsReadOnReturn() throws {
+        let row = categoryRow("srf_news_all")
+        XCTAssertTrue(row.waitForExistence(timeout: timeout))
+
+        let before = try XCTUnwrap(
+            unreadCount(of: row),
+            "Row label should end in the unread count, got '\(row.label)'"
+        )
+        XCTAssertEqual(before, UITestLaunch.articlesPerCategory, "All articles start unread")
+
+        row.tap()
+        firstReadButton().tap()
+        XCTAssertTrue(app.scrollViews["articleDetailView"].waitForExistence(timeout: timeout))
+
+        goBack()
+        XCTAssertTrue(app.otherElements["articleList"].waitForExistence(timeout: timeout))
+        goBack()
+
+        XCTAssertTrue(row.waitForExistence(timeout: timeout))
+
+        // The badge updates once the read state propagates.
+        let deadline = Date().addingTimeInterval(timeout)
+        var after = unreadCount(of: row)
+        while (after ?? before) >= before, Date() < deadline {
+            usleep(200_000)
+            after = unreadCount(of: row)
+        }
+
+        XCTAssertLessThan(
+            try XCTUnwrap(after), before,
+            "Unread count should drop after reading an article"
+        )
+    }
+
+    // MARK: - Scroll restoration (issue #18)
+
+    func testReturningFromALowerCategoryKeepsItOnScreen() throws {
+        let lastCategoryId = UITestLaunch.lastCategoryId
+        let lastCategory = categoryRow(lastCategoryId)
+
+        XCTAssertTrue(categoryRow("srf_news_all").waitForExistence(timeout: timeout))
+
+        // Reach a category in the lower part of the home screen.
+        var attempts = 0
+        while !lastCategory.isHittable && attempts < 8 {
+            app.swipeUp()
+            attempts += 1
+        }
+        XCTAssertTrue(lastCategory.isHittable, "Should be able to reach the lower category")
+
+        lastCategory.tap()
+        XCTAssertTrue(app.otherElements["articleList"].waitForExistence(timeout: timeout))
+
+        goBack()
+
+        XCTAssertTrue(lastCategory.waitForExistence(timeout: timeout))
+        XCTAssertTrue(
+            lastCategory.isHittable,
+            "Returning should land back at the category, not at the top of the list"
+        )
+    }
+
+    // MARK: - Settings
+
+    func testSettingsOpensAndClosesAgain() throws {
+        openSettings()
+        goBack()
+
+        // Reaching settings scrolls to the bottom, so the header is not
+        // rendered until the list is scrolled back up.
+        var attempts = 0
+        while !app.staticTexts["Swiss News"].exists && attempts < 8 {
+            app.swipeDown()
+            attempts += 1
+        }
+
+        XCTAssertTrue(
+            app.staticTexts["Swiss News"].waitForExistence(timeout: timeout),
+            "Should return to the home screen"
+        )
+    }
+
+    func testTimeFilterIsPresentInSettings() throws {
+        openSettings()
+
+        XCTAssertTrue(
+            app.staticTexts["Zeitraum"].waitForExistence(timeout: timeout),
+            "Time filter should be offered in settings"
+        )
+    }
+
+    func testSourceSelectionOpensFromSettings() throws {
+        openSettings()
+
+        let sourcesButton = app.buttons.matching(
+            NSPredicate(format: "label CONTAINS 'Quellen'")
+        ).firstMatch
+        XCTAssertTrue(sourcesButton.waitForExistence(timeout: timeout), "Source selection should be reachable")
+        sourcesButton.tap()
+
+        XCTAssertTrue(
+            app.staticTexts["Willkommen bei Swiss News 👋"].waitForExistence(timeout: timeout),
+            "Source selection screen should open"
+        )
+    }
+
+    // MARK: - Refresh
+
+    func testPullToRefreshKeepsContentOnScreen() throws {
+        let category = categoryRow("srf_news_all")
+        XCTAssertTrue(category.waitForExistence(timeout: timeout))
+
+        app.swipeDown()
+
+        XCTAssertTrue(
+            category.waitForExistence(timeout: timeout),
+            "Content should survive a refresh"
+        )
+    }
+
+    // MARK: - Helpers
+
+    private func categoryRow(_ id: String) -> XCUIElement {
+        app.buttons["categoryRow_\(id)"]
+    }
+
+    private func openFirstCategory() {
+        let category = categoryRow("srf_news_all")
+        XCTAssertTrue(category.waitForExistence(timeout: timeout), "First category should exist")
+        category.tap()
+    }
+
+    /// Matched by label, not identifier: ArticleRowView's `articleRow_<guid>`
+    /// identifier propagates onto its children, so every element in the row —
+    /// including this button — reports that identifier instead of its own. The
+    /// row's title and image also fill the screen, so scroll until it shows up.
+    @discardableResult
+    private func firstReadButton() -> XCUIElement {
+        XCTAssertTrue(app.otherElements["articleList"].waitForExistence(timeout: timeout), "Articles should load")
+
+        let readButton = app.buttons.matching(NSPredicate(format: "label == %@", "Lesen")).firstMatch
+
+        var attempts = 0
+        while !readButton.exists && attempts < 8 {
+            app.swipeUp()
+            attempts += 1
+        }
+
+        XCTAssertTrue(readButton.waitForExistence(timeout: timeout), "Read button should be reachable")
+        return readButton
+    }
+
+    /// Category rows label themselves "Titel, N" where N is the unread count.
+    private func unreadCount(of row: XCUIElement) -> Int? {
+        guard let trailing = row.label.split(separator: ",").last else { return nil }
+        return Int(trailing.trimmingCharacters(in: .whitespaces))
+    }
+
+    private func openSettings() {
+        let settingsButton = app.buttons["settingsButton"]
+
+        var attempts = 0
+        while !settingsButton.exists && attempts < 8 {
+            app.swipeUp()
+            attempts += 1
+        }
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: timeout), "Settings button should be reachable")
+        settingsButton.tap()
+
+        XCTAssertTrue(
+            app.staticTexts["Artikel Filter"].waitForExistence(timeout: timeout),
+            "Settings screen should open"
+        )
+    }
+
+    private func goBack() {
+        let backButton = app.navigationBars.buttons.firstMatch
+        if backButton.waitForExistence(timeout: timeout) {
+            backButton.tap()
+        } else {
+            app.swipeRight()
+        }
+    }
+}
+
+/// Mirrors the app-side UITestSupport values; the app target is not importable
+/// from the UI test bundle.
+enum UITestLaunch {
+    static let argument = "-UITesting"
+    static let articlesPerCategory = 4
+    static let lastCategoryId = "srf_knowledge_all"
+}

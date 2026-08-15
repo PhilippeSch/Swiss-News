@@ -1,48 +1,56 @@
 import Foundation
 
-struct NewsItem: Identifiable, Equatable {
+struct NewsItem: Identifiable, Equatable, Sendable, Codable {
     let title: String
     let description: String
+    /// HTML stripped and whitespace collapsed, derived once at init.
+    let cleanDescription: String
     let pubDate: Date
     let link: String
     let guid: String
-    
+    /// Article image, already normalised for watchOS. Derived once at init.
+    let imageUrl: URL?
+
     var id: String { guid }
-    
-    var cleanDescription: String {
-        description
-            .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
-            .replacingOccurrences(of: "\n", with: " ")
-            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+    init(title: String, description: String, pubDate: Date, link: String, guid: String, imageUrl: URL? = nil) {
+        self.title = title
+        self.description = description
+        self.cleanDescription = Self.stripHTML(from: description)
+        self.pubDate = pubDate
+        self.link = link
+        self.guid = guid
+        self.imageUrl = imageUrl.map(Self.watchCompatibleURL)
     }
-    
-    var imageUrl: URL? {
-        let pattern = "<enclosure url=\"([^\"]+)\""
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-              let match = regex.firstMatch(in: description, range: NSRange(description.startIndex..., in: description)),
-              let range = Range(match.range(at: 1), in: description) else {
-            return nil
-        }
-        return URL(string: String(description[range]))
+
+    private static let htmlTagRegex = try! NSRegularExpression(pattern: "<[^>]+>")
+    private static let whitespaceRegex = try! NSRegularExpression(pattern: "\\s+")
+
+    /// Removes HTML markup and collapses runs of whitespace into single spaces.
+    static func stripHTML(from description: String) -> String {
+        let range = NSRange(description.startIndex..., in: description)
+        let withoutTags = htmlTagRegex.stringByReplacingMatches(in: description, range: range, withTemplate: "")
+        let collapsed = whitespaceRegex.stringByReplacingMatches(
+            in: withoutTags,
+            range: NSRange(withoutTags.startIndex..., in: withoutTags),
+            withTemplate: " "
+        )
+        return collapsed.trimmingCharacters(in: .whitespacesAndNewlines)
     }
-    
-    /// Returns a watchOS-compatible image URL, converting WebP to JPEG if needed
-    var watchCompatibleImageUrl: URL? {
-        guard let url = imageUrl else { return nil }
+
+    /// watchOS cannot decode WebP, so ask the CDN for the JPEG variant instead.
+    private static func watchCompatibleURL(_ url: URL) -> URL {
         let urlString = url.absoluteString
-        // Convert WebP to JPEG for watchOS compatibility
-        if urlString.hasSuffix(".webp") {
-            let jpgUrlString = urlString.replacingOccurrences(of: ".webp", with: ".jpg")
-            return URL(string: jpgUrlString)
-        }
-        return url
+        guard urlString.hasSuffix(".webp") else { return url }
+        let jpgUrlString = urlString.replacingOccurrences(of: ".webp", with: ".jpg")
+        return URL(string: jpgUrlString) ?? url
     }
-    
+
     static func == (lhs: NewsItem, rhs: NewsItem) -> Bool {
         lhs.guid == rhs.guid &&
         lhs.title == rhs.title &&
         lhs.description == rhs.description &&
-        lhs.pubDate == rhs.pubDate
+        lhs.pubDate == rhs.pubDate &&
+        lhs.imageUrl == rhs.imageUrl
     }
-} 
+}

@@ -9,9 +9,15 @@ struct CategoryRowView: View {
     let newsItems: [NewsItem]
     @ObservedObject var readArticlesManager: ReadArticlesManager
     @ObservedObject var rssParser: RSSFeedParser
-    @State private var unreadCount: Int = 0
-    @Environment(\.scrollPositionId) private var scrollPositionId
-    
+
+    /// Derived rather than stored: `newsItems` is passed in and
+    /// `readArticlesManager` is observed, so the body re-evaluates whenever
+    /// either changes. The previous version mirrored this into @State and kept
+    /// it in sync from five separate triggers.
+    private var unreadCount: Int {
+        newsItems.filter { !readArticlesManager.isRead($0.link) }.count
+    }
+
     var body: some View {
         NavigationLink(value: CategoryNavigationValue(categoryId: category.id)) {
             SectionHeaderView(
@@ -24,27 +30,6 @@ struct CategoryRowView: View {
         }
         .id("category_\(category.id)")
         .accessibilityIdentifier("categoryRow_\(category.id)")
-        .onAppear {
-            updateUnreadCount()
-        }
-        .onChange(of: readArticlesManager.readArticles) { _, _ in
-            updateUnreadCount()
-        }
-        .onChange(of: newsItems) { _, _ in
-            updateUnreadCount()
-        }
-        .onChange(of: rssParser.state.lastUpdate) { _, _ in
-            updateUnreadCount()
-        }
-        .task {
-            updateUnreadCount()
-        }
-    }
-    
-    private func updateUnreadCount() {
-        Task { @MainActor in
-            unreadCount = newsItems.filter { !readArticlesManager.isRead($0.link) }.count
-        }
     }
 }
 

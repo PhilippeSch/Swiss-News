@@ -18,14 +18,6 @@ class Settings: ObservableObject {
         }
     }
     
-    private let currentAppVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
-    private let lastLaunchedVersion = UserDefaults.standard.string(forKey: "lastLaunchedVersion")
-    
-    private static let firstLaunchKey = "com.scheuber.swissnews.firstLaunch"
-    
-    private var isBatchUpdating = false
-    private var hasChanges = false
-    
     private var pendingCategoryChanges: Set<String>?
     private var pendingSourceChanges: Set<String>?
     
@@ -60,7 +52,7 @@ class Settings: ObservableObject {
         }
         
         // Initialize category order
-        if let data = UserDefaults.standard.data(forKey: "categoryOrder"),
+        if let data = UserDefaults.standard.data(forKey: Constants.UserDefaults.categoryOrderKey),
            let decoded = try? JSONDecoder().decode([NewsCategory.CategoryGroup].self, from: data) {
             self.categoryOrder = decoded
         } else {
@@ -72,42 +64,35 @@ class Settings: ObservableObject {
     }
     
     private func setupObservers() {
-        if !UserDefaults.standard.bool(forKey: "selectedCategoriesInitialized") {
+        let defaults = UserDefaults.standard
+
+        if !defaults.bool(forKey: Constants.UserDefaults.selectedCategoriesInitializedKey) {
             if let encoded = try? JSONEncoder().encode(Array(selectedCategories)) {
-                UserDefaults.standard.set(encoded, forKey: "selectedCategories")
-                UserDefaults.standard.set(true, forKey: "selectedCategoriesInitialized")
+                defaults.set(encoded, forKey: Constants.UserDefaults.selectedCategoriesKey)
+                defaults.set(true, forKey: Constants.UserDefaults.selectedCategoriesInitializedKey)
             }
         }
-        
-        if UserDefaults.standard.double(forKey: "cutoffHours") == 0 {
-            UserDefaults.standard.set(self.cutoffHours, forKey: "cutoffHours")
+
+        if defaults.double(forKey: Constants.UserDefaults.cutoffHoursKey) == 0 {
+            defaults.set(self.cutoffHours, forKey: Constants.UserDefaults.cutoffHoursKey)
         }
     }
-    
+
     #if DEBUG
     static func resetAllSettings() {
-        print("Resetting all settings")
         // Löscht alle UserDefaults
         if let bundleID = Bundle.main.bundleIdentifier {
             UserDefaults.standard.removePersistentDomain(forName: bundleID)
         }
-        
-        // Löscht den App Container
-        if let appDomain = Bundle.main.bundleIdentifier {
-            UserDefaults.standard.removePersistentDomain(forName: appDomain)
-        }
-        
+
         // Setzt Default-Werte zurück
         let defaults = UserDefaults.standard
-        defaults.removeObject(forKey: "selectedCategories")
-        defaults.removeObject(forKey: "selectedSources")
-        defaults.removeObject(forKey: "categoryOrder")
-        defaults.removeObject(forKey: "cutoffHours")
-        defaults.removeObject(forKey: "selectedCategoriesInitialized")
-        defaults.removeObject(forKey: Settings.firstLaunchKey)
-        
-        // Synchronisiert UserDefaults
-        defaults.synchronize()
+        defaults.removeObject(forKey: Constants.UserDefaults.selectedCategoriesKey)
+        defaults.removeObject(forKey: Constants.UserDefaults.selectedSourcesKey)
+        defaults.removeObject(forKey: Constants.UserDefaults.categoryOrderKey)
+        defaults.removeObject(forKey: Constants.UserDefaults.cutoffHoursKey)
+        defaults.removeObject(forKey: Constants.UserDefaults.selectedCategoriesInitializedKey)
+        defaults.removeObject(forKey: Constants.UserDefaults.firstLaunchKey)
     }
     #endif
     
@@ -121,19 +106,6 @@ class Settings: ObservableObject {
         // Speichert die Standardwerte
         saveSelectedCategories()
         saveSelectedSources()
-    }
-    
-    func beginBatchUpdate() {
-        isBatchUpdating = true
-    }
-    
-    func endBatchUpdate() {
-        isBatchUpdating = false
-        if hasChanges {
-            // Trigger a single update after all changes are complete
-            objectWillChange.send()
-            hasChanges = false
-        }
     }
     
     func saveSelectedCategories() {
@@ -153,7 +125,6 @@ class Settings: ObservableObject {
     }
     
     func resetFirstLaunch() {
-        print("Resetting first launch state")
         isFirstLaunch = true
     }
     
@@ -177,21 +148,5 @@ class Settings: ObservableObject {
         pendingSourceChanges = nil
     }
     
-    func discardSettingsChanges() {
-        // Restore original state if needed
-        if let originalCategories = pendingCategoryChanges {
-            selectedCategories = originalCategories
-        }
-        if let originalSources = pendingSourceChanges {
-            selectedSources = originalSources
-        }
-        
-        // Clear pending changes
-        pendingCategoryChanges = nil
-        pendingSourceChanges = nil
-    }
 }
 
-extension Notification.Name {
-    static let settingsChanged = Notification.Name("settingsChanged")
-} 
