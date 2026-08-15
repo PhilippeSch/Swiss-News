@@ -203,9 +203,10 @@ private struct ReadButton: View {
                 .background(Color.accentColor)
                 .foregroundColor(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-                .accessibilityIdentifier("readButton")
         }
         .buttonStyle(.plain)
+        // On the link itself, not its label, so it is exposed as a button.
+        .accessibilityIdentifier("readButton")
         .simultaneousGesture(TapGesture().onEnded {
             isViewingArticle = true
             readArticlesManager.markAsViewed(url)

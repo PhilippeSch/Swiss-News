@@ -14,9 +14,13 @@ class RSSFeedParser: ObservableObject {
     private let urlSession: URLSession
     private let cache: NewsCacheStore?
 
-    init(settings: Settings, urlSession: URLSession = .shared, cache: NewsCacheStore? = NewsCacheStore()) {
+    init(settings: Settings, urlSession: URLSession? = nil, cache: NewsCacheStore? = NewsCacheStore()) {
         self.settings = settings
-        self.urlSession = urlSession
+        #if DEBUG
+        self.urlSession = urlSession ?? (UITestSupport.isActive ? UITestSupport.makeSession() : .shared)
+        #else
+        self.urlSession = urlSession ?? .shared
+        #endif
         self.cache = cache
         setupSettingsObserver()
     }
