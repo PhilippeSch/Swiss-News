@@ -66,3 +66,9 @@ fastlane/test_output
 
 ## Xcode Cloud log bundles copied in for debugging
 cloud-logs*/
+
+## Claude Code: only the shared rules in .claude/CLAUDE.md are tracked
+/CLAUDE.md
+/CLAUDE.local.md
+.claude/*
+!.claude/CLAUDE.md
